@@ -1,0 +1,115 @@
+<!doctype html><html lang='zh-CN'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>交01补全 · 新会话联合联调提示词</title><style>
+:root{color-scheme:light;--ink:#30251e;--muted:#75675d;--line:#e6ded5;--orange:#aa4a1c;--bg:#fffaf5}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.85 'Segoe UI','Microsoft YaHei',sans-serif}
+.bar{position:sticky;top:0;background:#fffaf5f7;border-bottom:1px solid var(--line);padding:14px 24px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+button{background:var(--orange);border:0;color:#fff;padding:10px 20px;border-radius:8px;cursor:pointer;font:inherit}button:focus-visible,a:focus-visible{outline:3px solid #e7ab77;outline-offset:3px}
+a{color:var(--orange);text-underline-offset:3px}article,footer{max-width:1020px;margin:auto;padding:28px 30px}h1{font-size:30px;line-height:1.4}h2{font-size:25px;margin-top:38px}h3{font-size:21px;margin-top:32px}p,li{overflow-wrap:anywhere}li{margin:8px 0}code{font:14px/1.7 Consolas,monospace;background:#fff0e5;padding:2px 4px}pre{white-space:pre-wrap;overflow:auto}hr{border:0;border-top:1px solid var(--line);margin:36px 0}footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px}#copy-status{color:var(--muted)}
+@media(max-width:680px){article,footer{padding:22px 18px}h1{font-size:25px}.bar{padding:12px 18px}}@media print{.bar{display:none}body{background:white}article{max-width:none}h2,h3{break-after:avoid}}
+</style></head><body><div class='bar'><button id='copy-prompt' type='button'>复制完整提示词，发给01</button><a href='发给01会话的联调提示词.md'>Markdown全文</a><span id='copy-status' role='status'></span></div><article><h1>请01核对并补全：交给新会话执行的01＋02联调提示词</h1>
+<p>版本：XOPS-JOINT-HANDOFF-v0.1｜2026-10-23｜02已整理，待01按当前现场补全。</p>
+<p>你是01负责会话。用户调整协作方式：<strong>你先核对并补全这份提示词；用户把你输出的完整版本交给一个新会话，由新会话统一完成01和02的联调及必要修复；完成后，用户把同一版结果分别交回01、02原会话独立检查和验收。</strong></p>
+<p>本轮只审查和补全提示词，不启动联合实施，不创建新会话，不给其他会话发送消息。保留01现有成果；02目录只读。后续新会话对01、02的联调改动授权不转移给本轮审阅阶段。</p>
+<p>先读01的HANDOFF顶部、当前验收/启动说明、接口与对应源码，再读下文02材料。不遍历历史报告，不假定01未实现或02契约已获双方签收。依据当前源码和版本证据补充，不为补提示词重复全量测试。</p>
+<h2>你必须补全的信息</h2>
+<ol>
+<li><strong>01现状与源码版本</strong>：已实现且验证、已实现未验、缺失、与02冲突的能力；commit或文件SHA清单、未提交改动及需保留文件。不能只说“01已完成”。</li>
+<li><strong>实际运行版本</strong>：服务/构建、依赖锁、数据库类型与迁移号、当前加载代码的核验方法；源码存在不等于服务已加载，不沿用旧PID或测试数。</li>
+<li><strong>接口完整信息</strong>：身份、预检、发布/读/暂停/恢复/结束、02投影/grant、回执/对账/finalize/cancel、全店快照与活动实际。逐项给完整路径/方法、认证/店铺/权限/CSRF、请求/响应/错误、幂等/修订/状态及样本和源码位置；逐项说明接受02实物还是需两侧适配。</li>
+<li><strong>运行与配置</strong>：本地地址/端口、统一入口与代理、启停脚本/动态登记、健康/版本检查、环境变量名称与配置方式、测试账号/店铺的安全准备方式；密钥、Cookie、密码不写入提示词。</li>
+<li><strong>数据库、迁移与测试隔离</strong>：01现有迁移/初始化方法、专用测试库要求与可用性、事务/锁/账本/Outbox入口、恢复方式；不能让新会话猜迁移号或借用02库。</li>
+<li><strong>数据与样本</strong>：脱敏Snapshot、活动/预检/grant/回执/实际、订单/支付/退款/库存/让利账本的可勾稽样本；来源、时点、版本、SHA、预期结果和缺失提供方。synthetic保持其身份。</li>
+<li><strong>验证与限制</strong>：可复用的既有证据、命令/环境/结果、首次失败、回归入口，真实HTTP/DB/页面/并发/性能哪些已验、未验或受阻；不得用Mock或测试总数填补。</li>
+<li><strong>新会话任务及你的验收要求</strong>：01/02需改模块、关键兼容约束、实施先后顺序、阻塞依赖/处理建议；最终01检查项、证据和复验方法。缺失接口可交新会话在授权范围内补齐，不要求先由01单独完成全部。</li>
+</ol>
+<p><strong>输出前逐项检查以上八类信息是否齐全。不能只回复“确认”、补充清单或零散差异；必须把你的结论与具体信息合并进下方草稿，输出一份可直接复制给新会话的完整提示词，不让用户拼接。</strong> 无法证实的内容标“待新会话现场核对”，附查证路径/命令和影响；不能以“请自行看文档”替代已能查明的关键参数，也不要编造地址、迁移号、测试结论。你的确认只覆盖01事实及交接可执行性，不代02或联合验收签字。</p>
+<p>可将最终完整稿保存到01自己的docs/04-integration目录并提供路径。先给简短审查结论，再给整份提示词。</p>
+<p>以下“新会话提示词草稿”供你补全并重写；其中02基线由新会话重新核对，不能当永久现场状态。</p>
+<hr />
+<h2>新会话提示词草稿：01＋02首发闭环联调与必要修复</h2>
+<p>你接手已有实现的01＋02联合实施任务，不重启需求阶段。先核对现场、保留成果，再修复接口与页面差异，完成首发真实链路并交付可复验结果。原01、02会话在用户回传结果后分别检查和验收；你负责联合实施及联调执行，不代替两边最终签收。</p>
+<h3>一、目标与职责</h3>
+<p>用户已批准：“首发SKU现货直降，完整可行方案＋发布/暂停/结束＋商城真实生效＋实际回传”。</p>
+<p>链路：统一登录→店铺经营快照→设置目标→比较候选→检查利润/预算/库存/客服与仓储容量→完整方案→店长确认→有权人员明确发布→01商城展示/quote/建单/支付实际采用活动规则→暂停/恢复/结束→活动实际回到02监控复盘。</p>
+<p>01拥有身份、活动执行、商品/交易/履约、库存/数量/让利账本和执行事实；02拥有经营输入、确定性测算、不可变方案/审批、短期grant、回执/实际消费、监控复盘。金额/利润/预算/工时由代码计算。当前02助手是确定性工具解释，不表述为已完成真实模型Agent。</p>
+<p>本地测算、演示确认、HTTP替身、按钮或测试总数不能替代真实跨服务闭环。可在隔离测试店铺使用synthetic数据走真实HTTP/数据库/业务服务，但不能将其记为真实商家收入或经营增量。</p>
+<h3>二、授权与协作</h3>
+<ul>
+<li>允许修改 <code>D:\codex_project\项目实战\01-ecommerce-customer-service-agent</code> 与 <code>D:\codex_project\项目实战\02-ecommerce-operations-agent</code> 内完成联调必需的源码、配置、迁移、测试和交接文档，保留未提交改动。03、总目录和其他项目只读；共享入口/代理配置放在获准项目内，不复制01整仓到02。</li>
+<li>原01、02会话此阶段作为回传后审阅方；发现其他执行者正改相同文件时先协调，不并发覆盖。用户转发提示词和结果，不自行发消息、创建新会话。</li>
+<li>不付费调用模型、不部署生产、不进行真实支付或对外业务操作；通过本地/隔离环境服务及测试账号验收。</li>
+<li>使用各项目现有启停脚本和动态记录，核对PID/启动时刻/项目命令，不沿用旧PID或结束无关进程。不重置02 <code>.runtime/demo.db</code>、既有演示数据或已有用户订单。</li>
+<li>两项目各用自己的隔离测试库/目录，不共用物理业务库或借用对方测试库，不直写对方业务表绕过接口。02真实模式用<code>ops02_</code>前缀专用PostgreSQL。</li>
+<li>每模块开头报“当前执行XX模块的开发/验收”。可用子代理，仅gpt-6.1-sol、medium，主执行者验收，写入文件互不重叠。</li>
+<li>按风险选择检查，复用相关状态未变的证据，保留首次失败/修复/版本；不为恢复上下文反复全量测试。UI沿用01暖白橙，减少重复标签。</li>
+</ul>
+<h3>三、先核对现场与共同版本</h3>
+<p>01先读HANDOFF顶部、README/当前验收、当前契约与源码/测试，以及01原会话合并进本提示词的八类现场信息；不把历史报告当现状。</p>
+<p>02目录 <code>D:\codex_project\项目实战\02-ecommerce-operations-agent</code>，依次读：</p>
+<ol>
+<li><code>HANDOFF.MD</code>顶部/避坑、<code>README.md</code>。</li>
+<li><code>docs/06-acceptance/02模块验收记录.md</code>、<code>验证证据.json</code>、<code>收尾复核证据.json</code>、<code>02收尾与联调交付.md</code>。</li>
+<li><code>docs/04-integration/02实际执行契约.md</code>（尤其第8节差异）及<code>contracts/activity-v0.1.json</code>。</li>
+<li><code>docs/03-plan/02实施计划.md</code>、<code>API约定.md</code>，按需需求/设计及对应源码/测试。</li>
+</ol>
+<p>02对照版本OPS02-HANDOFF-20261023，code清单摘要 <code>91a0f5b78b77a4fbf30aea8109f0f53f1ab2d22f44e9b9e39b329fd93f691578</code>。原后端179/前端16基线；收尾聚焦桥/API65、前端17、Ruff/类型/构建通过，65不能加到179。真实01、02专用PG并发、实际交易、模型及生产未验。新会话要查当前指纹/运行版本，不直接继承结论。</p>
+<p>先输出两边版本、接口/能力差异表、首发必需缺口和模块顺序，然后推进授权工作。02原P0中SKU/渠道问数/追问、来源回放/derived父链、CSV导出等仍有差异，按首发适用性保留判定；不能因未实现就降级或用“后续”跳过适用必需项。改变已批准范围须列明冲突交用户决定，不重问首发方向或逐文件许可。</p>
+<h3>四、统一身份与可操作页面</h3>
+<p>同源01 <code>/shop</code>、02 <code>/operations/</code>，API分别 <code>/api/v1</code>、<code>/api/ops/v1</code>。保留01原登录与业务页面。02后端在线读01 <code>/api/v1/session</code>，校验可信店铺、capabilities、auth_version、capability_revision、CSRF、expires_at；Cookie只发配置的01地址，不随前端URL改变或跟随重定向。</p>
+<p>验证店长/运营/查看者/顾客/另一店、退出撤权/旧会话、成本敏感出口、Origin/CSRF、登录next白名单。缺字段/依赖不可用时失败关闭，不把已登录员工当有经营或发布权限。</p>
+<p>接通真实预检→确认→明确发布及暂停/恢复/结束。02当前活动控制按钮关闭；须接通操作或01同源管理入口，并检查导航、错误/未决及状态刷新，不能留下占位按钮报完成。</p>
+<h3>五、执行契约、撤销与未知结果</h3>
+<p>02实物为XOPS-ACTIVITY-v0.1；XOPS-INTEGRATION-v0.1是早期提案名。依据两边源码/Schema固定共同版本，逐项适配，不降低安全边界换通路。完整字段、金额/时间/认证/错误以实际契约为准，不能只照本段摘要。</p>
+<ul>
+<li>01预检 <code>POST /api/v1/shop/activity-previews</code> 成功data.status=passed，绑定store/plan/version/manifest_digest，有效≤5分钟；不创建活动或扣额度。</li>
+<li>01读取02受控投影，创建持久唯一slot <code>(store_id,plan_id,plan_version,approval_ref)</code>和服务器intent_id，向02申请grant；02内部完整前缀<code>/api/ops/v1/internal</code>。字段intent_id，不使用旧execution_intent_id别名。</li>
+<li>manifest绑定SKU/活动单价/基准价格版本/数量/预算/时间/来源，按契约序列化摘要。grant60秒，一个审批一个intent/grant/activity；同完整请求原样返回，不续签/换intent/终态重开。执行人与审批actor及身份/能力版本匹配，委托未开放。sandbox_confirmed/contract_stub不准签真实grant。</li>
+<li>01本地短事务重验权限、版本、价格、冲突、库存/额度；交易事务内不调用02或模型。发布/cancel/finalize共用slot屏障。</li>
+<li>回执绑定event_id/intent/approval/digest/terminal_revision；终态只committed或closed_no_effect，不能反转。phase用activity_revision，重复幂等/旧修订不覆盖，ended不可重开。</li>
+<li>01对账路径 <code>/api/v1/internal/stores/{store_id}/execution-intents/{intent_id}</code>，到期/取消后缀<code>/finalize-expired</code>、<code>/cancel-request</code>。404、超时、坏契约、unknown、本地到期均不能推定无效果或解冻；须01持久closed_no_effect阻断迟到发布。</li>
+<li>02已有“申请撤销审批/核对未决执行”：无grant本地cancelled；签发后cancel_pending并依赖01同slot屏障；committed保留实际phase，另走暂停/结束。获得过grant的方案禁止原地改版，另建前复核旧预占/核销和新增预算。</li>
+<li>保留data=null/列表/标量对账负例：返回result_unknown并冻结，不能500或虚构撤销成功。</li>
+</ul>
+<h3>六、交易真实生效与经营实际</h3>
+<p>活动价独立于常规价；展示/quote/create_order统一价格解析和活动修订校验，同SKU不叠加，未结束活动拒绝冲突改价，活动窗[start,end)。库存/活动数量/让利预算同事务预占；付款核销，未付取消/过期幂等释放，已付退款不恢复营销额度。暂停/结束使未建单旧报价失效，已建订单保持承诺价和付款期限。</p>
+<p>01提供全店受控Snapshot契约/脱敏包，02授权JSON/CSV导入可作为当前输入，但须验来源/时效；不满足则补自动拉取消费者。客服结束周汇总不冒充实时源。</p>
+<p>01通过02 <code>/api/ops/v1/internal/activity-actuals</code>回传实际：先有可信活动回执，同活动/原窗固定snapshot_id、revision递增整批替换、watermark不倒退；支付/退款/让利核销/预占/已付件数分列，迟到退款仍归原活动，不相加各revision。02展示来源/水位、预算余量、部分周期保护和复盘；实际费用/退货成本缺失时利润未知。Outbox/恢复必须验证重送、断连、重启。</p>
+<h3>七、必须执行的验证</h3>
+<p>通过隔离店铺/数据库、真实HTTP和浏览器验证完整链路，规则及Mock故障证据单列。至少覆盖：</p>
+<ol>
+<li>角色/店铺/成本隔离、撤权/过期、错误摘要/版本、失效预检与grant、缺依赖失败关闭。</li>
+<li>完整方案→确认→发布→商城优惠→建单/支付/退款→回执/实际→02监控/复盘，及暂停/恢复/结束、旧报价/已建单边界。</li>
+<li>金样本：原价10000、活动9200、上限100件、固定费10000、总预算100000、可变让利上限90000；2件原价20000/优惠1600/实付18400，退款9200、净支付9200、已付件数2；账本与实际勾稽，优惠不重扣。固定费预算占用不等于现金支出。</li>
+<li>同审批双客户端/换键、发布丢响应/超时/404/重启、提交与撤销/到期竞争、临界到期/迟到发布，证明唯一活动与同slot持久屏障。</li>
+<li>重复/乱序/迟到实际、错误来源/窗/水位，02版本/冻结/未知与部分周期语义。</li>
+<li>分别在01真实测试DB及02专用PG验证并发/唯一约束/锁/幂等/恢复；受阻如实记，继续独立工作，不用SQLite代替PG通过。</li>
+<li>回归01原无活动交易、库存、取消/退款和受影响既有功能，以及02原测算/权限/不可变版本/导入导出。</li>
+<li>性能：同环境同负载比较无活动/有活动quote/create_order的样本量、P50/P95/P95差额、锁等待/查询数/资源；新增开销目标≤50ms，未达标记录。断开02/模型后已发布活动仍交易正确；02轮询有界、隐藏停止、失败可恢复。</li>
+</ol>
+<h3>八、完成报告与两边独立验收</h3>
+<p>新会话交付状态为“联合实施及联调执行结果，待01/02原会话独立验收”。不要代两边签收或以单方通过宣布完整V1通过。</p>
+<p>在各自项目docs/04-integration、docs/06-acceptance记录共同契约/差异/变更/结果与证据，更新两边HANDOFF顶部及避坑。两边报告使用同一integration_run_id，绑定双方源码commit或SHA清单/未提交差异、服务构建/依赖/迁移、Schema/样本/时钟、运行方式；源码和实际加载版本分开记录。不为报告写总目录。</p>
+<p>最终给用户三份可转发材料：</p>
+<ul>
+<li><strong>联合执行总报告</strong>：改动/原因/完整链路及负例/命令和证据路径/首次失败与修复/截图/并发与性能/运行方式/未完成受阻及复验方法。</li>
+<li><strong>给01原会话的验收回传</strong>：01变更和最终版本、迁移、身份/活动/交易/库存/账本/slot/Outbox/并发/性能/既有功能回归证据，要求其独立检查最终源码与结果。</li>
+<li><strong>给02原会话的验收回传</strong>：02变更和同一联合版本、身份/预检/方案/审批/grant/撤销/对账/回执/实际/监控/页面/02 PG证据，要求其独立检查最终源码与结果。</li>
+</ul>
+<p>每份分开标已实现且验证、实现未验、未实现、受阻，附最终文件路径/摘要和复验入口，不只写“全绿”。任一必需链路缺失时不宣称V1完成。任一方验收前又改代码/Schema，更新版本并复验受影响项，不能拼接不同版本结论。结果由用户转发，不自动发消息、付费或部署。</p>
+<hr />
+<p>01请按八类信息清单补全并合并草稿，输出供用户直接转给新会话的完整最终版本。02状态由新会话读现场/证据核对；你的本轮确认不代表02或双方联合验收通过。</p></article><footer>提示词版本 XOPS-JOINT-HANDOFF-v0.1 · 待01补全；未签收联合验收。<br>来源SHA256：dca0885838e2a0768ebcae2069af194e1ce7cdd707acbe9caa766461a946189b</footer><script id='prompt-data' type='application/json'>{"text": "# 请01核对并补全：交给新会话执行的01＋02联调提示词\n\n版本：XOPS-JOINT-HANDOFF-v0.1｜2026-10-23｜02已整理，待01按当前现场补全。\n\n你是01负责会话。用户调整协作方式：**你先核对并补全这份提示词；用户把你输出的完整版本交给一个新会话，由新会话统一完成01和02的联调及必要修复；完成后，用户把同一版结果分别交回01、02原会话独立检查和验收。**\n\n本轮只审查和补全提示词，不启动联合实施，不创建新会话，不给其他会话发送消息。保留01现有成果；02目录只读。后续新会话对01、02的联调改动授权不转移给本轮审阅阶段。\n\n先读01的HANDOFF顶部、当前验收/启动说明、接口与对应源码，再读下文02材料。不遍历历史报告，不假定01未实现或02契约已获双方签收。依据当前源码和版本证据补充，不为补提示词重复全量测试。\n\n## 你必须补全的信息\n\n1. **01现状与源码版本**：已实现且验证、已实现未验、缺失、与02冲突的能力；commit或文件SHA清单、未提交改动及需保留文件。不能只说“01已完成”。\n2. **实际运行版本**：服务/构建、依赖锁、数据库类型与迁移号、当前加载代码的核验方法；源码存在不等于服务已加载，不沿用旧PID或测试数。\n3. **接口完整信息**：身份、预检、发布/读/暂停/恢复/结束、02投影/grant、回执/对账/finalize/cancel、全店快照与活动实际。逐项给完整路径/方法、认证/店铺/权限/CSRF、请求/响应/错误、幂等/修订/状态及样本和源码位置；逐项说明接受02实物还是需两侧适配。\n4. **运行与配置**：本地地址/端口、统一入口与代理、启停脚本/动态登记、健康/版本检查、环境变量名称与配置方式、测试账号/店铺的安全准备方式；密钥、Cookie、密码不写入提示词。\n5. **数据库、迁移与测试隔离**：01现有迁移/初始化方法、专用测试库要求与可用性、事务/锁/账本/Outbox入口、恢复方式；不能让新会话猜迁移号或借用02库。\n6. **数据与样本**：脱敏Snapshot、活动/预检/grant/回执/实际、订单/支付/退款/库存/让利账本的可勾稽样本；来源、时点、版本、SHA、预期结果和缺失提供方。synthetic保持其身份。\n7. **验证与限制**：可复用的既有证据、命令/环境/结果、首次失败、回归入口，真实HTTP/DB/页面/并发/性能哪些已验、未验或受阻；不得用Mock或测试总数填补。\n8. **新会话任务及你的验收要求**：01/02需改模块、关键兼容约束、实施先后顺序、阻塞依赖/处理建议；最终01检查项、证据和复验方法。缺失接口可交新会话在授权范围内补齐，不要求先由01单独完成全部。\n\n**输出前逐项检查以上八类信息是否齐全。不能只回复“确认”、补充清单或零散差异；必须把你的结论与具体信息合并进下方草稿，输出一份可直接复制给新会话的完整提示词，不让用户拼接。** 无法证实的内容标“待新会话现场核对”，附查证路径/命令和影响；不能以“请自行看文档”替代已能查明的关键参数，也不要编造地址、迁移号、测试结论。你的确认只覆盖01事实及交接可执行性，不代02或联合验收签字。\n\n可将最终完整稿保存到01自己的docs/04-integration目录并提供路径。先给简短审查结论，再给整份提示词。\n\n以下“新会话提示词草稿”供你补全并重写；其中02基线由新会话重新核对，不能当永久现场状态。\n\n---\n\n## 新会话提示词草稿：01＋02首发闭环联调与必要修复\n\n你接手已有实现的01＋02联合实施任务，不重启需求阶段。先核对现场、保留成果，再修复接口与页面差异，完成首发真实链路并交付可复验结果。原01、02会话在用户回传结果后分别检查和验收；你负责联合实施及联调执行，不代替两边最终签收。\n\n### 一、目标与职责\n\n用户已批准：“首发SKU现货直降，完整可行方案＋发布/暂停/结束＋商城真实生效＋实际回传”。\n\n链路：统一登录→店铺经营快照→设置目标→比较候选→检查利润/预算/库存/客服与仓储容量→完整方案→店长确认→有权人员明确发布→01商城展示/quote/建单/支付实际采用活动规则→暂停/恢复/结束→活动实际回到02监控复盘。\n\n01拥有身份、活动执行、商品/交易/履约、库存/数量/让利账本和执行事实；02拥有经营输入、确定性测算、不可变方案/审批、短期grant、回执/实际消费、监控复盘。金额/利润/预算/工时由代码计算。当前02助手是确定性工具解释，不表述为已完成真实模型Agent。\n\n本地测算、演示确认、HTTP替身、按钮或测试总数不能替代真实跨服务闭环。可在隔离测试店铺使用synthetic数据走真实HTTP/数据库/业务服务，但不能将其记为真实商家收入或经营增量。\n\n### 二、授权与协作\n\n- 允许修改 `D:\\codex_project\\项目实战\\01-ecommerce-customer-service-agent` 与 `D:\\codex_project\\项目实战\\02-ecommerce-operations-agent` 内完成联调必需的源码、配置、迁移、测试和交接文档，保留未提交改动。03、总目录和其他项目只读；共享入口/代理配置放在获准项目内，不复制01整仓到02。\n- 原01、02会话此阶段作为回传后审阅方；发现其他执行者正改相同文件时先协调，不并发覆盖。用户转发提示词和结果，不自行发消息、创建新会话。\n- 不付费调用模型、不部署生产、不进行真实支付或对外业务操作；通过本地/隔离环境服务及测试账号验收。\n- 使用各项目现有启停脚本和动态记录，核对PID/启动时刻/项目命令，不沿用旧PID或结束无关进程。不重置02 `.runtime/demo.db`、既有演示数据或已有用户订单。\n- 两项目各用自己的隔离测试库/目录，不共用物理业务库或借用对方测试库，不直写对方业务表绕过接口。02真实模式用`ops02_`前缀专用PostgreSQL。\n- 每模块开头报“当前执行XX模块的开发/验收”。可用子代理，仅gpt-6.1-sol、medium，主执行者验收，写入文件互不重叠。\n- 按风险选择检查，复用相关状态未变的证据，保留首次失败/修复/版本；不为恢复上下文反复全量测试。UI沿用01暖白橙，减少重复标签。\n\n### 三、先核对现场与共同版本\n\n01先读HANDOFF顶部、README/当前验收、当前契约与源码/测试，以及01原会话合并进本提示词的八类现场信息；不把历史报告当现状。\n\n02目录 `D:\\codex_project\\项目实战\\02-ecommerce-operations-agent`，依次读：\n\n1. `HANDOFF.MD`顶部/避坑、`README.md`。\n2. `docs/06-acceptance/02模块验收记录.md`、`验证证据.json`、`收尾复核证据.json`、`02收尾与联调交付.md`。\n3. `docs/04-integration/02实际执行契约.md`（尤其第8节差异）及`contracts/activity-v0.1.json`。\n4. `docs/03-plan/02实施计划.md`、`API约定.md`，按需需求/设计及对应源码/测试。\n\n02对照版本OPS02-HANDOFF-20261023，code清单摘要 `91a0f5b78b77a4fbf30aea8109f0f53f1ab2d22f44e9b9e39b329fd93f691578`。原后端179/前端16基线；收尾聚焦桥/API65、前端17、Ruff/类型/构建通过，65不能加到179。真实01、02专用PG并发、实际交易、模型及生产未验。新会话要查当前指纹/运行版本，不直接继承结论。\n\n先输出两边版本、接口/能力差异表、首发必需缺口和模块顺序，然后推进授权工作。02原P0中SKU/渠道问数/追问、来源回放/derived父链、CSV导出等仍有差异，按首发适用性保留判定；不能因未实现就降级或用“后续”跳过适用必需项。改变已批准范围须列明冲突交用户决定，不重问首发方向或逐文件许可。\n\n### 四、统一身份与可操作页面\n\n同源01 `/shop`、02 `/operations/`，API分别 `/api/v1`、`/api/ops/v1`。保留01原登录与业务页面。02后端在线读01 `/api/v1/session`，校验可信店铺、capabilities、auth_version、capability_revision、CSRF、expires_at；Cookie只发配置的01地址，不随前端URL改变或跟随重定向。\n\n验证店长/运营/查看者/顾客/另一店、退出撤权/旧会话、成本敏感出口、Origin/CSRF、登录next白名单。缺字段/依赖不可用时失败关闭，不把已登录员工当有经营或发布权限。\n\n接通真实预检→确认→明确发布及暂停/恢复/结束。02当前活动控制按钮关闭；须接通操作或01同源管理入口，并检查导航、错误/未决及状态刷新，不能留下占位按钮报完成。\n\n### 五、执行契约、撤销与未知结果\n\n02实物为XOPS-ACTIVITY-v0.1；XOPS-INTEGRATION-v0.1是早期提案名。依据两边源码/Schema固定共同版本，逐项适配，不降低安全边界换通路。完整字段、金额/时间/认证/错误以实际契约为准，不能只照本段摘要。\n\n- 01预检 `POST /api/v1/shop/activity-previews` 成功data.status=passed，绑定store/plan/version/manifest_digest，有效≤5分钟；不创建活动或扣额度。\n- 01读取02受控投影，创建持久唯一slot `(store_id,plan_id,plan_version,approval_ref)`和服务器intent_id，向02申请grant；02内部完整前缀`/api/ops/v1/internal`。字段intent_id，不使用旧execution_intent_id别名。\n- manifest绑定SKU/活动单价/基准价格版本/数量/预算/时间/来源，按契约序列化摘要。grant60秒，一个审批一个intent/grant/activity；同完整请求原样返回，不续签/换intent/终态重开。执行人与审批actor及身份/能力版本匹配，委托未开放。sandbox_confirmed/contract_stub不准签真实grant。\n- 01本地短事务重验权限、版本、价格、冲突、库存/额度；交易事务内不调用02或模型。发布/cancel/finalize共用slot屏障。\n- 回执绑定event_id/intent/approval/digest/terminal_revision；终态只committed或closed_no_effect，不能反转。phase用activity_revision，重复幂等/旧修订不覆盖，ended不可重开。\n- 01对账路径 `/api/v1/internal/stores/{store_id}/execution-intents/{intent_id}`，到期/取消后缀`/finalize-expired`、`/cancel-request`。404、超时、坏契约、unknown、本地到期均不能推定无效果或解冻；须01持久closed_no_effect阻断迟到发布。\n- 02已有“申请撤销审批/核对未决执行”：无grant本地cancelled；签发后cancel_pending并依赖01同slot屏障；committed保留实际phase，另走暂停/结束。获得过grant的方案禁止原地改版，另建前复核旧预占/核销和新增预算。\n- 保留data=null/列表/标量对账负例：返回result_unknown并冻结，不能500或虚构撤销成功。\n\n### 六、交易真实生效与经营实际\n\n活动价独立于常规价；展示/quote/create_order统一价格解析和活动修订校验，同SKU不叠加，未结束活动拒绝冲突改价，活动窗[start,end)。库存/活动数量/让利预算同事务预占；付款核销，未付取消/过期幂等释放，已付退款不恢复营销额度。暂停/结束使未建单旧报价失效，已建订单保持承诺价和付款期限。\n\n01提供全店受控Snapshot契约/脱敏包，02授权JSON/CSV导入可作为当前输入，但须验来源/时效；不满足则补自动拉取消费者。客服结束周汇总不冒充实时源。\n\n01通过02 `/api/ops/v1/internal/activity-actuals`回传实际：先有可信活动回执，同活动/原窗固定snapshot_id、revision递增整批替换、watermark不倒退；支付/退款/让利核销/预占/已付件数分列，迟到退款仍归原活动，不相加各revision。02展示来源/水位、预算余量、部分周期保护和复盘；实际费用/退货成本缺失时利润未知。Outbox/恢复必须验证重送、断连、重启。\n\n### 七、必须执行的验证\n\n通过隔离店铺/数据库、真实HTTP和浏览器验证完整链路，规则及Mock故障证据单列。至少覆盖：\n\n1. 角色/店铺/成本隔离、撤权/过期、错误摘要/版本、失效预检与grant、缺依赖失败关闭。\n2. 完整方案→确认→发布→商城优惠→建单/支付/退款→回执/实际→02监控/复盘，及暂停/恢复/结束、旧报价/已建单边界。\n3. 金样本：原价10000、活动9200、上限100件、固定费10000、总预算100000、可变让利上限90000；2件原价20000/优惠1600/实付18400，退款9200、净支付9200、已付件数2；账本与实际勾稽，优惠不重扣。固定费预算占用不等于现金支出。\n4. 同审批双客户端/换键、发布丢响应/超时/404/重启、提交与撤销/到期竞争、临界到期/迟到发布，证明唯一活动与同slot持久屏障。\n5. 重复/乱序/迟到实际、错误来源/窗/水位，02版本/冻结/未知与部分周期语义。\n6. 分别在01真实测试DB及02专用PG验证并发/唯一约束/锁/幂等/恢复；受阻如实记，继续独立工作，不用SQLite代替PG通过。\n7. 回归01原无活动交易、库存、取消/退款和受影响既有功能，以及02原测算/权限/不可变版本/导入导出。\n8. 性能：同环境同负载比较无活动/有活动quote/create_order的样本量、P50/P95/P95差额、锁等待/查询数/资源；新增开销目标≤50ms，未达标记录。断开02/模型后已发布活动仍交易正确；02轮询有界、隐藏停止、失败可恢复。\n\n### 八、完成报告与两边独立验收\n\n新会话交付状态为“联合实施及联调执行结果，待01/02原会话独立验收”。不要代两边签收或以单方通过宣布完整V1通过。\n\n在各自项目docs/04-integration、docs/06-acceptance记录共同契约/差异/变更/结果与证据，更新两边HANDOFF顶部及避坑。两边报告使用同一integration_run_id，绑定双方源码commit或SHA清单/未提交差异、服务构建/依赖/迁移、Schema/样本/时钟、运行方式；源码和实际加载版本分开记录。不为报告写总目录。\n\n最终给用户三份可转发材料：\n\n- **联合执行总报告**：改动/原因/完整链路及负例/命令和证据路径/首次失败与修复/截图/并发与性能/运行方式/未完成受阻及复验方法。\n- **给01原会话的验收回传**：01变更和最终版本、迁移、身份/活动/交易/库存/账本/slot/Outbox/并发/性能/既有功能回归证据，要求其独立检查最终源码与结果。\n- **给02原会话的验收回传**：02变更和同一联合版本、身份/预检/方案/审批/grant/撤销/对账/回执/实际/监控/页面/02 PG证据，要求其独立检查最终源码与结果。\n\n每份分开标已实现且验证、实现未验、未实现、受阻，附最终文件路径/摘要和复验入口，不只写“全绿”。任一必需链路缺失时不宣称V1完成。任一方验收前又改代码/Schema，更新版本并复验受影响项，不能拼接不同版本结论。结果由用户转发，不自动发消息、付费或部署。\n\n---\n\n01请按八类信息清单补全并合并草稿，输出供用户直接转给新会话的完整最终版本。02状态由新会话读现场/证据核对；你的本轮确认不代表02或双方联合验收通过。\n"}</script><script>
+document.getElementById('copy-prompt').addEventListener('click', async () => {
+  const text = JSON.parse(document.getElementById('prompt-data').textContent).text;
+  const status = document.getElementById('copy-status');
+  try {
+    await navigator.clipboard.writeText(text);
+    status.textContent = '完整提示词已复制';
+  } catch {
+    const field = document.createElement('textarea');
+    field.value = text;
+    field.style.position = 'fixed'; field.style.left = '-10000px';
+    document.body.appendChild(field); field.select();
+    const copied = document.execCommand('copy'); field.remove();
+    status.textContent = copied ? '完整提示词已复制' : '请打开Markdown全文复制';
+  }
+});
+</script></body></html>

@@ -1,0 +1,41 @@
+{
+  "review_id": "CS03-CONTRACT-REVIEW-20261024-v1",
+  "captured_at": "2026-10-24T04:58:45.022855+00:00",
+  "source_digest_unchanged": "c92f1f554ae2d3e7a2ee8fe9636e6745d9eb391a809c944af6c52054f19e829a",
+  "source_files": 288,
+  "03_inputs_match_last_reviewed": true,
+  "external_03_input_updates_reviewed": [
+    {
+      "path": "D:\\codex_project\\项目实战\\03-ecommerce-text2sql-finetuning\\docs\\01-requirements\\PRD.md",
+      "initial_sha256": "e002d87a9d3c8ffe2066125ebedac8ef707410e9651b9b9a915c67b43966aabd",
+      "final_sha256": "6a9f9ddb3d4f4bcc996225e5e659a9c48e6138a00a2741971a8b983eb57dbe62",
+      "external_change": "one added index row for 01 contract review package",
+      "removing_only_added_index_row_matches_initial_sha": true
+    }
+  ],
+  "03_written_by_this_review": false,
+  "existing_acceptance_files_unchanged": 186,
+  "unit_results": {
+    "cases": 28,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "real_validator_observations": 37,
+  "query_schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+  "logical_columns": 52,
+  "question_answers": 10,
+  "seed_questions_reviewed": 24,
+  "local_links_checked": 40,
+  "broken_links": [],
+  "html_parsed": true,
+  "credential_shape_matches": 0,
+  "not_executed": [
+    "business DB access",
+    "PostgreSQL sandbox",
+    "live HTTP services",
+    "paid model",
+    "training"
+  ],
+  "scope": "01 written contract review, not joint protocol approval or 24-case PG acceptance"
+}

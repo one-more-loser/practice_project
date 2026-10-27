@@ -1,0 +1,2843 @@
+{
+  "revision": "SOURCE-MAP-CS-B1-v1",
+  "batch_id": "sim_b0_20261022",
+  "generation": 1,
+  "source_kind": "synthetic",
+  "seed": 20261022,
+  "catalog_revision": "SIM-CS-CATALOG-v1",
+  "catalog_fingerprint": "59bb8bc855b79d750c9569b40157883fd44252ef7d2b7c7c5a701cf037371645",
+  "entities": [
+    {
+      "entity": "business_operation",
+      "task": "T-CS-004",
+      "grain": "一次受控写操作",
+      "source": "可信主体/参数摘要/原结果；不保存原始私密表单",
+      "columns": [
+        {
+          "name": "operation_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": true,
+          "references": []
+        },
+        {
+          "name": "actor_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "subject.subject_id"
+          ]
+        },
+        {
+          "name": "actor_role",
+          "type": "VARCHAR(32)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "action",
+          "type": "VARCHAR(60)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "idempotency_key",
+          "type": "VARCHAR(128)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "parameters_digest",
+          "type": "VARCHAR(64)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "resource_ref",
+          "type": "VARCHAR(80)",
+          "required": false,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "confirmation_id",
+          "type": "VARCHAR(80)",
+          "required": false,
+          "primary_key": false,
+          "references": [
+            "action_confirmation.confirmation_id"
+          ]
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(32)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "result",
+          "type": "JSONB",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "http_status",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "store_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "store.store_id"
+          ]
+        },
+        {
+          "name": "source_kind",
+          "type": "VARCHAR(32)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "data_batch_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.batch_id"
+          ]
+        },
+        {
+          "name": "batch_generation",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.generation"
+          ]
+        },
+        {
+          "name": "version",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        }
+      ]
+    },
+    {
+      "entity": "action_confirmation",
+      "task": "T-CS-004",
+      "grain": "一次顾客确认意图",
+      "source": "服务端生成，绑定资源/参数/版本和5分钟有效期",
+      "columns": [
+        {
+          "name": "confirmation_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": true,
+          "references": []
+        },
+        {
+          "name": "owner_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "subject.subject_id"
+          ]
+        },
+        {
+          "name": "actor_role",
+          "type": "VARCHAR(32)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "auth_version",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "action",
+          "type": "VARCHAR(60)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "resource_ref",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "parameters",
+          "type": "JSONB",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "parameters_digest",
+          "type": "VARCHAR(64)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "summary",
+          "type": "JSONB",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "expected_version",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "expires_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(16)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "confirmed_at",
+          "type": "DATETIME",
+          "required": false,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "store_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "store.store_id"
+          ]
+        },
+        {
+          "name": "source_kind",
+          "type": "VARCHAR(32)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "data_batch_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.batch_id"
+          ]
+        },
+        {
+          "name": "batch_generation",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.generation"
+          ]
+        },
+        {
+          "name": "version",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        }
+      ]
+    },
+    {
+      "entity": "wallet_account",
+      "task": "T-CS-004",
+      "grain": "本人单店CNY账户",
+      "source": "开户零元，余额仅经获准账务变化",
+      "columns": [
+        {
+          "name": "account_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": true,
+          "references": []
+        },
+        {
+          "name": "owner_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "subject.subject_id"
+          ]
+        },
+        {
+          "name": "currency",
+          "type": "VARCHAR(3)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "balance_minor",
+          "type": "BIGINT",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "ledger_sequence",
+          "type": "BIGINT",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(16)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "store_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "store.store_id"
+          ]
+        },
+        {
+          "name": "source_kind",
+          "type": "VARCHAR(32)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "data_batch_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.batch_id"
+          ]
+        },
+        {
+          "name": "batch_generation",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.generation"
+          ]
+        },
+        {
+          "name": "version",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        }
+      ]
+    },
+    {
+      "entity": "wallet_entry",
+      "task": "T-CS-004",
+      "grain": "一次不可改写账务事实",
+      "source": "开户合成零元；后续业务操作派生",
+      "columns": [
+        {
+          "name": "entry_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": true,
+          "references": []
+        },
+        {
+          "name": "account_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "wallet_account.account_id"
+          ]
+        },
+        {
+          "name": "owner_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "operation_id",
+          "type": "VARCHAR(80)",
+          "required": false,
+          "primary_key": false,
+          "references": [
+            "business_operation.operation_id"
+          ]
+        },
+        {
+          "name": "sequence",
+          "type": "BIGINT",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "kind",
+          "type": "VARCHAR(24)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "currency",
+          "type": "VARCHAR(3)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "amount_minor",
+          "type": "BIGINT",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "balance_before_minor",
+          "type": "BIGINT",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "balance_after_minor",
+          "type": "BIGINT",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "business_ref",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "occurred_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "recorded_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "store_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "store.store_id"
+          ]
+        },
+        {
+          "name": "source_kind",
+          "type": "VARCHAR(32)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "data_batch_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.batch_id"
+          ]
+        },
+        {
+          "name": "batch_generation",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.generation"
+          ]
+        },
+        {
+          "name": "version",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        }
+      ]
+    },
+    {
+      "entity": "business_outbox",
+      "task": "T-CS-004",
+      "grain": "一次事务内业务事件",
+      "source": "与业务同事务；仅本项目持久，尚无外部投递",
+      "columns": [
+        {
+          "name": "event_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": true,
+          "references": []
+        },
+        {
+          "name": "event_type",
+          "type": "VARCHAR(64)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "aggregate_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "aggregate_version",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "business_ref",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "dedupe_key",
+          "type": "VARCHAR(160)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "contract_version",
+          "type": "VARCHAR(32)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "payload",
+          "type": "JSONB",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "occurred_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "recorded_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(16)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "store_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "store.store_id"
+          ]
+        },
+        {
+          "name": "source_kind",
+          "type": "VARCHAR(32)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "data_batch_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.batch_id"
+          ]
+        },
+        {
+          "name": "batch_generation",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.generation"
+          ]
+        },
+        {
+          "name": "version",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        }
+      ]
+    },
+    {
+      "entity": "product",
+      "task": "T-CS-005",
+      "grain": "商品主体",
+      "source": "合成catalog-v1或获准店铺新增/维护",
+      "columns": [
+        {
+          "name": "product_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": true,
+          "references": []
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR(160)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "category",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "description",
+          "type": "VARCHAR(2000)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "aliases",
+          "type": "JSONB",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "image_slug",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(16)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "source_revision",
+          "type": "VARCHAR(64)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "source_fingerprint",
+          "type": "VARCHAR(64)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "external_id",
+          "type": "VARCHAR(80)",
+          "required": false,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "supplier_ref",
+          "type": "VARCHAR(80)",
+          "required": false,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "store_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "store.store_id"
+          ]
+        },
+        {
+          "name": "source_kind",
+          "type": "VARCHAR(32)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "data_batch_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.batch_id"
+          ]
+        },
+        {
+          "name": "batch_generation",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.generation"
+          ]
+        },
+        {
+          "name": "version",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        }
+      ]
+    },
+    {
+      "entity": "sku",
+      "task": "T-CS-005",
+      "grain": "一个可交易规格",
+      "source": "商品关联，现价/版本/可售状态",
+      "columns": [
+        {
+          "name": "sku_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": true,
+          "references": []
+        },
+        {
+          "name": "product_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "product.product_id"
+          ]
+        },
+        {
+          "name": "specifications",
+          "type": "JSONB",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "price_minor",
+          "type": "BIGINT",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "currency",
+          "type": "VARCHAR(3)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "cost_minor",
+          "type": "BIGINT",
+          "required": false,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "price_version",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(16)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "store_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "store.store_id"
+          ]
+        },
+        {
+          "name": "source_kind",
+          "type": "VARCHAR(32)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "data_batch_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.batch_id"
+          ]
+        },
+        {
+          "name": "batch_generation",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.generation"
+          ]
+        },
+        {
+          "name": "version",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        }
+      ]
+    },
+    {
+      "entity": "inventory",
+      "task": "T-CS-005",
+      "grain": "一个SKU的库存余额",
+      "source": "合成开库存；后续变更从流水派生",
+      "columns": [
+        {
+          "name": "sku_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": true,
+          "references": [
+            "sku.sku_id"
+          ]
+        },
+        {
+          "name": "stock_qty",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "reserved_qty",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "store_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "store.store_id"
+          ]
+        },
+        {
+          "name": "source_kind",
+          "type": "VARCHAR(32)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "data_batch_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.batch_id"
+          ]
+        },
+        {
+          "name": "batch_generation",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.generation"
+          ]
+        },
+        {
+          "name": "version",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        }
+      ]
+    },
+    {
+      "entity": "stock_movement",
+      "task": "T-CS-005",
+      "grain": "一次SKU库存/预留变动",
+      "source": "opening/reservation/payment/release/adjustment，前后值可对账",
+      "columns": [
+        {
+          "name": "movement_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": true,
+          "references": []
+        },
+        {
+          "name": "sku_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "sku.sku_id"
+          ]
+        },
+        {
+          "name": "operation_id",
+          "type": "VARCHAR(80)",
+          "required": false,
+          "primary_key": false,
+          "references": [
+            "business_operation.operation_id"
+          ]
+        },
+        {
+          "name": "business_ref",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "kind",
+          "type": "VARCHAR(32)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "stock_delta",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "reserved_delta",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "stock_before",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "stock_after",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "reserved_before",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "reserved_after",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "reason",
+          "type": "VARCHAR(160)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "occurred_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "recorded_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "store_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "store.store_id"
+          ]
+        },
+        {
+          "name": "source_kind",
+          "type": "VARCHAR(32)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "data_batch_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.batch_id"
+          ]
+        },
+        {
+          "name": "batch_generation",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.generation"
+          ]
+        },
+        {
+          "name": "version",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        }
+      ]
+    },
+    {
+      "entity": "cart",
+      "task": "T-CS-006",
+      "grain": "本人单店购物袋",
+      "source": "初始化容器；内容来自本人动作",
+      "columns": [
+        {
+          "name": "cart_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": true,
+          "references": []
+        },
+        {
+          "name": "owner_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "subject.subject_id"
+          ]
+        },
+        {
+          "name": "store_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "store.store_id"
+          ]
+        },
+        {
+          "name": "source_kind",
+          "type": "VARCHAR(32)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "data_batch_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.batch_id"
+          ]
+        },
+        {
+          "name": "batch_generation",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.generation"
+          ]
+        },
+        {
+          "name": "version",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        }
+      ]
+    },
+    {
+      "entity": "cart_item",
+      "task": "T-CS-006",
+      "grain": "购物袋中的一种SKU",
+      "source": "本人数量/选中状态，非库存预留",
+      "columns": [
+        {
+          "name": "item_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": true,
+          "references": []
+        },
+        {
+          "name": "cart_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "cart.cart_id"
+          ]
+        },
+        {
+          "name": "sku_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "sku.sku_id"
+          ]
+        },
+        {
+          "name": "qty",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "selected",
+          "type": "BOOLEAN",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "store_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "store.store_id"
+          ]
+        },
+        {
+          "name": "source_kind",
+          "type": "VARCHAR(32)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "data_batch_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.batch_id"
+          ]
+        },
+        {
+          "name": "batch_generation",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.generation"
+          ]
+        },
+        {
+          "name": "version",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        }
+      ]
+    },
+    {
+      "entity": "checkout_quote",
+      "task": "T-CS-006",
+      "grain": "一次5分钟有效报价",
+      "source": "受控现价/库存/政策读取；引用本人收货输入",
+      "columns": [
+        {
+          "name": "quote_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": true,
+          "references": []
+        },
+        {
+          "name": "owner_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "subject.subject_id"
+          ]
+        },
+        {
+          "name": "shipping_input_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "shipping_input.input_id"
+          ]
+        },
+        {
+          "name": "lines",
+          "type": "JSONB",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "cart_bindings",
+          "type": "JSONB",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "currency",
+          "type": "VARCHAR(3)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "goods_minor",
+          "type": "BIGINT",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "discount_minor",
+          "type": "BIGINT",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "freight_minor",
+          "type": "BIGINT",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "payable_minor",
+          "type": "BIGINT",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "policy_snapshot",
+          "type": "JSONB",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "expires_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(16)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "store_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "store.store_id"
+          ]
+        },
+        {
+          "name": "source_kind",
+          "type": "VARCHAR(32)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "data_batch_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.batch_id"
+          ]
+        },
+        {
+          "name": "batch_generation",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.generation"
+          ]
+        },
+        {
+          "name": "version",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        }
+      ]
+    },
+    {
+      "entity": "customer_order",
+      "task": "T-CS-006",
+      "grain": "一个顾客订单",
+      "source": "获准报价确认建单，交易与履约双状态",
+      "columns": [
+        {
+          "name": "order_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": true,
+          "references": [
+            "order_shipping_snapshot.order_id"
+          ]
+        },
+        {
+          "name": "owner_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "subject.subject_id"
+          ]
+        },
+        {
+          "name": "display_no",
+          "type": "VARCHAR(40)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "quote_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "checkout_quote.quote_id"
+          ]
+        },
+        {
+          "name": "trade_status",
+          "type": "VARCHAR(32)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "fulfillment_status",
+          "type": "VARCHAR(32)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "currency",
+          "type": "VARCHAR(3)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "goods_minor",
+          "type": "BIGINT",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "discount_minor",
+          "type": "BIGINT",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "freight_minor",
+          "type": "BIGINT",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "payable_minor",
+          "type": "BIGINT",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "paid_minor",
+          "type": "BIGINT",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "refunded_minor",
+          "type": "BIGINT",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "refunded_goods_minor",
+          "type": "BIGINT",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "refunded_freight_minor",
+          "type": "BIGINT",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "policy_snapshot",
+          "type": "JSONB",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "current_shipping_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "order_shipping_snapshot.snapshot_id"
+          ]
+        },
+        {
+          "name": "change_count",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "payment_expires_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "paid_at",
+          "type": "DATETIME",
+          "required": false,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "shipped_at",
+          "type": "DATETIME",
+          "required": false,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "received_at",
+          "type": "DATETIME",
+          "required": false,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "cancelled_at",
+          "type": "DATETIME",
+          "required": false,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "cancellation_reason",
+          "type": "VARCHAR(80)",
+          "required": false,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "store_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "store.store_id"
+          ]
+        },
+        {
+          "name": "source_kind",
+          "type": "VARCHAR(32)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "data_batch_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.batch_id"
+          ]
+        },
+        {
+          "name": "batch_generation",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.generation"
+          ]
+        },
+        {
+          "name": "version",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        }
+      ]
+    },
+    {
+      "entity": "order_item",
+      "task": "T-CS-006",
+      "grain": "订单中的一种SKU明细",
+      "source": "冻结名称/规格/现价与分摊；实际支付和退款另记",
+      "columns": [
+        {
+          "name": "order_item_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": true,
+          "references": []
+        },
+        {
+          "name": "order_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "customer_order.order_id"
+          ]
+        },
+        {
+          "name": "sku_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "sku.sku_id"
+          ]
+        },
+        {
+          "name": "product_name",
+          "type": "VARCHAR(160)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "specifications",
+          "type": "JSONB",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "image_slug",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "unit_price_minor",
+          "type": "BIGINT",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "ordered_qty",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "goods_minor",
+          "type": "BIGINT",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "discount_minor",
+          "type": "BIGINT",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "allocated_minor",
+          "type": "BIGINT",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "paid_goods_minor",
+          "type": "BIGINT",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "unit_allocations",
+          "type": "JSONB",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "allocation_revision",
+          "type": "VARCHAR(40)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "refunded_qty",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "reserved_refund_qty",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "refunded_goods_minor",
+          "type": "BIGINT",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "reserved_refund_minor",
+          "type": "BIGINT",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "store_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "store.store_id"
+          ]
+        },
+        {
+          "name": "source_kind",
+          "type": "VARCHAR(32)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "data_batch_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.batch_id"
+          ]
+        },
+        {
+          "name": "batch_generation",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.generation"
+          ]
+        },
+        {
+          "name": "version",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        }
+      ]
+    },
+    {
+      "entity": "order_shipping_snapshot",
+      "task": "T-CS-006/008",
+      "grain": "订单一次收货资料版本",
+      "source": "本人输入派生，当前指针与同订单复合关联",
+      "columns": [
+        {
+          "name": "snapshot_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": true,
+          "references": []
+        },
+        {
+          "name": "order_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "customer_order.order_id"
+          ]
+        },
+        {
+          "name": "owner_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "input_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "shipping_input.input_id"
+          ]
+        },
+        {
+          "name": "recipient",
+          "type": "VARCHAR(100)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "phone",
+          "type": "VARCHAR(32)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "province",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "city",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "district",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "street",
+          "type": "VARCHAR(300)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "postal_code",
+          "type": "VARCHAR(16)",
+          "required": false,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "store_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "store.store_id"
+          ]
+        },
+        {
+          "name": "source_kind",
+          "type": "VARCHAR(32)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "data_batch_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.batch_id"
+          ]
+        },
+        {
+          "name": "batch_generation",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.generation"
+          ]
+        },
+        {
+          "name": "version",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        }
+      ]
+    },
+    {
+      "entity": "stock_reservation",
+      "task": "T-CS-006",
+      "grain": "一单一个SKU的有效预留",
+      "source": "建单保留15分钟，付款消耗/关闭释放",
+      "columns": [
+        {
+          "name": "reservation_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": true,
+          "references": []
+        },
+        {
+          "name": "order_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "customer_order.order_id"
+          ]
+        },
+        {
+          "name": "sku_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "sku.sku_id"
+          ]
+        },
+        {
+          "name": "qty",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(16)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "expires_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "store_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "store.store_id"
+          ]
+        },
+        {
+          "name": "source_kind",
+          "type": "VARCHAR(32)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "data_batch_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.batch_id"
+          ]
+        },
+        {
+          "name": "batch_generation",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.generation"
+          ]
+        },
+        {
+          "name": "version",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        }
+      ]
+    },
+    {
+      "entity": "order_payment",
+      "task": "T-CS-006",
+      "grain": "一次成功订单付款",
+      "source": "关联唯一operation和钱包扣款流水",
+      "columns": [
+        {
+          "name": "payment_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": true,
+          "references": []
+        },
+        {
+          "name": "order_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "customer_order.order_id"
+          ]
+        },
+        {
+          "name": "operation_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "business_operation.operation_id"
+          ]
+        },
+        {
+          "name": "entry_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "wallet_entry.entry_id"
+          ]
+        },
+        {
+          "name": "amount_minor",
+          "type": "BIGINT",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "currency",
+          "type": "VARCHAR(3)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(16)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "paid_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "store_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "store.store_id"
+          ]
+        },
+        {
+          "name": "source_kind",
+          "type": "VARCHAR(32)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "data_batch_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.batch_id"
+          ]
+        },
+        {
+          "name": "batch_generation",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.generation"
+          ]
+        },
+        {
+          "name": "version",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        }
+      ]
+    },
+    {
+      "entity": "order_shipment",
+      "task": "T-CS-008",
+      "grain": "整单包裹",
+      "source": "店铺成功发货产生，绑定实际发货快照；模拟轨迹",
+      "columns": [
+        {
+          "name": "shipment_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": true,
+          "references": []
+        },
+        {
+          "name": "order_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "customer_order.order_id"
+          ]
+        },
+        {
+          "name": "operation_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "business_operation.operation_id"
+          ]
+        },
+        {
+          "name": "shipping_snapshot_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "order_shipping_snapshot.snapshot_id"
+          ]
+        },
+        {
+          "name": "carrier",
+          "type": "VARCHAR(60)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "tracking_no",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(24)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "shipped_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "carrier_signed_at",
+          "type": "DATETIME",
+          "required": false,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "tracking_updated_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "tracking_events",
+          "type": "JSONB",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "store_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "store.store_id"
+          ]
+        },
+        {
+          "name": "source_kind",
+          "type": "VARCHAR(32)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "data_batch_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.batch_id"
+          ]
+        },
+        {
+          "name": "batch_generation",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.generation"
+          ]
+        },
+        {
+          "name": "version",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        }
+      ]
+    },
+    {
+      "entity": "shipment_item",
+      "task": "T-CS-008",
+      "grain": "包裹对应订单明细",
+      "source": "完整数量映射，不做部分发货",
+      "columns": [
+        {
+          "name": "shipment_item_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": true,
+          "references": []
+        },
+        {
+          "name": "shipment_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "order_shipment.shipment_id"
+          ]
+        },
+        {
+          "name": "order_item_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "order_item.order_item_id"
+          ]
+        },
+        {
+          "name": "qty",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "store_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "store.store_id"
+          ]
+        },
+        {
+          "name": "source_kind",
+          "type": "VARCHAR(32)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "data_batch_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.batch_id"
+          ]
+        },
+        {
+          "name": "batch_generation",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.generation"
+          ]
+        },
+        {
+          "name": "version",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        }
+      ]
+    },
+    {
+      "entity": "order_address_change",
+      "task": "T-CS-008",
+      "grain": "订单唯一成功改址",
+      "source": "本人确认，保留前后快照和原操作",
+      "columns": [
+        {
+          "name": "change_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": true,
+          "references": []
+        },
+        {
+          "name": "order_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "customer_order.order_id"
+          ]
+        },
+        {
+          "name": "operation_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "business_operation.operation_id"
+          ]
+        },
+        {
+          "name": "confirmation_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "action_confirmation.confirmation_id"
+          ]
+        },
+        {
+          "name": "old_snapshot_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "order_shipping_snapshot.snapshot_id"
+          ]
+        },
+        {
+          "name": "new_snapshot_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "order_shipping_snapshot.snapshot_id"
+          ]
+        },
+        {
+          "name": "changed_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "store_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "store.store_id"
+          ]
+        },
+        {
+          "name": "source_kind",
+          "type": "VARCHAR(32)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "data_batch_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.batch_id"
+          ]
+        },
+        {
+          "name": "batch_generation",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.generation"
+          ]
+        },
+        {
+          "name": "version",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        }
+      ]
+    },
+    {
+      "entity": "customer_receipt",
+      "task": "T-CS-008",
+      "grain": "本人整单收货事实",
+      "source": "本人确认成功；与承运签收不同",
+      "columns": [
+        {
+          "name": "receipt_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": true,
+          "references": []
+        },
+        {
+          "name": "order_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "customer_order.order_id"
+          ]
+        },
+        {
+          "name": "owner_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "operation_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "business_operation.operation_id"
+          ]
+        },
+        {
+          "name": "confirmed_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "store_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "store.store_id"
+          ]
+        },
+        {
+          "name": "source_kind",
+          "type": "VARCHAR(32)",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "data_batch_id",
+          "type": "VARCHAR(80)",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.batch_id"
+          ]
+        },
+        {
+          "name": "batch_generation",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": [
+            "source_batch.generation"
+          ]
+        },
+        {
+          "name": "version",
+          "type": "INTEGER",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "required": true,
+          "primary_key": false,
+          "references": []
+        }
+      ]
+    }
+  ],
+  "future_csv_rule": "逐列核对类型/金额单位/时区/枚举/缺失；补充字段单列来源，不冒充原CSV已有；本批未读取真实CSV"
+}

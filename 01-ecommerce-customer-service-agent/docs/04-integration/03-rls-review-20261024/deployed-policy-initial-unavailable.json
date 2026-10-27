@@ -1,0 +1,21 @@
+{
+  "captured_at": "2026-10-24T06:21:02.100044+00:00",
+  "mode": "read-only REPEATABLE READ; metadata only; no business row query",
+  "databases": {
+    "cs_agent_b0": {
+      "status": "unverified",
+      "error_type": "OperationalError",
+      "reason": "read-only metadata connection/guard/catalog unavailable; raw DSN and exception suppressed"
+    },
+    "cs_agent_b0_test": {
+      "status": "unverified",
+      "error_type": "OperationalError",
+      "reason": "read-only metadata connection/guard/catalog unavailable; raw DSN and exception suppressed"
+    },
+    "cs_agent_b0_upgrade": {
+      "status": "unverified",
+      "error_type": "OperationalError",
+      "reason": "read-only metadata connection/guard/catalog unavailable; raw DSN and exception suppressed"
+    }
+  }
+}

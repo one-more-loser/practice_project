@@ -1,0 +1,67 @@
+{
+  "profile": "operations_store_min_sqlite",
+  "schema_revision": "OPS-QUERY-SQLITE-MIN-v1",
+  "metric_revision": "OPS-METRIC-PAYMENT-MIN-v1",
+  "calculation_revision": "OPS-CALC-PAYMENT-MIN-v1",
+  "validator_revision": "OPS-SQL-SMALL-GRAMMAR-v1",
+  "dialect": "sqlite_exact_integer_sum_v1",
+  "tables": {
+    "ops_order": {
+      "order_id": "TEXT PRIMARY KEY",
+      "paid_minor": "exact integer TEXT"
+    },
+    "ops_order_item": {
+      "order_id": "TEXT",
+      "line_no": "INTEGER",
+      "sku_id": "TEXT",
+      "qty": "exact integer TEXT",
+      "primary_key": [
+        "order_id",
+        "line_no"
+      ]
+    }
+  },
+  "scope": "server-bound store and exact archive; paid cohort prefiltered before SQL",
+  "visibility": "start_at<=paid_at<end_at AND paid_at<=min(as_of,snapshot.as_of,now)",
+  "parameters": {
+    "required": [
+      "start_at",
+      "end_at",
+      "as_of"
+    ],
+    "optional": [
+      "channel",
+      "sku_id"
+    ],
+    "rules": "sku_id required only for paid_units; channel matches normalized channel"
+  },
+  "grammar": "only three SELECT forms, case and whitespace variations permitted",
+  "sql_examples": {
+    "payment_minor": "SELECT COALESCE(SUM(paid_minor), 0) AS payment_minor FROM ops_order",
+    "paid_order_count": "SELECT COUNT(*) AS paid_order_count FROM ops_order",
+    "paid_units": "SELECT COALESCE(SUM(qty), 0) AS paid_units FROM ops_order_item WHERE sku_id = :sku_id"
+  },
+  "limits": {
+    "timeout_ms": 1000,
+    "max_orders": 20000,
+    "max_items": 100000,
+    "max_snapshot_bytes": 8388608,
+    "max_sql_bytes": 4096,
+    "max_rows": 1,
+    "max_result_bytes": 4096,
+    "concurrency_per_process": 2,
+    "sqlite_max_bytes": 33554432
+  },
+  "unsupported": [
+    "refunds",
+    "cost",
+    "join",
+    "group_by",
+    "CTE",
+    "subquery",
+    "literal filters",
+    "PostgreSQL training baseline equivalence"
+  ],
+  "metric_digest": "d85b17af90ba386384cb125d82c0131bba5ab85e4e16ffc1092b5f7c91ae9537",
+  "schema_digest": "f80b87c1e97b010452c65dac9e9d61a8eda4ec61b68a8d7d27885e5c3d5ca46a"
+}

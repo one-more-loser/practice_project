@@ -1,0 +1,2226 @@
+{
+  "profile": "operations_store",
+  "status": "02_review_not_jointly_approved",
+  "business_schema_changed": false,
+  "production_sql_available": false,
+  "fixture_revision": "OPS03-FIXTURE-review.1",
+  "data_classification": "synthetic_only",
+  "usage": "contract examples/candidate oracle; NOT jointly frozen gold or training approval",
+  "runtime_limits": "no SQL/PG/HTTP/auth runtime proof; service archive read is replaced",
+  "cases": [
+    {
+      "case_id": "F01",
+      "label": "正常与跨期退款：03四订单示例的02 oracle",
+      "profile": "operations_store",
+      "source_kind": "synthetic",
+      "mode": "dashboard_read_double",
+      "snapshot": {
+        "snapshot_id": "ops03_review_synthetic",
+        "revision": 1,
+        "store_id": "fixture_store_A",
+        "source_kind": "synthetic",
+        "as_of": "2026-12-10T00:00:00+08:00",
+        "currency": "CNY",
+        "skus": [
+          {
+            "sku_id": "A",
+            "title": "合成商品A",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          },
+          {
+            "sku_id": "B",
+            "title": "合成商品B",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          }
+        ],
+        "orders": [
+          {
+            "order_id": "A",
+            "paid_at": "2026-11-01T00:05:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "10000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              }
+            ]
+          },
+          {
+            "order_id": "B",
+            "paid_at": "2026-11-15T10:01:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "30000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              },
+              {
+                "sku_id": "B",
+                "qty": 2,
+                "paid_minor": "20000"
+              }
+            ]
+          },
+          {
+            "order_id": "C",
+            "paid_at": null,
+            "status": "cancelled",
+            "channel": "web",
+            "paid_minor": "0",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "0"
+              }
+            ]
+          },
+          {
+            "order_id": "D",
+            "paid_at": "2026-11-25T09:01:00+08:00",
+            "status": "paid",
+            "channel": "",
+            "paid_minor": "20000",
+            "items": [
+              {
+                "sku_id": "B",
+                "qty": 2,
+                "paid_minor": "20000"
+              }
+            ]
+          }
+        ],
+        "refunds": [
+          {
+            "refund_id": "R-B",
+            "order_id": "B",
+            "occurred_at": "2026-11-20T10:00:00+08:00",
+            "status": "succeeded",
+            "amount_minor": "10000"
+          },
+          {
+            "refund_id": "R-D",
+            "order_id": "D",
+            "occurred_at": "2026-12-05T10:00:00+08:00",
+            "status": "succeeded",
+            "amount_minor": "20000"
+          }
+        ]
+      },
+      "parameters": {
+        "start_at": "2026-11-01T00:00:00+08:00",
+        "end_at": "2026-12-01T00:00:00+08:00",
+        "as_of": "2026-12-10T00:00:00+08:00"
+      },
+      "expected": {
+        "payment_minor": "60000",
+        "refund_minor": "10000",
+        "net_paid_minor": "50000",
+        "paid_order_count": 3,
+        "paid_units": 6,
+        "average_order_minor": "20000",
+        "cohort_refund_order_rate": "0.666667",
+        "cohort_refund_amount_rate": "0.500000"
+      },
+      "normalized_snapshot_digest": "6f738c139a4a695162c5169b3bd400d39f3c2fd704fa859b8c55f0a427e3ffef"
+    },
+    {
+      "case_id": "F02",
+      "label": "同归档早as_of事件重算，不等于历史已知状态重建",
+      "profile": "operations_store",
+      "source_kind": "synthetic",
+      "mode": "domain",
+      "snapshot": {
+        "snapshot_id": "ops03_review_synthetic",
+        "revision": 1,
+        "store_id": "fixture_store_A",
+        "source_kind": "synthetic",
+        "as_of": "2026-12-10T00:00:00+08:00",
+        "currency": "CNY",
+        "skus": [
+          {
+            "sku_id": "A",
+            "title": "合成商品A",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          },
+          {
+            "sku_id": "B",
+            "title": "合成商品B",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          }
+        ],
+        "orders": [
+          {
+            "order_id": "A",
+            "paid_at": "2026-11-01T00:05:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "10000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              }
+            ]
+          },
+          {
+            "order_id": "B",
+            "paid_at": "2026-11-15T10:01:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "30000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              },
+              {
+                "sku_id": "B",
+                "qty": 2,
+                "paid_minor": "20000"
+              }
+            ]
+          },
+          {
+            "order_id": "C",
+            "paid_at": null,
+            "status": "cancelled",
+            "channel": "web",
+            "paid_minor": "0",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "0"
+              }
+            ]
+          },
+          {
+            "order_id": "D",
+            "paid_at": "2026-11-25T09:01:00+08:00",
+            "status": "paid",
+            "channel": "",
+            "paid_minor": "20000",
+            "items": [
+              {
+                "sku_id": "B",
+                "qty": 2,
+                "paid_minor": "20000"
+              }
+            ]
+          }
+        ],
+        "refunds": [
+          {
+            "refund_id": "R-B",
+            "order_id": "B",
+            "occurred_at": "2026-11-20T10:00:00+08:00",
+            "status": "succeeded",
+            "amount_minor": "10000"
+          },
+          {
+            "refund_id": "R-D",
+            "order_id": "D",
+            "occurred_at": "2026-12-05T10:00:00+08:00",
+            "status": "succeeded",
+            "amount_minor": "20000"
+          }
+        ]
+      },
+      "parameters": {
+        "start_at": "2026-11-01T00:00:00+08:00",
+        "end_at": "2026-12-01T00:00:00+08:00",
+        "as_of": "2026-11-30T00:00:00+08:00"
+      },
+      "expected": {
+        "payment_minor": "60000",
+        "refund_minor": "10000",
+        "net_paid_minor": "50000",
+        "paid_order_count": 3,
+        "paid_units": 6,
+        "average_order_minor": "20000",
+        "cohort_refund_order_rate": "0.333333",
+        "cohort_refund_amount_rate": "0.166667"
+      },
+      "normalized_snapshot_digest": "6f738c139a4a695162c5169b3bd400d39f3c2fd704fa859b8c55f0a427e3ffef"
+    },
+    {
+      "case_id": "F03",
+      "label": "完整空事件快照：零与无分母",
+      "profile": "operations_store",
+      "source_kind": "synthetic",
+      "mode": "dashboard_read_double",
+      "snapshot": {
+        "snapshot_id": "ops03_review_synthetic",
+        "revision": 1,
+        "store_id": "fixture_store_A",
+        "source_kind": "synthetic",
+        "as_of": "2026-12-10T00:00:00+08:00",
+        "currency": "CNY",
+        "skus": [
+          {
+            "sku_id": "A",
+            "title": "合成商品A",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          },
+          {
+            "sku_id": "B",
+            "title": "合成商品B",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          }
+        ],
+        "orders": [],
+        "refunds": []
+      },
+      "parameters": {
+        "start_at": "2026-11-01T00:00:00+08:00",
+        "end_at": "2026-12-01T00:00:00+08:00",
+        "as_of": "2026-12-10T00:00:00+08:00"
+      },
+      "expected": {
+        "payment_minor": "0",
+        "refund_minor": "0",
+        "net_paid_minor": "0",
+        "paid_order_count": 0,
+        "paid_units": 0,
+        "average_order_minor": null,
+        "cohort_refund_order_rate": null,
+        "cohort_refund_amount_rate": null
+      },
+      "expected_history_empty": true,
+      "normalized_snapshot_digest": "b3e7458a32db7af01ee9faf034fe4ae38b516ff855e18a17bf8e982e95d1b711"
+    },
+    {
+      "case_id": "F04",
+      "label": "窗外支付本窗退款：负现金期净额",
+      "profile": "operations_store",
+      "source_kind": "synthetic",
+      "mode": "dashboard_read_double",
+      "snapshot": {
+        "snapshot_id": "ops03_review_synthetic",
+        "revision": 1,
+        "store_id": "fixture_store_A",
+        "source_kind": "synthetic",
+        "as_of": "2026-12-10T00:00:00+08:00",
+        "currency": "CNY",
+        "skus": [
+          {
+            "sku_id": "A",
+            "title": "合成商品A",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          },
+          {
+            "sku_id": "B",
+            "title": "合成商品B",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          }
+        ],
+        "orders": [
+          {
+            "order_id": "old",
+            "paid_at": "2026-10-31T10:00:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "5000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "5000"
+              }
+            ]
+          }
+        ],
+        "refunds": [
+          {
+            "refund_id": "old-R",
+            "order_id": "old",
+            "occurred_at": "2026-11-05T10:00:00+08:00",
+            "status": "succeeded",
+            "amount_minor": "5000"
+          }
+        ]
+      },
+      "parameters": {
+        "start_at": "2026-11-01T00:00:00+08:00",
+        "end_at": "2026-12-01T00:00:00+08:00",
+        "as_of": "2026-12-10T00:00:00+08:00"
+      },
+      "expected": {
+        "payment_minor": "0",
+        "refund_minor": "5000",
+        "net_paid_minor": "-5000",
+        "paid_order_count": 0
+      },
+      "normalized_snapshot_digest": "f29990065cea6e89046cb667d2e18eeb9b329cec8096f3ef599210eba90b6f1b"
+    },
+    {
+      "case_id": "F05",
+      "label": "重复订单/退款身份去重；不按原始数组重复汇总",
+      "profile": "operations_store",
+      "source_kind": "synthetic",
+      "mode": "dashboard_read_double",
+      "snapshot": {
+        "snapshot_id": "ops03_review_synthetic",
+        "revision": 1,
+        "store_id": "fixture_store_A",
+        "source_kind": "synthetic",
+        "as_of": "2026-12-10T00:00:00+08:00",
+        "currency": "CNY",
+        "skus": [
+          {
+            "sku_id": "A",
+            "title": "合成商品A",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          },
+          {
+            "sku_id": "B",
+            "title": "合成商品B",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          }
+        ],
+        "orders": [
+          {
+            "order_id": "A",
+            "paid_at": "2026-11-01T00:05:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "10000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              }
+            ]
+          },
+          {
+            "order_id": "B",
+            "paid_at": "2026-11-15T10:01:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "30000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              },
+              {
+                "sku_id": "B",
+                "qty": 2,
+                "paid_minor": "20000"
+              }
+            ]
+          },
+          {
+            "order_id": "C",
+            "paid_at": null,
+            "status": "cancelled",
+            "channel": "web",
+            "paid_minor": "0",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "0"
+              }
+            ]
+          },
+          {
+            "order_id": "D",
+            "paid_at": "2026-11-25T09:01:00+08:00",
+            "status": "paid",
+            "channel": "",
+            "paid_minor": "20000",
+            "items": [
+              {
+                "sku_id": "B",
+                "qty": 2,
+                "paid_minor": "20000"
+              }
+            ]
+          },
+          {
+            "order_id": "B",
+            "paid_at": "2026-11-15T10:01:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "30000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              },
+              {
+                "sku_id": "B",
+                "qty": 2,
+                "paid_minor": "20000"
+              }
+            ]
+          }
+        ],
+        "refunds": [
+          {
+            "refund_id": "R-B",
+            "order_id": "B",
+            "occurred_at": "2026-11-20T10:00:00+08:00",
+            "status": "succeeded",
+            "amount_minor": "10000"
+          },
+          {
+            "refund_id": "R-D",
+            "order_id": "D",
+            "occurred_at": "2026-12-05T10:00:00+08:00",
+            "status": "succeeded",
+            "amount_minor": "20000"
+          },
+          {
+            "refund_id": "R-B",
+            "order_id": "B",
+            "occurred_at": "2026-11-20T10:00:00+08:00",
+            "status": "succeeded",
+            "amount_minor": "10000"
+          }
+        ]
+      },
+      "parameters": {
+        "start_at": "2026-11-01T00:00:00+08:00",
+        "end_at": "2026-12-01T00:00:00+08:00",
+        "as_of": "2026-12-10T00:00:00+08:00"
+      },
+      "expected": {
+        "payment_minor": "60000",
+        "refund_minor": "10000",
+        "net_paid_minor": "50000",
+        "paid_order_count": 3,
+        "paid_units": 6,
+        "average_order_minor": "20000",
+        "cohort_refund_order_rate": "0.666667",
+        "cohort_refund_amount_rate": "0.500000"
+      },
+      "normalized_snapshot_digest": "6f738c139a4a695162c5169b3bd400d39f3c2fd704fa859b8c55f0a427e3ffef"
+    },
+    {
+      "case_id": "F06",
+      "label": "冲突重复主键整批拒绝",
+      "profile": "operations_store",
+      "source_kind": "synthetic",
+      "mode": "dashboard_read_double",
+      "snapshot": {
+        "snapshot_id": "ops03_review_synthetic",
+        "revision": 1,
+        "store_id": "fixture_store_A",
+        "source_kind": "synthetic",
+        "as_of": "2026-12-10T00:00:00+08:00",
+        "currency": "CNY",
+        "skus": [
+          {
+            "sku_id": "A",
+            "title": "合成商品A",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          },
+          {
+            "sku_id": "B",
+            "title": "合成商品B",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          }
+        ],
+        "orders": [
+          {
+            "order_id": "A",
+            "paid_at": "2026-11-01T00:05:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "10000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              }
+            ]
+          },
+          {
+            "order_id": "B",
+            "paid_at": "2026-11-15T10:01:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "30000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              },
+              {
+                "sku_id": "B",
+                "qty": 2,
+                "paid_minor": "20000"
+              }
+            ]
+          },
+          {
+            "order_id": "C",
+            "paid_at": null,
+            "status": "cancelled",
+            "channel": "web",
+            "paid_minor": "0",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "0"
+              }
+            ]
+          },
+          {
+            "order_id": "D",
+            "paid_at": "2026-11-25T09:01:00+08:00",
+            "status": "paid",
+            "channel": "",
+            "paid_minor": "20000",
+            "items": [
+              {
+                "sku_id": "B",
+                "qty": 2,
+                "paid_minor": "20000"
+              }
+            ]
+          },
+          {
+            "order_id": "A",
+            "paid_at": "2026-11-01T00:05:00+08:00",
+            "status": "paid",
+            "channel": "conflict",
+            "paid_minor": "10000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              }
+            ]
+          }
+        ],
+        "refunds": [
+          {
+            "refund_id": "R-B",
+            "order_id": "B",
+            "occurred_at": "2026-11-20T10:00:00+08:00",
+            "status": "succeeded",
+            "amount_minor": "10000"
+          },
+          {
+            "refund_id": "R-D",
+            "order_id": "D",
+            "occurred_at": "2026-12-05T10:00:00+08:00",
+            "status": "succeeded",
+            "amount_minor": "20000"
+          }
+        ]
+      },
+      "parameters": {
+        "start_at": "2026-11-01T00:00:00+08:00",
+        "end_at": "2026-12-01T00:00:00+08:00",
+        "as_of": "2026-12-10T00:00:00+08:00"
+      },
+      "expected": {},
+      "expected_error": "invalid_snapshot"
+    },
+    {
+      "case_id": "F07",
+      "label": "成本缺失不抹去收入；实际利润未知",
+      "profile": "operations_store",
+      "source_kind": "synthetic",
+      "mode": "dashboard_read_double",
+      "snapshot": {
+        "snapshot_id": "ops03_review_synthetic",
+        "revision": 1,
+        "store_id": "fixture_store_A",
+        "source_kind": "synthetic",
+        "as_of": "2026-12-10T00:00:00+08:00",
+        "currency": "CNY",
+        "skus": [
+          {
+            "sku_id": "A",
+            "title": "合成商品A",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": null,
+            "variable_fee_minor": null,
+            "available_qty": 120,
+            "price_version": 1
+          },
+          {
+            "sku_id": "B",
+            "title": "合成商品B",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          }
+        ],
+        "orders": [
+          {
+            "order_id": "A",
+            "paid_at": "2026-11-01T00:05:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "10000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              }
+            ]
+          },
+          {
+            "order_id": "B",
+            "paid_at": "2026-11-15T10:01:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "30000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              },
+              {
+                "sku_id": "B",
+                "qty": 2,
+                "paid_minor": "20000"
+              }
+            ]
+          },
+          {
+            "order_id": "C",
+            "paid_at": null,
+            "status": "cancelled",
+            "channel": "web",
+            "paid_minor": "0",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "0"
+              }
+            ]
+          },
+          {
+            "order_id": "D",
+            "paid_at": "2026-11-25T09:01:00+08:00",
+            "status": "paid",
+            "channel": "",
+            "paid_minor": "20000",
+            "items": [
+              {
+                "sku_id": "B",
+                "qty": 2,
+                "paid_minor": "20000"
+              }
+            ]
+          }
+        ],
+        "refunds": [
+          {
+            "refund_id": "R-B",
+            "order_id": "B",
+            "occurred_at": "2026-11-20T10:00:00+08:00",
+            "status": "succeeded",
+            "amount_minor": "10000"
+          },
+          {
+            "refund_id": "R-D",
+            "order_id": "D",
+            "occurred_at": "2026-12-05T10:00:00+08:00",
+            "status": "succeeded",
+            "amount_minor": "20000"
+          }
+        ]
+      },
+      "parameters": {
+        "start_at": "2026-11-01T00:00:00+08:00",
+        "end_at": "2026-12-01T00:00:00+08:00",
+        "as_of": "2026-12-10T00:00:00+08:00"
+      },
+      "expected": {
+        "payment_minor": "60000",
+        "refund_minor": "10000",
+        "net_paid_minor": "50000",
+        "paid_order_count": 3,
+        "paid_units": 6,
+        "average_order_minor": "20000",
+        "cohort_refund_order_rate": "0.666667",
+        "cohort_refund_amount_rate": "0.500000"
+      },
+      "expected_profit_null": true,
+      "normalized_snapshot_digest": "052c87527111443451ce0673d16880b427fdf03cd77c9f987ddfc7113a917e14"
+    },
+    {
+      "case_id": "F08",
+      "label": "单SKU原生支付已知、混合SKU退款无分摊",
+      "profile": "operations_store",
+      "source_kind": "synthetic",
+      "mode": "dashboard_read_double",
+      "snapshot": {
+        "snapshot_id": "ops03_review_synthetic",
+        "revision": 1,
+        "store_id": "fixture_store_A",
+        "source_kind": "synthetic",
+        "as_of": "2026-12-10T00:00:00+08:00",
+        "currency": "CNY",
+        "skus": [
+          {
+            "sku_id": "A",
+            "title": "合成商品A",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          },
+          {
+            "sku_id": "B",
+            "title": "合成商品B",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          }
+        ],
+        "orders": [
+          {
+            "order_id": "A",
+            "paid_at": "2026-11-01T00:05:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "10000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              }
+            ]
+          },
+          {
+            "order_id": "B",
+            "paid_at": "2026-11-15T10:01:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "30000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              },
+              {
+                "sku_id": "B",
+                "qty": 2,
+                "paid_minor": "20000"
+              }
+            ]
+          },
+          {
+            "order_id": "C",
+            "paid_at": null,
+            "status": "cancelled",
+            "channel": "web",
+            "paid_minor": "0",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "0"
+              }
+            ]
+          },
+          {
+            "order_id": "D",
+            "paid_at": "2026-11-25T09:01:00+08:00",
+            "status": "paid",
+            "channel": "",
+            "paid_minor": "20000",
+            "items": [
+              {
+                "sku_id": "B",
+                "qty": 2,
+                "paid_minor": "20000"
+              }
+            ]
+          }
+        ],
+        "refunds": [
+          {
+            "refund_id": "R-B",
+            "order_id": "B",
+            "occurred_at": "2026-11-20T10:00:00+08:00",
+            "status": "succeeded",
+            "amount_minor": "10000"
+          },
+          {
+            "refund_id": "R-D",
+            "order_id": "D",
+            "occurred_at": "2026-12-05T10:00:00+08:00",
+            "status": "succeeded",
+            "amount_minor": "20000"
+          }
+        ]
+      },
+      "parameters": {
+        "start_at": "2026-11-01T00:00:00+08:00",
+        "end_at": "2026-12-01T00:00:00+08:00",
+        "as_of": "2026-12-10T00:00:00+08:00",
+        "sku_id": "A"
+      },
+      "expected": {
+        "payment_minor": "20000",
+        "refund_minor": null,
+        "net_paid_minor": null,
+        "paid_order_count": 2,
+        "paid_units": 2,
+        "cohort_refund_order_rate": null,
+        "cohort_refund_amount_rate": null
+      },
+      "expected_unknown_refund_day": "2026-11-20",
+      "normalized_snapshot_digest": "6f738c139a4a695162c5169b3bd400d39f3c2fd704fa859b8c55f0a427e3ffef"
+    },
+    {
+      "case_id": "F09",
+      "label": "cohort退款在现金窗后：现金不变、cohort未知",
+      "profile": "operations_store",
+      "source_kind": "synthetic",
+      "mode": "dashboard_read_double",
+      "snapshot": {
+        "snapshot_id": "ops03_review_synthetic",
+        "revision": 1,
+        "store_id": "fixture_store_A",
+        "source_kind": "synthetic",
+        "as_of": "2026-12-10T00:00:00+08:00",
+        "currency": "CNY",
+        "skus": [
+          {
+            "sku_id": "A",
+            "title": "合成商品A",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          },
+          {
+            "sku_id": "B",
+            "title": "合成商品B",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          }
+        ],
+        "orders": [
+          {
+            "order_id": "A",
+            "paid_at": "2026-11-01T00:05:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "10000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              }
+            ]
+          },
+          {
+            "order_id": "B",
+            "paid_at": "2026-11-15T10:01:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "30000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              },
+              {
+                "sku_id": "B",
+                "qty": 2,
+                "paid_minor": "20000"
+              }
+            ]
+          },
+          {
+            "order_id": "C",
+            "paid_at": null,
+            "status": "cancelled",
+            "channel": "web",
+            "paid_minor": "0",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "0"
+              }
+            ]
+          },
+          {
+            "order_id": "D",
+            "paid_at": "2026-11-25T09:01:00+08:00",
+            "status": "paid",
+            "channel": "",
+            "paid_minor": "20000",
+            "items": [
+              {
+                "sku_id": "B",
+                "qty": 2,
+                "paid_minor": "20000"
+              }
+            ]
+          }
+        ],
+        "refunds": [
+          {
+            "refund_id": "R-B",
+            "order_id": "B",
+            "occurred_at": "2026-11-20T10:00:00+08:00",
+            "status": "succeeded",
+            "amount_minor": "10000"
+          },
+          {
+            "refund_id": "R-D",
+            "order_id": "D",
+            "occurred_at": "2026-12-05T10:00:00+08:00",
+            "status": "succeeded",
+            "amount_minor": "20000"
+          }
+        ]
+      },
+      "parameters": {
+        "start_at": "2026-11-01T00:00:00+08:00",
+        "end_at": "2026-11-16T00:00:00+08:00",
+        "as_of": "2026-12-10T00:00:00+08:00",
+        "sku_id": "A"
+      },
+      "expected": {
+        "payment_minor": "20000",
+        "refund_minor": "0",
+        "net_paid_minor": "20000",
+        "cohort_refund_order_rate": null,
+        "cohort_refund_amount_rate": null
+      },
+      "normalized_snapshot_digest": "6f738c139a4a695162c5169b3bd400d39f3c2fd704fa859b8c55f0a427e3ffef"
+    },
+    {
+      "case_id": "F10",
+      "label": "成本无权限：字段省略而非自报权限",
+      "profile": "operations_store",
+      "source_kind": "synthetic",
+      "mode": "dashboard_read_double",
+      "snapshot": {
+        "snapshot_id": "ops03_review_synthetic",
+        "revision": 1,
+        "store_id": "fixture_store_A",
+        "source_kind": "synthetic",
+        "as_of": "2026-12-10T00:00:00+08:00",
+        "currency": "CNY",
+        "skus": [
+          {
+            "sku_id": "A",
+            "title": "合成商品A",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          },
+          {
+            "sku_id": "B",
+            "title": "合成商品B",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          }
+        ],
+        "orders": [
+          {
+            "order_id": "A",
+            "paid_at": "2026-11-01T00:05:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "10000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              }
+            ]
+          },
+          {
+            "order_id": "B",
+            "paid_at": "2026-11-15T10:01:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "30000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              },
+              {
+                "sku_id": "B",
+                "qty": 2,
+                "paid_minor": "20000"
+              }
+            ]
+          },
+          {
+            "order_id": "C",
+            "paid_at": null,
+            "status": "cancelled",
+            "channel": "web",
+            "paid_minor": "0",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "0"
+              }
+            ]
+          },
+          {
+            "order_id": "D",
+            "paid_at": "2026-11-25T09:01:00+08:00",
+            "status": "paid",
+            "channel": "",
+            "paid_minor": "20000",
+            "items": [
+              {
+                "sku_id": "B",
+                "qty": 2,
+                "paid_minor": "20000"
+              }
+            ]
+          }
+        ],
+        "refunds": [
+          {
+            "refund_id": "R-B",
+            "order_id": "B",
+            "occurred_at": "2026-11-20T10:00:00+08:00",
+            "status": "succeeded",
+            "amount_minor": "10000"
+          },
+          {
+            "refund_id": "R-D",
+            "order_id": "D",
+            "occurred_at": "2026-12-05T10:00:00+08:00",
+            "status": "succeeded",
+            "amount_minor": "20000"
+          }
+        ]
+      },
+      "parameters": {
+        "start_at": "2026-11-01T00:00:00+08:00",
+        "end_at": "2026-12-01T00:00:00+08:00",
+        "as_of": "2026-12-10T00:00:00+08:00"
+      },
+      "expected": {
+        "payment_minor": "60000",
+        "refund_minor": "10000",
+        "net_paid_minor": "50000",
+        "paid_order_count": 3,
+        "paid_units": 6,
+        "average_order_minor": "20000",
+        "cohort_refund_order_rate": "0.666667",
+        "cohort_refund_amount_rate": "0.500000"
+      },
+      "capabilities": [
+        "metrics.read"
+      ],
+      "expected_cost_omitted": true,
+      "normalized_snapshot_digest": "6f738c139a4a695162c5169b3bd400d39f3c2fd704fa859b8c55f0a427e3ffef"
+    },
+    {
+      "case_id": "F11",
+      "label": "无metrics能力后端拒绝",
+      "profile": "operations_store",
+      "source_kind": "synthetic",
+      "mode": "dashboard_read_double",
+      "snapshot": {
+        "snapshot_id": "ops03_review_synthetic",
+        "revision": 1,
+        "store_id": "fixture_store_A",
+        "source_kind": "synthetic",
+        "as_of": "2026-12-10T00:00:00+08:00",
+        "currency": "CNY",
+        "skus": [
+          {
+            "sku_id": "A",
+            "title": "合成商品A",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          },
+          {
+            "sku_id": "B",
+            "title": "合成商品B",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          }
+        ],
+        "orders": [
+          {
+            "order_id": "A",
+            "paid_at": "2026-11-01T00:05:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "10000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              }
+            ]
+          },
+          {
+            "order_id": "B",
+            "paid_at": "2026-11-15T10:01:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "30000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              },
+              {
+                "sku_id": "B",
+                "qty": 2,
+                "paid_minor": "20000"
+              }
+            ]
+          },
+          {
+            "order_id": "C",
+            "paid_at": null,
+            "status": "cancelled",
+            "channel": "web",
+            "paid_minor": "0",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "0"
+              }
+            ]
+          },
+          {
+            "order_id": "D",
+            "paid_at": "2026-11-25T09:01:00+08:00",
+            "status": "paid",
+            "channel": "",
+            "paid_minor": "20000",
+            "items": [
+              {
+                "sku_id": "B",
+                "qty": 2,
+                "paid_minor": "20000"
+              }
+            ]
+          }
+        ],
+        "refunds": [
+          {
+            "refund_id": "R-B",
+            "order_id": "B",
+            "occurred_at": "2026-11-20T10:00:00+08:00",
+            "status": "succeeded",
+            "amount_minor": "10000"
+          },
+          {
+            "refund_id": "R-D",
+            "order_id": "D",
+            "occurred_at": "2026-12-05T10:00:00+08:00",
+            "status": "succeeded",
+            "amount_minor": "20000"
+          }
+        ]
+      },
+      "parameters": {
+        "start_at": "2026-11-01T00:00:00+08:00",
+        "end_at": "2026-12-01T00:00:00+08:00",
+        "as_of": "2026-12-10T00:00:00+08:00"
+      },
+      "expected": {},
+      "expected_error": "forbidden",
+      "capabilities": [],
+      "normalized_snapshot_digest": "6f738c139a4a695162c5169b3bd400d39f3c2fd704fa859b8c55f0a427e3ffef"
+    },
+    {
+      "case_id": "F12",
+      "label": "零元支付＋成功零额退款：不能过滤paid_minor>0",
+      "profile": "operations_store",
+      "source_kind": "synthetic",
+      "mode": "dashboard_read_double",
+      "snapshot": {
+        "snapshot_id": "ops03_review_synthetic",
+        "revision": 1,
+        "store_id": "fixture_store_A",
+        "source_kind": "synthetic",
+        "as_of": "2026-12-10T00:00:00+08:00",
+        "currency": "CNY",
+        "skus": [
+          {
+            "sku_id": "A",
+            "title": "合成商品A",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          },
+          {
+            "sku_id": "B",
+            "title": "合成商品B",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          }
+        ],
+        "orders": [
+          {
+            "order_id": "zero",
+            "paid_at": "2026-11-03T10:00:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "0",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "0"
+              }
+            ]
+          }
+        ],
+        "refunds": [
+          {
+            "refund_id": "zero-R",
+            "order_id": "zero",
+            "occurred_at": "2026-11-04T10:00:00+08:00",
+            "status": "succeeded",
+            "amount_minor": "0"
+          }
+        ]
+      },
+      "parameters": {
+        "start_at": "2026-11-01T00:00:00+08:00",
+        "end_at": "2026-12-01T00:00:00+08:00",
+        "as_of": "2026-12-10T00:00:00+08:00"
+      },
+      "expected": {
+        "payment_minor": "0",
+        "refund_minor": "0",
+        "paid_order_count": 1,
+        "paid_units": 1,
+        "average_order_minor": "0",
+        "cohort_refund_order_rate": "1.000000",
+        "cohort_refund_amount_rate": null
+      },
+      "normalized_snapshot_digest": "913d7ce941a29993c44fa03b5db565fb2e598b56fe76e991a2f4d27c1af51afa"
+    },
+    {
+      "case_id": "F13",
+      "label": "客单价半分按约定HALF_UP",
+      "profile": "operations_store",
+      "source_kind": "synthetic",
+      "mode": "dashboard_read_double",
+      "snapshot": {
+        "snapshot_id": "ops03_review_synthetic",
+        "revision": 1,
+        "store_id": "fixture_store_A",
+        "source_kind": "synthetic",
+        "as_of": "2026-12-10T00:00:00+08:00",
+        "currency": "CNY",
+        "skus": [
+          {
+            "sku_id": "A",
+            "title": "合成商品A",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          },
+          {
+            "sku_id": "B",
+            "title": "合成商品B",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          }
+        ],
+        "orders": [
+          {
+            "order_id": "half1",
+            "paid_at": "2026-11-03T10:00:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "10000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              }
+            ]
+          },
+          {
+            "order_id": "half2",
+            "paid_at": "2026-11-03T10:01:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "10001",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10001"
+              }
+            ]
+          }
+        ],
+        "refunds": []
+      },
+      "parameters": {
+        "start_at": "2026-11-01T00:00:00+08:00",
+        "end_at": "2026-12-01T00:00:00+08:00",
+        "as_of": "2026-12-10T00:00:00+08:00"
+      },
+      "expected": {
+        "payment_minor": "20001",
+        "paid_order_count": 2,
+        "average_order_minor": "10001"
+      },
+      "normalized_snapshot_digest": "e3d88a25991700eafd48ef879acce04ce252dbc921dee56c0382b069e8446995"
+    },
+    {
+      "case_id": "F14",
+      "label": "不存在渠道不是完整空结果",
+      "profile": "operations_store",
+      "source_kind": "synthetic",
+      "mode": "dashboard_read_double",
+      "snapshot": {
+        "snapshot_id": "ops03_review_synthetic",
+        "revision": 1,
+        "store_id": "fixture_store_A",
+        "source_kind": "synthetic",
+        "as_of": "2026-12-10T00:00:00+08:00",
+        "currency": "CNY",
+        "skus": [
+          {
+            "sku_id": "A",
+            "title": "合成商品A",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          },
+          {
+            "sku_id": "B",
+            "title": "合成商品B",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          }
+        ],
+        "orders": [
+          {
+            "order_id": "A",
+            "paid_at": "2026-11-01T00:05:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "10000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              }
+            ]
+          },
+          {
+            "order_id": "B",
+            "paid_at": "2026-11-15T10:01:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "30000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              },
+              {
+                "sku_id": "B",
+                "qty": 2,
+                "paid_minor": "20000"
+              }
+            ]
+          },
+          {
+            "order_id": "C",
+            "paid_at": null,
+            "status": "cancelled",
+            "channel": "web",
+            "paid_minor": "0",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "0"
+              }
+            ]
+          },
+          {
+            "order_id": "D",
+            "paid_at": "2026-11-25T09:01:00+08:00",
+            "status": "paid",
+            "channel": "",
+            "paid_minor": "20000",
+            "items": [
+              {
+                "sku_id": "B",
+                "qty": 2,
+                "paid_minor": "20000"
+              }
+            ]
+          }
+        ],
+        "refunds": [
+          {
+            "refund_id": "R-B",
+            "order_id": "B",
+            "occurred_at": "2026-11-20T10:00:00+08:00",
+            "status": "succeeded",
+            "amount_minor": "10000"
+          },
+          {
+            "refund_id": "R-D",
+            "order_id": "D",
+            "occurred_at": "2026-12-05T10:00:00+08:00",
+            "status": "succeeded",
+            "amount_minor": "20000"
+          }
+        ]
+      },
+      "parameters": {
+        "start_at": "2026-11-01T00:00:00+08:00",
+        "end_at": "2026-12-01T00:00:00+08:00",
+        "as_of": "2026-12-10T00:00:00+08:00",
+        "channel": "not_present"
+      },
+      "expected": {},
+      "expected_error": "invalid_filter",
+      "normalized_snapshot_digest": "6f738c139a4a695162c5169b3bd400d39f3c2fd704fa859b8c55f0a427e3ffef"
+    },
+    {
+      "case_id": "F15",
+      "label": "左边界含/右边界不含",
+      "profile": "operations_store",
+      "source_kind": "synthetic",
+      "mode": "domain",
+      "snapshot": {
+        "snapshot_id": "ops03_review_synthetic",
+        "revision": 1,
+        "store_id": "fixture_store_A",
+        "source_kind": "synthetic",
+        "as_of": "2026-12-01T00:00:00+08:00",
+        "currency": "CNY",
+        "skus": [
+          {
+            "sku_id": "A",
+            "title": "合成商品A",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          },
+          {
+            "sku_id": "B",
+            "title": "合成商品B",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          }
+        ],
+        "orders": [
+          {
+            "order_id": "left",
+            "paid_at": "2026-11-01T00:00:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "10000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              }
+            ]
+          },
+          {
+            "order_id": "right",
+            "paid_at": "2026-12-01T00:00:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "20000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "20000"
+              }
+            ]
+          }
+        ],
+        "refunds": []
+      },
+      "parameters": {
+        "start_at": "2026-11-01T00:00:00+08:00",
+        "end_at": "2026-12-01T00:00:00+08:00",
+        "as_of": "2026-12-10T00:00:00+08:00"
+      },
+      "expected": {
+        "payment_minor": "10000",
+        "paid_order_count": 1
+      },
+      "normalized_snapshot_digest": "2508f33ef8a5f6014a3ce77259748ff83cb2d53bee1aa0b8aef12879774b3cd9"
+    },
+    {
+      "case_id": "F16",
+      "label": "一单两行两退款：SQL扇出反例oracle",
+      "profile": "operations_store",
+      "source_kind": "synthetic",
+      "mode": "dashboard_read_double",
+      "snapshot": {
+        "snapshot_id": "ops03_review_synthetic",
+        "revision": 1,
+        "store_id": "fixture_store_A",
+        "source_kind": "synthetic",
+        "as_of": "2026-12-10T00:00:00+08:00",
+        "currency": "CNY",
+        "skus": [
+          {
+            "sku_id": "A",
+            "title": "合成商品A",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          },
+          {
+            "sku_id": "B",
+            "title": "合成商品B",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          }
+        ],
+        "orders": [
+          {
+            "order_id": "multi",
+            "paid_at": "2026-11-03T10:00:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "30000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              },
+              {
+                "sku_id": "B",
+                "qty": 2,
+                "paid_minor": "20000"
+              }
+            ]
+          }
+        ],
+        "refunds": [
+          {
+            "refund_id": "m1",
+            "order_id": "multi",
+            "occurred_at": "2026-11-04T10:00:00+08:00",
+            "status": "succeeded",
+            "amount_minor": "4000"
+          },
+          {
+            "refund_id": "m2",
+            "order_id": "multi",
+            "occurred_at": "2026-11-05T10:00:00+08:00",
+            "status": "succeeded",
+            "amount_minor": "6000"
+          }
+        ]
+      },
+      "parameters": {
+        "start_at": "2026-11-01T00:00:00+08:00",
+        "end_at": "2026-12-01T00:00:00+08:00",
+        "as_of": "2026-12-10T00:00:00+08:00"
+      },
+      "expected": {
+        "payment_minor": "30000",
+        "refund_minor": "10000",
+        "net_paid_minor": "20000",
+        "paid_order_count": 1,
+        "paid_units": 3,
+        "cohort_refund_order_rate": "1.000000",
+        "cohort_refund_amount_rate": "0.333333"
+      },
+      "normalized_snapshot_digest": "bf2f97c231886e1d588ea3c715aedb62834d44c286e72f23bcf28c5bcc3ee4df"
+    },
+    {
+      "case_id": "F17",
+      "label": "02不直接接01交易状态枚举",
+      "profile": "operations_store",
+      "source_kind": "synthetic",
+      "mode": "dashboard_read_double",
+      "snapshot": {
+        "snapshot_id": "ops03_review_synthetic",
+        "revision": 1,
+        "store_id": "fixture_store_A",
+        "source_kind": "synthetic",
+        "as_of": "2026-12-10T00:00:00+08:00",
+        "currency": "CNY",
+        "skus": [
+          {
+            "sku_id": "A",
+            "title": "合成商品A",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          },
+          {
+            "sku_id": "B",
+            "title": "合成商品B",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          }
+        ],
+        "orders": [
+          {
+            "order_id": "A",
+            "paid_at": "2026-11-01T00:05:00+08:00",
+            "status": "completed",
+            "channel": "web",
+            "paid_minor": "10000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              }
+            ]
+          },
+          {
+            "order_id": "B",
+            "paid_at": "2026-11-15T10:01:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "30000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              },
+              {
+                "sku_id": "B",
+                "qty": 2,
+                "paid_minor": "20000"
+              }
+            ]
+          },
+          {
+            "order_id": "C",
+            "paid_at": null,
+            "status": "cancelled",
+            "channel": "web",
+            "paid_minor": "0",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "0"
+              }
+            ]
+          },
+          {
+            "order_id": "D",
+            "paid_at": "2026-11-25T09:01:00+08:00",
+            "status": "paid",
+            "channel": "",
+            "paid_minor": "20000",
+            "items": [
+              {
+                "sku_id": "B",
+                "qty": 2,
+                "paid_minor": "20000"
+              }
+            ]
+          }
+        ],
+        "refunds": [
+          {
+            "refund_id": "R-B",
+            "order_id": "B",
+            "occurred_at": "2026-11-20T10:00:00+08:00",
+            "status": "succeeded",
+            "amount_minor": "10000"
+          },
+          {
+            "refund_id": "R-D",
+            "order_id": "D",
+            "occurred_at": "2026-12-05T10:00:00+08:00",
+            "status": "succeeded",
+            "amount_minor": "20000"
+          }
+        ]
+      },
+      "parameters": {
+        "start_at": "2026-11-01T00:00:00+08:00",
+        "end_at": "2026-12-01T00:00:00+08:00",
+        "as_of": "2026-12-10T00:00:00+08:00"
+      },
+      "expected": {},
+      "expected_error": "invalid_snapshot"
+    },
+    {
+      "case_id": "F18",
+      "label": "同订单同SKU可有两行：行键不能用order_id+sku_id",
+      "profile": "operations_store",
+      "source_kind": "synthetic",
+      "mode": "dashboard_read_double",
+      "snapshot": {
+        "snapshot_id": "ops03_review_synthetic",
+        "revision": 1,
+        "store_id": "fixture_store_A",
+        "source_kind": "synthetic",
+        "as_of": "2026-12-10T00:00:00+08:00",
+        "currency": "CNY",
+        "skus": [
+          {
+            "sku_id": "A",
+            "title": "合成商品A",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          },
+          {
+            "sku_id": "B",
+            "title": "合成商品B",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          }
+        ],
+        "orders": [
+          {
+            "order_id": "same-sku",
+            "paid_at": "2026-11-03T10:00:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "30000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              },
+              {
+                "sku_id": "A",
+                "qty": 2,
+                "paid_minor": "20000"
+              }
+            ]
+          }
+        ],
+        "refunds": []
+      },
+      "parameters": {
+        "start_at": "2026-11-01T00:00:00+08:00",
+        "end_at": "2026-12-01T00:00:00+08:00",
+        "as_of": "2026-12-10T00:00:00+08:00"
+      },
+      "expected": {
+        "payment_minor": "30000",
+        "paid_order_count": 1,
+        "paid_units": 3
+      },
+      "normalized_snapshot_digest": "29b6a373a7d82033f4d65f5e864677b681ab592c6a2e31f05ba1146ef956960b"
+    },
+    {
+      "case_id": "F19",
+      "label": "成功零额事件计入订单退款率：待业务确认",
+      "profile": "operations_store",
+      "source_kind": "synthetic",
+      "mode": "dashboard_read_double",
+      "snapshot": {
+        "snapshot_id": "ops03_review_synthetic",
+        "revision": 1,
+        "store_id": "fixture_store_A",
+        "source_kind": "synthetic",
+        "as_of": "2026-12-10T00:00:00+08:00",
+        "currency": "CNY",
+        "skus": [
+          {
+            "sku_id": "A",
+            "title": "合成商品A",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          },
+          {
+            "sku_id": "B",
+            "title": "合成商品B",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          }
+        ],
+        "orders": [
+          {
+            "order_id": "paid",
+            "paid_at": "2026-11-03T10:00:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "10000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              }
+            ]
+          }
+        ],
+        "refunds": [
+          {
+            "refund_id": "zr",
+            "order_id": "paid",
+            "occurred_at": "2026-11-04T10:00:00+08:00",
+            "status": "succeeded",
+            "amount_minor": "0"
+          }
+        ]
+      },
+      "parameters": {
+        "start_at": "2026-11-01T00:00:00+08:00",
+        "end_at": "2026-12-01T00:00:00+08:00",
+        "as_of": "2026-12-10T00:00:00+08:00"
+      },
+      "expected": {
+        "cohort_refund_order_rate": "1.000000",
+        "cohort_refund_amount_rate": "0.000000"
+      },
+      "normalized_snapshot_digest": "61c642daaf1f0d0c81c71d5363e15fd7b9bb4805f58c081b51b02af4e9419519"
+    },
+    {
+      "case_id": "F20",
+      "label": "库存未知保持null",
+      "profile": "operations_store",
+      "source_kind": "synthetic",
+      "mode": "dashboard_read_double",
+      "snapshot": {
+        "snapshot_id": "ops03_review_synthetic",
+        "revision": 1,
+        "store_id": "fixture_store_A",
+        "source_kind": "synthetic",
+        "as_of": "2026-12-10T00:00:00+08:00",
+        "currency": "CNY",
+        "skus": [
+          {
+            "sku_id": "A",
+            "title": "合成商品A",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": null,
+            "price_version": 1
+          },
+          {
+            "sku_id": "B",
+            "title": "合成商品B",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          }
+        ],
+        "orders": [
+          {
+            "order_id": "A",
+            "paid_at": "2026-11-01T00:05:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "10000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              }
+            ]
+          },
+          {
+            "order_id": "B",
+            "paid_at": "2026-11-15T10:01:00+08:00",
+            "status": "paid",
+            "channel": "web",
+            "paid_minor": "30000",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "10000"
+              },
+              {
+                "sku_id": "B",
+                "qty": 2,
+                "paid_minor": "20000"
+              }
+            ]
+          },
+          {
+            "order_id": "C",
+            "paid_at": null,
+            "status": "cancelled",
+            "channel": "web",
+            "paid_minor": "0",
+            "items": [
+              {
+                "sku_id": "A",
+                "qty": 1,
+                "paid_minor": "0"
+              }
+            ]
+          },
+          {
+            "order_id": "D",
+            "paid_at": "2026-11-25T09:01:00+08:00",
+            "status": "paid",
+            "channel": "",
+            "paid_minor": "20000",
+            "items": [
+              {
+                "sku_id": "B",
+                "qty": 2,
+                "paid_minor": "20000"
+              }
+            ]
+          }
+        ],
+        "refunds": [
+          {
+            "refund_id": "R-B",
+            "order_id": "B",
+            "occurred_at": "2026-11-20T10:00:00+08:00",
+            "status": "succeeded",
+            "amount_minor": "10000"
+          },
+          {
+            "refund_id": "R-D",
+            "order_id": "D",
+            "occurred_at": "2026-12-05T10:00:00+08:00",
+            "status": "succeeded",
+            "amount_minor": "20000"
+          }
+        ]
+      },
+      "parameters": {
+        "start_at": "2026-11-01T00:00:00+08:00",
+        "end_at": "2026-12-01T00:00:00+08:00",
+        "as_of": "2026-12-10T00:00:00+08:00"
+      },
+      "expected": {
+        "payment_minor": "60000",
+        "refund_minor": "10000",
+        "net_paid_minor": "50000",
+        "paid_order_count": 3,
+        "paid_units": 6,
+        "average_order_minor": "20000",
+        "cohort_refund_order_rate": "0.666667",
+        "cohort_refund_amount_rate": "0.500000"
+      },
+      "expected_stock_null": true,
+      "normalized_snapshot_digest": "d6e2d891315c7a55c3773b7813fa1181ac0b26258f8cce4dd7822399e1c35ca3"
+    }
+  ],
+  "static_or_pending_cases": [
+    {
+      "case_id": "S01",
+      "label": "跨店资源隔离/同Cookie撤权",
+      "status": "source_test_and_historical_R1_only_not_run_here",
+      "test": "backend/tests/test_api.py:307 test_identity_uses_current_capabilities_and_fails_closed_on_old_contract",
+      "conditions": "actor storeA; resource only storeB; do not send storeB as model parameter",
+      "expected": "backend inaccessible resource404; no storeB rows/ids; withdrawn cost403; old identity503"
+    },
+    {
+      "case_id": "S02",
+      "label": "SQL写/系统目录/缺WHERE/成本派生绕过",
+      "status": "proposed_unimplemented_execution_suite",
+      "expected": "02 independent enforcement rejects; no business execution or credentials in03"
+    },
+    {
+      "case_id": "S03",
+      "label": "未知Schema/metric版本、缺窗口与退款率歧义",
+      "status": "proposed_protocol_cases",
+      "expected": "mismatch=>error; missing slots=>clarify; unsupported feature=>unsupported"
+    }
+  ]
+}

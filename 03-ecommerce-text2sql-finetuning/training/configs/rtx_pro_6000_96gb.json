@@ -1,0 +1,107 @@
+{
+  "model": {
+    "path": "/root/autodl-tmp/models/Qwen3-8B-Base",
+    "revision": null,
+    "local_files_only": true,
+    "torch_dtype": "bfloat16",
+    "attention": "sdpa"
+  },
+  "data": {
+    "train": "data/sft_v1/train.jsonl",
+    "dev": "data/sft_v1/dev.jsonl",
+    "test": "data/sft_v1/test.jsonl",
+    "manifest": "data/sft_v1/manifest.json"
+  },
+  "adapter": {
+    "rank": 16,
+    "alpha": 32,
+    "dropout": 0.05,
+    "target_modules": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj",
+      "gate_proj",
+      "up_proj",
+      "down_proj"
+    ]
+  },
+  "sft": {
+    "max_steps": 60,
+    "epochs": 5,
+    "learning_rate": 0.0002,
+    "batch_size": 1,
+    "gradient_accumulation_steps": 8,
+    "max_seq_len": 1152,
+    "max_grad_norm": 1.0,
+    "save_every": 20,
+    "log_every": 1,
+    "warmup_ratio": 0.03,
+    "weight_decay": 0.0,
+    "optimizer": "adamw",
+    "seed": 20261024,
+    "fused_adamw": true,
+    "length_bucket_size": 32,
+    "loss_chunk_tokens": 32,
+    "pin_memory": true
+  },
+  "grpo": {
+    "max_steps": 60,
+    "learning_rate": 5e-06,
+    "batch_size": 1,
+    "gradient_accumulation_steps": 4,
+    "num_generations": 4,
+    "max_prompt_tokens": 1024,
+    "max_completion_tokens": 160,
+    "temperature": 0.8,
+    "top_p": 1.0,
+    "beta": 0.04,
+    "clip_epsilon": 0.2,
+    "updates_per_rollout": 1,
+    "max_grad_norm": 1.0,
+    "save_every": 20,
+    "seed": 20261024,
+    "weight_decay": 0.0
+  },
+  "runtime": {
+    "output_dir": "outputs/native-96gb",
+    "device": "cuda",
+    "gradient_checkpointing": true,
+    "max_seconds": 14400,
+    "min_vram_gb": 90,
+    "min_disk_gb": 80,
+    "allow_tf32": true,
+    "compile": false
+  },
+  "evaluation": {
+    "batch_size": 1,
+    "max_prompt_tokens": 1024,
+    "max_new_tokens": 160,
+    "do_sample": false,
+    "temperature": 1.0,
+    "top_p": 1.0
+  },
+  "pipeline": {
+    "stages": [
+      "base",
+      "sft",
+      "sft_eval",
+      "grpo",
+      "grpo_eval"
+    ],
+    "timeout_seconds": 14400,
+    "python": null,
+    "resume": {
+      "sft": null,
+      "grpo": null
+    }
+  },
+  "reward": {
+    "consumer01_root": "sandbox/consumer01",
+    "fixtures": [
+      "fx_a",
+      "fx_b",
+      "fx_c"
+    ]
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "contract_version": "CS-KNOWLEDGE-SOURCES-v1",
+  "rule_sources": [
+    {"source_ref": "PRD:7.4", "source_revision": "REQ-CS-v0.2", "status": "active", "visibility": "public", "description": "用户批准的模拟店铺规则；FAQ草稿依据，非发布记录。规则基线变更须同时停用旧来源。"}
+  ]
+}

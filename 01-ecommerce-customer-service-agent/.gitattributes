@@ -1,0 +1,2 @@
+deploy/database/*.sh text eol=lf
+deploy/database/initdb/*.sh text eol=lf

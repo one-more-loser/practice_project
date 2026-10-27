@@ -1,0 +1,70 @@
+name: cs01-db
+
+services:
+  postgres:
+    image: pgvector/pgvector:0.8.7-pg17-bookworm@sha256:ac08538c6f8b9904c33c8224c5e5706dbe760aca29db1d096972b4052c22a75d
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: cs01_bootstrap
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/bootstrap_password
+      POSTGRES_INITDB_ARGS: --encoding=UTF8 --locale=C --auth-host=scram-sha-256
+      TZ: UTC
+    secrets:
+      - bootstrap_password
+      - migrator_password
+      - app_password
+    ports:
+      - target: 5432
+        published: "55432"
+        host_ip: 192.168.10.100
+        protocol: tcp
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - type: bind
+        source: ./initdb
+        target: /docker-entrypoint-initdb.d
+        read_only: true
+        bind:
+          create_host_path: false
+    command:
+      - postgres
+      - -c
+      - timezone=UTC
+      - -c
+      - max_connections=60
+      - -c
+      - shared_buffers=128MB
+      - -c
+      - log_statement=none
+      - -c
+      - log_min_error_statement=panic
+      - -c
+      - log_parameter_max_length_on_error=0
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -h 127.0.0.1 -U cs01_bootstrap -d postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 20s
+    shm_size: 128mb
+    mem_limit: 768m
+    cpus: 1.0
+    stop_grace_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+
+volumes:
+  pgdata:
+    name: cs01_db_pg17_data
+
+secrets:
+  bootstrap_password:
+    file: ./secrets/bootstrap_password
+  migrator_password:
+    file: ./secrets/migrator_password
+  app_password:
+    file: ./secrets/app_password

@@ -1,0 +1,18 @@
+{
+  "review_id": "CS03-CONTRACT-REVIEW-20261024-v1",
+  "captured_at": "2026-10-24T04:58:45.025024+00:00",
+  "scope": "new review top-level artifacts plus current 01 HANDOFF; old acceptance indexes unchanged",
+  "files": {
+    "docs/04-integration/03-query-contract-review-20261024/01对03查询契约评审答复.html": "0b9365969607ac314b6753a9696c8495d5a07d97a8d25edfdf11ddf6e70ba5af",
+    "docs/04-integration/03-query-contract-review-20261024/01对03查询契约评审答复.md": "60e72dbf32d2ba646fd46d8fa7f46230d5353e9e99844797a1547993db993bc3",
+    "docs/04-integration/03-query-contract-review-20261024/actual-project-sql-request.json": "ea58aaf1a567de6a404fbf5069e7743989df3e9223767e3e0b403e5a308b5bac",
+    "docs/04-integration/03-query-contract-review-20261024/offline-observations.json": "a0a77e42aac753b64982515e4ecb733a6ea41d6eebdded6960d203a118109378",
+    "docs/04-integration/03-query-contract-review-20261024/probe_contract.py": "65b9335f5fb54e89cf68e74276926dfb725a2cb149e18671b31ddd2d96cbbf4e",
+    "docs/04-integration/03-query-contract-review-20261024/query-unit.xml": "4df13e4931aceeb68a83daebaf2145a37abe0492e00790fd8bad53d9181eb81f",
+    "docs/04-integration/03-query-contract-review-20261024/render_and_check.py": "fdb0954bdf9136d85629bfe60f94dd05cce3ae3030ff40bf63a3656d5f11e782",
+    "docs/04-integration/03-query-contract-review-20261024/review-baseline.json": "5dc23303e75dd7b118e2c2476a2b833c611ae2918beb1ff3e2060a82481a0013",
+    "docs/04-integration/03-query-contract-review-20261024/review-input-refresh.json": "7f63a5db9e30bce71fd3cd0a96df960d31d149cec7f24ac8594bfa9b65af51b6",
+    "docs/04-integration/03-query-contract-review-20261024/review-validation.json": "42156c588579e1bfe51a58edc1784b9ccdd91364a3816613caf1b00cc3b78db7",
+    "HANDOFF.MD": "f78a3874819e175d429afef92d076f1c57924b7ba1f064b5c1c9b58d7928669e"
+  }
+}

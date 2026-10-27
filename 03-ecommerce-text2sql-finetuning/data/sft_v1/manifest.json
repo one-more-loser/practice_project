@@ -1,0 +1,69 @@
+{
+  "version": "sft-v1",
+  "seed": 20261024,
+  "profile": "customer_self",
+  "schema_revision": "CS-QUERY-B2-v1",
+  "metric_revision": "CS-METRIC-B2-v1",
+  "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+  "created_at": "2026-10-24T17:22:00+08:00",
+  "split_policy": "group by business question + normalized SQL before paraphrases; train has 15 query groups + 4 non-query groups; test copied byte-for-byte from frozen test-v2; dev retained 12 rows with DV- IDs",
+  "counts": {
+    "train": 152,
+    "dev": 12,
+    "test": 20,
+    "total": 184,
+    "train_query": 120,
+    "train_clarify": 24,
+    "train_unsupported": 8
+  },
+  "files": {
+    "train": {
+      "path": "data/sft_v1/train.jsonl",
+      "rows": 152,
+      "sha256": "a03798fa1aeae5639aa6f550413f1be62e21e667b337cfcda1e4420b95e7597b"
+    },
+    "dev": {
+      "path": "data/sft_v1/dev.jsonl",
+      "rows": 12,
+      "sha256": "dd34b5a6849062dd693fb8881626a35655e9aa9ce83f018cc0a8332084b13282"
+    },
+    "test": {
+      "path": "data/sft_v1/test.jsonl",
+      "rows": 20,
+      "sha256": "469bd91ccaa3c92f5fa6745e267cf92ab669678089a4432e4a68a834827079bb"
+    }
+  },
+  "test_v1_sha256": "cf431555d87520d35faee61b965ca5c3450b341e00145a756641f443bb6b6c3d",
+  "test_v2_sha256": "469bd91ccaa3c92f5fa6745e267cf92ab669678089a4432e4a68a834827079bb",
+  "source": {
+    "seed_pack": "training/seeds/首轮SFT新增8个模板候选.json",
+    "existing_pool": "data/sft (47/12/20)",
+    "public_data": "not integrated in this batch"
+  },
+  "templates": [
+    "N01",
+    "N02",
+    "N03",
+    "N04",
+    "N05",
+    "N06",
+    "N07",
+    "N08",
+    "T01",
+    "T02",
+    "T03",
+    "T04",
+    "T05",
+    "T07",
+    "T08",
+    "T09",
+    "T10",
+    "T11",
+    "T12"
+  ],
+  "limitations": [
+    "candidate_unreviewed; independent business review required",
+    "train 152 is an execution quota, not 152 independent SQL problems",
+    "test must remain byte-identical to the archived test-v2"
+  ]
+}

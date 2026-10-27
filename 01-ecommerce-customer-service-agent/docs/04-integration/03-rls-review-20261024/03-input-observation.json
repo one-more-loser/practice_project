@@ -1,0 +1,24 @@
+{
+  "captured_at": "2026-10-24T06:39:34.425620+00:00",
+  "writer": "not established; this session issued read-only operations in 03",
+  "inputs": {
+    "D:\\codex_project\\项目实战\\03-ecommerce-text2sql-finetuning\\sandbox\\results\\rls-anomaly-20261024.json": {
+      "baseline_sha256": "926b4e1d0e97a50f22ba731e90812de2f1fc9e65adc18bc72adb8c4c3210b7cc",
+      "reviewed_sha256": "926b4e1d0e97a50f22ba731e90812de2f1fc9e65adc18bc72adb8c4c3210b7cc",
+      "changed_during_review": false,
+      "last_write_time": "2026-10-24T05:26:47.868720+00:00"
+    },
+    "D:\\codex_project\\项目实战\\03-ecommerce-text2sql-finetuning\\sandbox\\results\\miniloop-summary.md": {
+      "baseline_sha256": "dae09192ad46b5e3b0df990947a041b1108cbaa3f4b7cb4e78ff2f1a6ce29b62",
+      "reviewed_sha256": "7b30c7c2d75846dbf373406c7bb982e12519c081f897389e61b5f166da92c576",
+      "changed_during_review": true,
+      "last_write_time": "2026-10-24T06:24:31.111598+00:00"
+    },
+    "D:\\codex_project\\项目实战\\03-ecommerce-text2sql-finetuning\\sandbox\\sql\\01_schema.sql": {
+      "baseline_sha256": "370684a79b52382f7cfe7685ac8c095bdd2a36b6d0ad2fb75d56c222ad888643",
+      "reviewed_sha256": "370684a79b52382f7cfe7685ac8c095bdd2a36b6d0ad2fb75d56c222ad888643",
+      "changed_during_review": false,
+      "last_write_time": "2026-10-24T05:22:00.812147+00:00"
+    }
+  }
+}

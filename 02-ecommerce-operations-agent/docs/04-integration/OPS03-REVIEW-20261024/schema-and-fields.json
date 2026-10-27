@@ -1,0 +1,583 @@
+{
+  "profile": "operations_store",
+  "status": "02_review_not_jointly_approved",
+  "business_schema_changed": false,
+  "production_sql_available": false,
+  "document_revision": "OPS-QUERY-v0.2-draft.1",
+  "evidence": "source inspection; SQL names below do NOT exist as views",
+  "current_physical_archive": {
+    "table": "ops_snapshots",
+    "key": [
+      "store_id",
+      "snapshot_id",
+      "revision"
+    ],
+    "columns": [
+      "store_id",
+      "snapshot_id",
+      "revision",
+      "digest",
+      "body",
+      "created_at"
+    ],
+    "model_may_query_raw_archive": false
+  },
+  "current_snapshot_fields": {
+    "snapshot": [
+      {
+        "name": "snapshot_id",
+        "type": "string",
+        "nullable": false
+      },
+      {
+        "name": "revision",
+        "type": "integer>=1",
+        "nullable": false
+      },
+      {
+        "name": "store_id",
+        "type": "string",
+        "nullable": false
+      },
+      {
+        "name": "source_kind",
+        "type": "enum:synthetic|business_import|derived",
+        "nullable": false
+      },
+      {
+        "name": "as_of",
+        "type": "ISO8601_tz",
+        "nullable": false
+      },
+      {
+        "name": "currency",
+        "type": "const:CNY",
+        "nullable": false
+      },
+      {
+        "name": "skus",
+        "type": "array<Sku>",
+        "nullable": false
+      },
+      {
+        "name": "orders",
+        "type": "array<Order>",
+        "nullable": false
+      },
+      {
+        "name": "refunds",
+        "type": "array<Refund>",
+        "nullable": false
+      }
+    ],
+    "Sku": [
+      {
+        "name": "sku_id",
+        "type": "string",
+        "nullable": false
+      },
+      {
+        "name": "title",
+        "type": "string",
+        "nullable": false
+      },
+      {
+        "name": "category",
+        "type": "string",
+        "nullable": false
+      },
+      {
+        "name": "base_price_minor",
+        "type": "unsigned_minor_string>0",
+        "nullable": false
+      },
+      {
+        "name": "cost_minor",
+        "type": "unsigned_minor_string",
+        "nullable": true,
+        "capability": "cost.read"
+      },
+      {
+        "name": "variable_fee_minor",
+        "type": "unsigned_minor_string",
+        "nullable": true,
+        "capability": "cost.read"
+      },
+      {
+        "name": "available_qty",
+        "type": "integer>=0",
+        "nullable": true
+      },
+      {
+        "name": "price_version",
+        "type": "integer>=1",
+        "nullable": false
+      }
+    ],
+    "Order": [
+      {
+        "name": "order_id",
+        "type": "string",
+        "nullable": false
+      },
+      {
+        "name": "paid_at",
+        "type": "ISO8601_tz",
+        "nullable": true
+      },
+      {
+        "name": "status",
+        "type": "enum:paid|unpaid|cancelled",
+        "nullable": false
+      },
+      {
+        "name": "channel",
+        "type": "string; blank allowed",
+        "nullable": false
+      },
+      {
+        "name": "paid_minor",
+        "type": "unsigned_minor_string",
+        "nullable": false
+      },
+      {
+        "name": "items",
+        "type": "nonempty array<OrderItem>",
+        "nullable": false
+      }
+    ],
+    "OrderItem": [
+      {
+        "name": "sku_id",
+        "type": "string",
+        "nullable": false
+      },
+      {
+        "name": "qty",
+        "type": "integer>=1",
+        "nullable": false
+      },
+      {
+        "name": "paid_minor",
+        "type": "unsigned_minor_string",
+        "nullable": false
+      }
+    ],
+    "Refund": [
+      {
+        "name": "refund_id",
+        "type": "string",
+        "nullable": false
+      },
+      {
+        "name": "order_id",
+        "type": "string",
+        "nullable": false
+      },
+      {
+        "name": "occurred_at",
+        "type": "ISO8601_tz",
+        "nullable": false
+      },
+      {
+        "name": "status",
+        "type": "enum:succeeded|pending|failed",
+        "nullable": false
+      },
+      {
+        "name": "amount_minor",
+        "type": "unsigned_minor_string",
+        "nullable": false
+      }
+    ]
+  },
+  "optional_snapshot_fields": {
+    "schema_version": "OPS-SNAPSHOT-v0.1|OPS-SNAPSHOT-v0.2",
+    "execution_supported_rules": "array<string>; not authority to enable rules",
+    "source_metadata": "producer/source_revision/cost_basis/capacity_basis",
+    "provenance": "parents[{snapshot_id,revision,digest}]/transformation/inputs_version; v0.2 required"
+  },
+  "current_validation_notes": [
+    "strict field shapes; full snapshot validation in domain.py, not JSON Schema alone",
+    "each input integer or money <=9223372036854775807; booleans not integers; strings digits only",
+    "deduplicate identical sku_id/order_id/refund_id; conflicting duplicates reject",
+    "items have NO row id and NO uniqueness constraint on (order_id,sku_id)",
+    "sum(items.paid_minor)==order.paid_minor; item.sku_id must exist",
+    "paid status requires paid_at; current validator permits zero-value paid orders",
+    "succeeded refund requires paid original order, occurred_at>=paid_at; cumulative succeeded amount<=paid_minor",
+    "unknown enum rejects invalid_snapshot; pending/failed refunds do not affect metrics",
+    "as_of is snapshot event-time watermark; no per-event ingestion timestamps",
+    "available_qty may be null; no warehouse or historical stock series"
+  ],
+  "proposed_sql_resources": {
+    "ops_order": {
+      "status": "proposed_unimplemented",
+      "grain": "one normalized order in server-bound snapshot revision",
+      "key": [
+        "order_id"
+      ],
+      "fields": [
+        {
+          "name": "order_id",
+          "type": "TEXT",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "nullable": false
+        },
+        {
+          "name": "paid_at",
+          "type": "TIMESTAMPTZ",
+          "nullable": true
+        },
+        {
+          "name": "channel",
+          "type": "TEXT",
+          "nullable": false,
+          "normalization": "strip; empty=>unknown"
+        },
+        {
+          "name": "paid_minor",
+          "type": "BIGINT",
+          "nullable": false
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "nullable": false,
+          "derived": "snapshot.currency"
+        }
+      ]
+    },
+    "ops_order_item": {
+      "status": "proposed_unimplemented",
+      "grain": "one array item in a fixed order snapshot",
+      "key": [
+        "order_id",
+        "line_no"
+      ],
+      "fields": [
+        {
+          "name": "order_id",
+          "type": "TEXT",
+          "nullable": false
+        },
+        {
+          "name": "line_no",
+          "type": "BIGINT",
+          "nullable": false,
+          "derived": "1-based array ordinal; not native order_item_id"
+        },
+        {
+          "name": "sku_id",
+          "type": "TEXT",
+          "nullable": false
+        },
+        {
+          "name": "qty",
+          "type": "BIGINT",
+          "nullable": false
+        },
+        {
+          "name": "paid_minor",
+          "type": "BIGINT",
+          "nullable": false
+        }
+      ]
+    },
+    "ops_refund": {
+      "status": "proposed_unimplemented",
+      "grain": "one normalized refund event",
+      "key": [
+        "refund_id"
+      ],
+      "fields": [
+        {
+          "name": "refund_id",
+          "type": "TEXT",
+          "nullable": false
+        },
+        {
+          "name": "order_id",
+          "type": "TEXT",
+          "nullable": false
+        },
+        {
+          "name": "occurred_at",
+          "type": "TIMESTAMPTZ",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "nullable": false
+        },
+        {
+          "name": "amount_minor",
+          "type": "BIGINT",
+          "nullable": false
+        }
+      ]
+    },
+    "ops_sku": {
+      "status": "proposed_unimplemented",
+      "grain": "one sku at the fixed snapshot instant",
+      "key": [
+        "sku_id"
+      ],
+      "fields": [
+        {
+          "name": "sku_id",
+          "type": "TEXT",
+          "nullable": false
+        },
+        {
+          "name": "title",
+          "type": "TEXT",
+          "nullable": false
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "nullable": false
+        },
+        {
+          "name": "base_price_minor",
+          "type": "BIGINT",
+          "nullable": false
+        },
+        {
+          "name": "price_version",
+          "type": "BIGINT",
+          "nullable": false
+        },
+        {
+          "name": "available_qty",
+          "type": "BIGINT",
+          "nullable": true
+        },
+        {
+          "name": "as_of",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "derived": "snapshot.as_of"
+        },
+        {
+          "name": "cost_minor",
+          "type": "BIGINT",
+          "nullable": true,
+          "capability": "cost.read"
+        },
+        {
+          "name": "variable_fee_minor",
+          "type": "BIGINT",
+          "nullable": true,
+          "capability": "cost.read"
+        }
+      ]
+    }
+  },
+  "proposed_relations": [
+    {
+      "from": "ops_order_item.order_id",
+      "to": "ops_order.order_id",
+      "cardinality": "N:1"
+    },
+    {
+      "from": "ops_order_item.sku_id",
+      "to": "ops_sku.sku_id",
+      "cardinality": "N:1"
+    },
+    {
+      "from": "ops_refund.order_id",
+      "to": "ops_order.order_id",
+      "cardinality": "N:1"
+    }
+  ],
+  "fanout_warning": "order_item N x refund M must not repeat order-level payment; aggregate independently or use approved semijoin",
+  "excluded_resources": {
+    "ops_payment": "no native payment event id/array",
+    "ops_cost": "no historical effective intervals",
+    "ops_inventory": "only sku.available_qty at as_of; separate series unimplemented",
+    "ops_sales_period": "no persistent model view",
+    "ops_traffic_period": "no visitor/traffic source",
+    "ops_activity_actuals": "exists in02 archive but not approved SQL model projection"
+  },
+  "public_schema_example": {
+    "revision": "OPS-QUERY-v0.2-draft.1",
+    "dialect": "postgresql",
+    "resources": {
+      "ops_order": {
+        "status": "proposed_unimplemented",
+        "grain": "one normalized order in server-bound snapshot revision",
+        "key": [
+          "order_id"
+        ],
+        "fields": [
+          {
+            "name": "order_id",
+            "type": "TEXT",
+            "nullable": false
+          },
+          {
+            "name": "status",
+            "type": "TEXT",
+            "nullable": false
+          },
+          {
+            "name": "paid_at",
+            "type": "TIMESTAMPTZ",
+            "nullable": true
+          },
+          {
+            "name": "channel",
+            "type": "TEXT",
+            "nullable": false,
+            "normalization": "strip; empty=>unknown"
+          },
+          {
+            "name": "paid_minor",
+            "type": "BIGINT",
+            "nullable": false
+          },
+          {
+            "name": "currency",
+            "type": "TEXT",
+            "nullable": false,
+            "derived": "snapshot.currency"
+          }
+        ]
+      },
+      "ops_order_item": {
+        "status": "proposed_unimplemented",
+        "grain": "one array item in a fixed order snapshot",
+        "key": [
+          "order_id",
+          "line_no"
+        ],
+        "fields": [
+          {
+            "name": "order_id",
+            "type": "TEXT",
+            "nullable": false
+          },
+          {
+            "name": "line_no",
+            "type": "BIGINT",
+            "nullable": false,
+            "derived": "1-based array ordinal; not native order_item_id"
+          },
+          {
+            "name": "sku_id",
+            "type": "TEXT",
+            "nullable": false
+          },
+          {
+            "name": "qty",
+            "type": "BIGINT",
+            "nullable": false
+          },
+          {
+            "name": "paid_minor",
+            "type": "BIGINT",
+            "nullable": false
+          }
+        ]
+      },
+      "ops_refund": {
+        "status": "proposed_unimplemented",
+        "grain": "one normalized refund event",
+        "key": [
+          "refund_id"
+        ],
+        "fields": [
+          {
+            "name": "refund_id",
+            "type": "TEXT",
+            "nullable": false
+          },
+          {
+            "name": "order_id",
+            "type": "TEXT",
+            "nullable": false
+          },
+          {
+            "name": "occurred_at",
+            "type": "TIMESTAMPTZ",
+            "nullable": false
+          },
+          {
+            "name": "status",
+            "type": "TEXT",
+            "nullable": false
+          },
+          {
+            "name": "amount_minor",
+            "type": "BIGINT",
+            "nullable": false
+          }
+        ]
+      },
+      "ops_sku": {
+        "status": "proposed_unimplemented",
+        "grain": "one sku at the fixed snapshot instant",
+        "key": [
+          "sku_id"
+        ],
+        "fields": [
+          {
+            "name": "sku_id",
+            "type": "TEXT",
+            "nullable": false
+          },
+          {
+            "name": "title",
+            "type": "TEXT",
+            "nullable": false
+          },
+          {
+            "name": "category",
+            "type": "TEXT",
+            "nullable": false
+          },
+          {
+            "name": "base_price_minor",
+            "type": "BIGINT",
+            "nullable": false
+          },
+          {
+            "name": "price_version",
+            "type": "BIGINT",
+            "nullable": false
+          },
+          {
+            "name": "available_qty",
+            "type": "BIGINT",
+            "nullable": true
+          },
+          {
+            "name": "as_of",
+            "type": "TIMESTAMPTZ",
+            "nullable": false,
+            "derived": "snapshot.as_of"
+          }
+        ]
+      }
+    },
+    "scope": "store+snapshot_id+revision pinned by02; not user/model WHERE",
+    "status": "proposed_unimplemented_not_training_frozen"
+  },
+  "public_schema_example_digest": "ddd291474c26edb7ea74ffcf4e7ae653c34a4550e153bdcaf4df76b405f99fdc",
+  "digest_algorithm": "sha256(UTF8(json.dumps(schema,ensure_ascii=False,sort_keys=True,separators=(comma,colon))))",
+  "digest_warning": "draft schema artifact digest only; no deployed validator recognizes it; cost projection requires another digest",
+  "pending": [
+    "sandbox DDL/loader",
+    "02 RLS or equally enforced scope projection",
+    "AST/function allowlist",
+    "execution endpoint",
+    "approved immutable schema/metric versions",
+    "joint acceptance"
+  ]
+}

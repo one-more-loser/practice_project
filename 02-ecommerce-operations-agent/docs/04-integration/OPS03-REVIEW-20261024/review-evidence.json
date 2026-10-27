@@ -1,0 +1,64 @@
+{
+  "review_id": "OPS03-REVIEW-20261024-r1",
+  "captured_at": "2026-10-24T04:48:42.256126+00:00",
+  "status": "review_delivered_not_joint_contract_approval",
+  "reviewed_questions": [
+    "Q-02-01",
+    "Q-02-02",
+    "Q-02-03",
+    "Q-02-04",
+    "Q-02-05",
+    "Q-02-06",
+    "Q-02-07",
+    "Q-02-08",
+    "Q-02-09",
+    "Q-02-10",
+    "Q-02-11",
+    "Q-02-12"
+  ],
+  "source_files_unchanged": 58,
+  "source_digest": "f6222c748a4ce8def5ffb48b64ec5baaccf0d4866536c9c6c19885ec2d40ee8f",
+  "03_inputs_unchanged": 3,
+  "protected_acceptance_files_unchanged": 92,
+  "fixture_checks": {
+    "executed": 20,
+    "passed": 20,
+    "static_or_pending": 3,
+    "mode": "isolated current Python domain/dashboard with normalized synthetic JSON and archive read double"
+  },
+  "checks": {
+    "json_parse_files": 6,
+    "generator_python_ast": "passed",
+    "local_links": 22,
+    "unique_HTML_ids": true,
+    "external_assets": 0,
+    "wire_variant_exclusivity": "passed",
+    "current_API_example_has_no_new_digest": "passed"
+  },
+  "evidence_limits": [
+    "HTML generated/static checks only; file-protocol preview previously blocked and not retried",
+    "SQL example not parsed/validated/executed; no02 SQL executor exists",
+    "no current HTTP/PG/auth/model integration or new production SLA evidence",
+    "read double bypasses archive/identity persistence; tenant security only cited from prior evidence"
+  ],
+  "subagent_reviews": {
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "medium",
+    "mode": "read_only",
+    "count": 2,
+    "correction": "01 original trade_status has no separate whitelist in current projection; corrected before finalization"
+  },
+  "HANDOFF_history_note": "R1 index keeps earlier HANDOFF hash; this new doc-only review records current HANDOFF, without rewriting signed evidence",
+  "files": {
+    "docs/04-integration/OPS03-REVIEW-20261024/build_review_materials.py": "7c618099c70f16aa94faff173fe09932cafdc5a48b0fd4911a5165ead05c1504",
+    "docs/04-integration/OPS03-REVIEW-20261024/fixture-results.json": "7110e94ed331cbb5f636ea40aa34253143deeb997fd39002af37bc4477a585ff",
+    "docs/04-integration/OPS03-REVIEW-20261024/fixtures.json": "8fa46804336960071defbcb259da2ad15a8d3b03642d4baa760d99b1dd9784e8",
+    "docs/04-integration/OPS03-REVIEW-20261024/metrics-and-parameters.json": "7189390b1c86f296307e216228fabf27400d55b8c7274553de7e4de96b69a8a6",
+    "docs/04-integration/OPS03-REVIEW-20261024/request-response-examples.json": "f70bdcb3aacbef7d69155e4476a5a70526ef6ca1958cc023000b9c8dba10cf3a",
+    "docs/04-integration/OPS03-REVIEW-20261024/review-baseline.json": "a09be7956d4482c39265201c53249fa6f8eca2a2e72e1250468057a2c6499ec9",
+    "docs/04-integration/OPS03-REVIEW-20261024/schema-and-fields.json": "916d24effc9b6690f91ee60fbb9b8dc953029a60b130c45e04902865984944d7",
+    "docs/04-integration/OPS03-REVIEW-20261024/给03的契约评审答复.html": "2790d5d15da2b0a89c548befc45400d50556d0b4d3790b2a7f705db5668dbcdc",
+    "docs/04-integration/OPS03-REVIEW-20261024/给03的契约评审答复.md": "92c9a4d8e64180e95afba454cc6bed99911fd0756bdb4785e76d33467312e595",
+    "HANDOFF.MD": "5666186ed381a4b11603fed963d226604a2b72cfed274d7efa583aca1073a5d3"
+  }
+}

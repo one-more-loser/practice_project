@@ -1,0 +1,18 @@
+{
+  "review_inputs_refreshed_after_external_update": true,
+  "updates": [
+    {
+      "path": "D:\\codex_project\\项目实战\\03-ecommerce-text2sql-finetuning\\docs\\01-requirements\\PRD.md",
+      "initial_sha256": "e002d87a9d3c8ffe2066125ebedac8ef707410e9651b9b9a915c67b43966aabd",
+      "final_sha256": "6a9f9ddb3d4f4bcc996225e5e659a9c48e6138a00a2741971a8b983eb57dbe62",
+      "external_change": "one added index row for 01 contract review package",
+      "removing_only_added_index_row_matches_initial_sha": true
+    }
+  ],
+  "final_input_hashes": {
+    "D:\\codex_project\\项目实战\\03-ecommerce-text2sql-finetuning\\docs\\01-requirements\\PRD.md": "6a9f9ddb3d4f4bcc996225e5e659a9c48e6138a00a2741971a8b983eb57dbe62",
+    "D:\\codex_project\\项目实战\\03-ecommerce-text2sql-finetuning\\docs\\02-design\\_research\\contract-mapping.md": "bc2f9d349618a8aa5b5a8eb3fe2a938d23498cd06d5644beaa733b4ad91efa09",
+    "D:\\codex_project\\项目实战\\03-ecommerce-text2sql-finetuning\\docs\\03-data\\01-小闭环计划.md": "57560c32a2c5e73ecf0d0a0c98e153dd85b92cd054edc30172405b241209e31e"
+  },
+  "03_written_by_this_review": false
+}

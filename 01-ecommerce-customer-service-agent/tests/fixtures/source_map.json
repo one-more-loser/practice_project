@@ -1,0 +1,16 @@
+{
+  "revision": "LINEAGE-CS-B0-v1",
+  "source": "data/synthetic/manifest.json",
+  "real_csv_ingested": false,
+  "fields": [
+    {"entity": "SourceBatch", "required": ["batch_id", "generation", "source_kind", "seed", "fingerprint", "manifest_revision", "status", "created_at"], "source": "manifest与规范化样本SHA256"},
+    {"entity": "Store", "required": ["store_id", "name", "status", "currency", "business_timezone"], "source": "模拟单店规则"},
+    {"entity": "Subject", "required": ["subject_id", "store_id", "subject_type", "login_name", "password_digest", "account_status", "auth_version"], "conditional": {"customer_id": "subject_type=customer"}, "source": "合成账号；密码随机生成后仅保存摘要"},
+    {"entity": "RoleGrant", "required": ["grant_id", "staff_id", "store_id", "role", "grant_status", "valid_from"], "conditional": {"valid_to": "限时授权", "revoked_at": "撤销", "revocation_reason": "撤销"}, "source": "已批准角色矩阵，兼任不合并权限"},
+    {"entity": "LoginSession", "required": ["session_id", "subject_id", "token_digest", "csrf_digest", "active_role", "auth_version", "status", "expires_at"], "conditional": {"revoked_at": "退出或吊销"}, "source": "服务端登录动作；无原始cookie入库"},
+    {"entity": "ShippingInput", "required": ["input_id", "owner_id", "store_id", "recipient", "phone", "province", "city", "district", "street", "purpose"], "optional": ["postal_code"], "source": "B0合成受控输入；T-CS-006个人表单补写入与订单关联"},
+    {"entity": "AuditEvent", "required": ["audit_id", "request_id", "action", "outcome", "summary", "occurred_at", "recorded_at", "source_kind"], "conditional": {"actor_id,role,store_id,data_batch_id,batch_generation": "已认证且可归属", "resource_ref": "已核对数据库资源"}, "source": "脱敏业务动作；无原始请求或异常堆栈"}
+  ],
+  "ordinary_common_fields": ["created_at", "updated_at", "version", "source_kind", "data_batch_id", "batch_generation"],
+  "future_csv_rule": "逐列映射、类型/单位/时区/枚举/缺失质量核验；补充字段独立记录来源，不宣称原CSV已有"
+}

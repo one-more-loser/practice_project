@@ -1,0 +1,61 @@
+-- customer_self logical schema (01 CS-QUERY-B2-v1, 52 columns)
+-- revision: CS-QUERY-B2-v1  metric revision: CS-METRIC-B2-v1
+-- digest: 509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9
+-- This is the model-visible schema only. Identity, RLS, and execution stay
+-- outside the model.
+
+cs_order_self(
+  order_id text, created_at timestamptz, paid_at timestamptz, received_at timestamptz,
+  trade_status text, fulfillment_status text,
+  goods_minor bigint, discount_minor bigint, freight_minor bigint, payable_minor bigint,
+  paid_minor bigint, refunded_minor bigint, net_paid_minor bigint, currency text
+)
+-- grain: one row per order; amounts in integer minor units (CNY cents)
+-- trade_status: awaiting_payment, paid, completed, cancelled_unpaid,
+--               cancelled_refunded, closed_refunded
+-- fulfillment_status: unshipped, in_transit, received_by_customer
+
+cs_order_item_self(
+  order_item_id text, order_id text, sku_id text, product_name text,
+  ordered_qty integer, paid_goods_minor bigint,
+  refunded_qty integer, refunded_goods_minor bigint,
+  remaining_qty integer, remaining_goods_minor bigint
+)
+-- grain: one row per order line
+
+cs_shipment_self(
+  shipment_id text, order_id text, carrier text, status text,
+  shipped_at timestamptz, carrier_signed_at timestamptz, tracking_updated_at timestamptz
+)
+-- grain: one row per shipment/package; status: carrier_signed etc.
+
+cs_wallet_summary_self(
+  account_id text, balance_minor bigint, currency text, status text
+)
+-- grain: one row per wallet account
+
+cs_wallet_entry_self(
+  entry_id text, kind text, amount_minor bigint, sequence integer,
+  balance_before_minor bigint, balance_after_minor bigint,
+  occurred_at timestamptz, currency text
+)
+-- grain: one row per ledger entry; kind: initialization, topup, payment, refund
+-- amount_minor is the entry amount (direction is carried by kind, not sign)
+
+cs_product_public(
+  product_id text, sku_id text, name text, category text, currency text,
+  price_minor bigint, available_qty integer, price_version integer, as_of timestamptz
+)
+-- grain: one row per published SKU; public fields only
+
+metrics:
+  orders.count          count of paid orders (4 paid statuses + paid_minor>0), created_at window
+  orders.paid_minor     sum(paid_minor), same cohort
+  orders.refunded_minor sum(refunded_minor), order-cumulative refunds, not wallet cash
+  orders.net_paid_minor sum(paid_minor - refunded_minor), non-negative at order level in 01
+
+rules:
+  - Asia/Shanghai business window; SQL receives aware UTC half-open [start_at,end_at)
+  - monetary values are integer minor units; compare integer cents
+  - no identity WHERE; identity/RLS is server-side
+  - unknown/ambiguous refund scope -> clarify; write or cross-customer -> unsupported

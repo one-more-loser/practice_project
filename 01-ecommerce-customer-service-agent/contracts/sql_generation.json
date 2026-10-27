@@ -1,0 +1,38 @@
+{
+  "contract_version": "XCS-SQL-v0.1",
+  "status": "01_consumer_draft_not_jointly_approved",
+  "schema_contract": "cs_agent.query.schema REVISION/DIGEST; unknown values fail closed",
+  "configuration": [
+    "base_url",
+    "api_key_secret_ref",
+    "model",
+    "service_revision",
+    "protocol"
+  ],
+  "request": "scoped logical schema and metric revision plus redacted question; identity scope is bound by server independently",
+  "response": "read-only SQL candidate with schema/metric versions; parsed and qualified before execution",
+  "execution": "01 controlled query role, fixed resources/fields/functions, timeout/row/cost bounds; no database credential goes to model",
+  "writes": "authorized business APIs only; model has no SQL execution right",
+  "ownership": "project 03 chooses, trains, evaluates and supplies SQL model; project 01 does not hardcode its model type",
+  "external_validation": "this repair run used pure unit and SQLite adapters only; no project03, paid model, production or current database execution",
+  "baseline_entry": "docs/04-integration/query-binding-20261024/README.md",
+  "request_examples": "docs/04-integration/query-binding-20261024/protocol-examples.json",
+  "optional_request_fields": [
+    "query_context",
+    "metric_definitions"
+  ],
+  "optional_nonquery_fields": [
+    "reason_code",
+    "missing_slots",
+    "clarify",
+    "questions",
+    "options",
+    "query_context_id",
+    "query_context_version",
+    "code",
+    "error_code",
+    "error",
+    "retryable"
+  ],
+  "parameter_binding": "model returns parameter_names only; backend grounds explicit user text, checks current scope and binds execution values"
+}

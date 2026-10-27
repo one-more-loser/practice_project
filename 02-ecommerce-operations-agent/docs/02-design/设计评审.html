@@ -1,0 +1,609 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>V1店铺活动执行闭环设计</title><style>
+:root{--ink:#30251e;--muted:#75675d;--line:#e6ded5;--green:#aa4a1c;--bg:#fffaf5}*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:76px}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.8 "Segoe UI","Microsoft YaHei",sans-serif}header,main,footer{max-width:1240px;margin:auto;padding:32px 36px}header{padding-top:54px}h1{font-size:clamp(28px,3vw,42px);line-height:1.3;letter-spacing:-.025em}h2{font-size:25px;line-height:1.5;margin-top:36px}h3{font-size:20px;margin-top:28px}h4{font-size:17px}p,li{overflow-wrap:anywhere}li{margin:6px 0}a{color:var(--green);text-underline-offset:3px}.status{display:inline-block;padding:3px 11px;color:#824312;background:#fff0d8;border:1px solid #dbbf8d;border-radius:4px;font-size:14px}.lead{font-size:18px;max-width:960px;color:var(--muted)}nav{position:sticky;top:0;background:#fffaf5f7;z-index:4;border-block:1px solid var(--line)}nav div{max-width:1240px;margin:auto;display:flex;gap:25px;overflow:auto;padding:13px 36px}nav a{white-space:nowrap;font-weight:600;text-decoration:none}.flow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:18px 0;border-block:1px solid var(--line);margin-top:26px;font-weight:600}.flow i{color:#c7a082;font-style:normal}.two{display:grid;grid-template-columns:1.1fr 1fr;gap:32px}.callout{border-left:3px solid var(--green);padding-left:22px}.table-scroll{overflow:auto;border:1px solid var(--line);margin:20px 0}table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.75;min-width:700px}th,td{text-align:left;vertical-align:top;padding:12px 14px;border-bottom:1px solid var(--line);overflow-wrap:anywhere}th{background:#fff0e5}tr:nth-child(even){background:#fff7ee}tr:last-child td{border-bottom:0}.document{border-top:2px solid var(--green);padding-top:20px;margin-top:46px}.document h1{font-size:30px}.document-top{display:flex;justify-content:space-between;gap:16px;font-size:14px;color:var(--muted)}pre{background:#fff1e7;overflow:auto;padding:18px}code{font:13px/1.7 Consolas,monospace;background:#fff1e7;padding:2px 4px;overflow-wrap:anywhere}pre code{padding:0}footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px}details{margin:12px 0}summary{cursor:pointer}@media(max-width:760px){header,main,footer{padding:24px 18px}.two{grid-template-columns:1fr;gap:16px}nav div{padding:12px 18px;gap:18px}.document h1{font-size:26px}}@media print{nav{display:none}body{background:white;font-size:11pt}header,main,footer{max-width:none;padding:12px}.document{break-before:page}table{min-width:0;font-size:8pt}.table-scroll{overflow:visible;border:0}th,td{padding:6px}tr{break-inside:avoid}h2,h3{break-after:avoid}}
+</style></head><body><header><p>02 · 电商促销筹备与经营分析 Agent</p><h1>V1店铺活动执行闭环设计</h1><span class="status">2026-10-23 · 设计已批准 · 02本地收尾 · 待真实联调</span><p class="lead">用户已批准首发现货直降与完整执行闭环，02已实施M0～M6。当前阅读入口用于核对需求、设计和实现边界；01契约尚未签收，真实联调、模型和生产未验收。</p></header><nav aria-label="评审导航"><div><a href="#overview">产品与执行主线</a><a href="#doc-architecture">闭环设计</a><a href="#doc-contracts">接口与01变更单</a><a href="#doc-review">设计评审记录</a></div></nav><main>
+<section id="overview"><div class="two"><div><h2>第一版交付什么</h2><p><strong>一份校验可行、负责人确认、可以在店铺发布执行的运营方案。</strong>经营看板、Agent问数与候选比较为该结果服务。</p><ol><li>统一登录，进入获准店铺的管理端。</li><li>查看经营快照，设定活动目标、预算与利润底线。</li><li>比较候选，编制库存/岗位容量、执行责任与监控计划。</li><li>必需经营、资源、执行条件全通过，店长确认方案。</li><li>店铺活动页预检并发布，让商城报价和订单实际生效。</li><li>暂停/结束活动，实际数据回到02监控与复盘。</li></ol></div><div class="callout"><h2>01与02各做什么</h2><p><strong>01：</strong>现有商城、商品/售价、库存、订单与履约；V1需新增活动执行、统一优惠报价、数量/预算额度及实际出口。</p><p><strong>02：</strong>经营问数、确定性测算、完整方案、可行性检查、确认及监控复盘；模型不自主发布。</p><p><strong>03：</strong>后台SQL生成/训练评测，管理员无须进入训练工程。</p><p>首发已批准：选定SKU现货直降，真实发布/暂停/结束；满额券可探索测算，执行不支持时不能标整体可行。</p></div></div><div class="flow"><span>经营目标</span><i>→</i><span>完整方案</span><i>→</i><span>经营/资源/执行检查</span><i>→</i><span>店长确认</span><i>→</i><span>活动发布</span><i>→</i><span>成交与复盘</span></div><h2>当前交付与验收门槛</h2><ol><li>首发SKU现货直降、完整方案、发布/暂停/结束、商城真实生效与实际回传已获用户批准；02本地M0～M6已有实现。</li><li>活动价独立于常规售价，预算/数量/库存同事务预占，暂停结束不改旧订单。</li><li>发布超时先按原执行意图对账；一个意图只能对应一个01活动。</li><li>本会话只修改02；01先核对补全提示词，新会话统一实施01/02联调，结果由用户分别交原会话独立验收。</li><li>真实经营数据、模型费用、数值SLA和部署仍按对应阶段确认，不扩大既有授权。</li></ol><p>21项功能、23条业务规则、9项非功能目标、60项验收条件仍为业务判定基线。02有本地规则/API/工作台、撤销和对账入口；演示确认不签真实grant。完整V1待01真实执行、02真实消费、专用PG及同版本联合验收。确定性工具解释不代表真实模型Agent。</p></section>
+<section class="document" id="doc-architecture"><div class="document-top"><span>闭环设计</span><a href="V1闭环设计.md">Markdown源文件</a></div><h1 id="architecture-v1">V1完整运营方案与店铺活动闭环设计</h1>
+<p>版本：DESIGN-OPS-v0.1｜2026-10-23｜<strong>用户已批准，02已实施；01待用户协调与双方联调</strong>。</p>
+<p>输入：<a href="../01-requirements/PRD.md">REQ-OPS-v0.2</a>。用户已批准首发现货直降及完整方案/真实执行闭环，明确“01由我协调，本会话仅实施02”。批准不代替01契约签收、真实集成验收、模型费用或部署授权。02实现差异见<a href="../06-acceptance/02模块验收记录.md">模块验收</a>，字段/路径见<a href="../04-integration/02实际执行契约.md">实际契约</a>。以下设计原则保留为双方验收目标。</p>
+<h2 id="architecture-1">1. 交付结果与首发范围</h2>
+<p>V1出口是：管理员一次登录，在经营工作台提出目标；02基于经营快照生成候选，编制含资源、执行责任和监控条件的完整方案；所有必需检查通过后，店长确认，再明确点击“发布活动”；01在店铺系统持久发布，顾客看到活动价、结算和订单使用同一优惠，预算/数量不超占；管理员能暂停/结束；真实活动实际回到02监控复盘。</p>
+<p>首发建议限定：CNY、获准店铺、选定SKU的独立直降、现货不补货、无叠券/跨店、无采购/广告依赖；每SKU保存确定的活动单价和活动数量上限。可包含多个SKU，但每SKU规则独立，同SKU重叠活动拒绝。客服/仓储用已确认的岗位容量参数检查，不提前建设个人排班系统。满额券保留探索测算，执行不支持时不能进入可发布集。</p>
+<p>独立测算、合同替身、演示按钮都是中间产物。V1签收需要真实01/02接口、数据库和商城购买流程；模拟店铺的数据仍标synthetic，不承诺促销实际增量。</p>
+<h2 id="architecture-2">2. 架构选择与职责</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>方案</th>
+<th>取舍</th>
+<th>选择</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>同一产品入口，01与02按API分开维护</td>
+<td>复用01身份、商城与执行事实，02独立维护经营数据/方案；需要身份/活动/经营契约签收</td>
+<td>推荐；符合三个目录及当前事实</td>
+</tr>
+<tr>
+<td>将01整仓复制到02再扩展</td>
+<td>两套身份、订单/库存和回归容易分叉，活动实际难以统一</td>
+<td>不采用</td>
+</tr>
+<tr>
+<td>02单独看板＋模拟发布</td>
+<td>初期规则验证便捷，无法证明店铺执行效果</td>
+<td>仅测试适配器，不作为V1产品</td>
+</tr>
+</tbody>
+</table></div>
+<p>建议Vue/TypeScript承载02工作台、FastAPI承载业务API、PostgreSQL承载02数据与持久任务；与01技术生态保持兼容，最终依赖版本在实施前锁定。02依赖已安装并锁定，当前版本见requirements.lock/package-lock.json；真实PG与01集成仍待验收。首版不引入Redis、独立消息队列、向量库或多Agent层。数据库持久任务/Outbox满足当前状态与重试；模型适配器与业务服务分开。</p>
+<pre><code class="language-mermaid">flowchart LR
+  U[管理人员] --&gt; WEB[同一管理入口]
+  WEB --&gt; OPS[02 经营工作台与API]
+  WEB --&gt; CS[01 店铺活动与商城API]
+  OPS --&gt; ID[01 可信会话与店铺范围]
+  OPS --&gt; ODB[(02 快照/指标/方案/确认/对账)]
+  OPS --&gt; MODEL[获准模型 / 后续03 SQL]
+  OPS &lt;--&gt; CONTRACT[版本化方案授权/经营/活动回执]
+  CONTRACT &lt;--&gt; CS
+  CS --&gt; CDB[(01 活动/报价/订单/预算额度/支付)]
+  BUYER[顾客] --&gt; CS
+</code></pre>
+<p>01拥有活动状态、报价、订单、库存、预占/核销、支付/退款与执行回执；02拥有分析目标、来源快照、计算、完整方案、决策和监控视图；03只生成SQL候选/训练评测，不获得数据库执行权。02不读取01物理库或持有01写连接，模型不能调用活动写工具。</p>
+<h2 id="architecture-3">3. 统一管理入口与身份</h2>
+<p>建议统一站点下 <code>/shop</code> 保留01业务管理，<code>/operations</code>承载02工作台，管理导航增加“经营分析”“店铺活动”；既有 <code>/api/v1/</code>路由到01，新 <code>/api/ops/v1/</code>到02。具体入口配置归总体协调，本文不改根目录或01。可以是两个前端构建，不要求复制或合并整个工程。</p>
+<p>现有事实：01用HttpOnly/SameSite=Strict的cs_session Cookie，POST/DELETE/PATCH校验Origin与X-CSRF-Token；GET <code>/api/v1/session</code>返回subject_id/store_id/active_role/roles/auth_version/expires_at/csrf_token。frontend request使用same-origin。01不是已交付的通用SSO，也没有天然operations角色或跨店列表。</p>
+<p>设计消费方式：02仅向配置白名单内的01会话地址转交指定cs_session Cookie进行身份校验，不保存密码、不解析或复制01会话签名算法、不将Cookie交模型/日志；禁跟随重定向。每个敏感读/写、任务恢复、下载和决策重新核验，不用正向权限缓存满足撤权。01不可用时失败关闭。返回字段限白名单，不导出个人身份细节。</p>
+<p>02定义经营能力metrics.read、cost.read、data.import、plan.edit、plan.confirm，但在线能力授予/撤销以01的主体/店铺/capability_revision为单一权威；02只保存投影/审计，不建立另一套可独立扩权的授权主库。activity.publish/manage同由01实施，并与已确认计划绑定；shop_admin名字不自动附成本/发布权。发布事务重新锁定核验01当前主体/能力版本，撤权不能仅靠02缓存传播。初版只开放当前会话获准店铺；多店登录能力另审。02写API校验本站Origin及可信会话绑定CSRF，向01写入仍由01鉴权/CSRF。01现有session尚无该能力投影，须DEP-06/07签收新增字段/管理方式。</p>
+<p>开发测试可注入固定身份适配器，仅在隔离测试配置启用；生产配置禁止该适配器，也不接受X-User/X-Store等客户端自报身份。测试登录/页面通过不算统一登录通过。</p>
+<h2 id="architecture-4">4. 管理人员页面与操作</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>区域</th>
+<th>核心内容</th>
+<th>动作与门禁</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>经营工作台</td>
+<td>支付/退款/净实付、销量/库存/成本覆盖、数据时点；Agent问题区</td>
+<td>看状态、追问、建立活动目标；利润未知时显示缺口</td>
+</tr>
+<tr>
+<td>方案详情</td>
+<td>目标、候选比较、资源/责任任务、执行规则、监控与停止条件、证据</td>
+<td>修改草稿、重算、提交、确认/驳回；未知硬约束不确认</td>
+</tr>
+<tr>
+<td>店铺活动</td>
+<td>完整执行方案、原价/活动价、SKU/额度、起止、执行状态/记录</td>
+<td>预检、发布、暂停、恢复、提前结束；执行权单独校验</td>
+</tr>
+<tr>
+<td>监控/复盘</td>
+<td>01实际支付/退款/数量/让利、计划差异、库存/预算余量、watermark</td>
+<td>查看风险、提出调整；调整产生新方案/审批，不让模型直接改正在运行的活动</td>
+</tr>
+</tbody>
+</table></div>
+<p>确认方案与发布活动是两个动作。发布前展示将生效的价格、数量/让利上限、时间及对旧报价/订单的影响；按快照计算过不代表最新预检通过。按钮必须关联真实API和回执，网络超时显示“结果待核对”，不能提示未发布并新建另一活动。</p>
+<h2 id="architecture-5-02">5. 02内部模块与主要数据</h2>
+<p>下列是拟新增职责/实体，不声称文件或表已经存在；物理迁移只在实现阶段创建和执行。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>模块</th>
+<th>主要职责/拟实体</th>
+<th>不变量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>identity</td>
+<td>01身份适配、能力只读投影/审计、字段投影</td>
+<td>在线授权权威在01，02不独立扩权；每次恢复复核</td>
+</tr>
+<tr>
+<td>snapshots</td>
+<td>data_batch、snapshot_revision、source_mapping、成本/费用/容量来源</td>
+<td>不可变批次、源修订替换、保留synthetic来源链</td>
+</tr>
+<tr>
+<td>metrics</td>
+<td>指标字典、固定只读查询、结果query_ref</td>
+<td>支付/退款粒度先聚合，口径与分母绑定；空/0/未知分开</td>
+</tr>
+<tr>
+<td>simulation</td>
+<td>候选/情景、Decimal/整数分测算、约束结果</td>
+<td>模型不算钱；同输入/版本结果一致</td>
+</tr>
+<tr>
+<td>plans</td>
+<td>goal、plan_version、validation_result、task_checklist、approval</td>
+<td>方案不可变版本，金额/资源/执行三类校验，审批不覆盖历史</td>
+</tr>
+<tr>
+<td>execution_bridge</td>
+<td>execution_intent、grant、receipt、outbox/inbox、reconcile_attempt</td>
+<td>一个审批版本至多一个意图、grant和01活动；01才是执行权威；未知结果先终态对账</td>
+</tr>
+<tr>
+<td>monitoring</td>
+<td>activity_snapshot_revision、metric_comparison、alert、retrospective</td>
+<td>经营实际与客服周证据分开，按revision替换，不把ACK当实际</td>
+</tr>
+<tr>
+<td>agent</td>
+<td>问题/槽位、工具路由、结构化解释、持久任务</td>
+<td>无发布/支付工具；有界请求、费用未授权不真实调用</td>
+</tr>
+</tbody>
+</table></div>
+<p>02自用数据库与01分离，迁移角色、应用角色、只读查询角色分开。金额用BIGINT分、跨服务字符串；比例用定点，未知值用NULL与原因。所有业务实体带store_id、来源/批次、version、created_at/updated_at；跨表引用校验相同store。唯一键至少包括源批次摘要、(store,plan_id,version)、执行意图号、消费event_id、(snapshot_id,revision)。</p>
+<p>成本/容量缺失不补0。V1模拟数据可以提供有标记的完整成本与岗位参数；若使用实际源则核验字段覆盖和负责人的确认记录。分析接口先读取02已签收快照，03后续仅对02允许的经营只读投影生成候选，不能去01写库查全表。</p>
+<h2 id="architecture-6">6. 完整方案的生成与状态</h2>
+<p>方案必须包含：目标/SKU/活动窗；数据证据/假设；原价与候选对比；选定价格/数量/让利预算；商品成本、贡献利润及范围；库存/履约/岗位容量；执行任务的负责人/截止/依赖/完成条件；活动发布/暂停/结束清单；监控阈值/数据源/复盘时间；版本与审批记录。</p>
+<p>方案状态建议：draft → evaluated → ready_for_confirmation → confirmed_feasible；不通过可为needs_data/infeasible；另有rejected/invalidated/archived。validation_scope记录已检查哪些范围，validation_result分经营、资源、执行、任务完整度。只算利润通过的候选仍为evaluated，不提升为完整可行。</p>
+<p>数据/预算/成本/资源/规则/活动能力改变必须重算并重新确认。确认前缺执行支持不能通过；如果01实际预检晚于方案确认发现资源变化，进入invalidated/needs_data，不跳过预检。确认绑定原始不可变版本，新的编辑只生成新草稿。</p>
+<p><strong>执行状态独立</strong>：not_requested → prepared → publishing → published；异常为result_unknown/failed，published之后回映01的scheduled/active/paused/ended。01未实际持久提交，02不能显示已发布。活动暂停/结束不会抹掉旧决策或改旧订单。</p>
+<h2 id="architecture-7">7. 发布协议与未知结果</h2>
+<p>为避免两个数据库假装原子事务，采用“不可变方案授权＋01本地事务＋回执/对账”。接口详见 <a href="#doc-contracts">跨项目接口与01变更单</a>。</p>
+<ol>
+<li>02按最终方案做资源/经营/执行检查，店长确认；01活动页通过服务身份取得受控方案，不信任前端传来的金额或确认人。</li>
+<li>用户点击预检，01按最新本地SKU/价格/库存/冲突/权限返回preview_ref、绑定的计划摘要/资源版本、有效期和检查结果。没有活动/事实契约时不伪造通过。</li>
+<li>用户明确发布；01再验会话/执行权/CSRF及预检，在短事务持久创建execution_slot，以(store_id,plan_ref,plan_version,approval_ref)唯一，服务器生成intent。两个客户端/不同幂等键命中同一槽位；02同样以审批版本唯一授予grant（绑定该intent、actor/store、版本/规则/期限），记录publishing并冻结原意图。网络调用在事务外。</li>
+<li>在授权期限内，01本地短事务按“主体/能力→execution_slot→商品/SKU→库存/活动额度”的统一次序锁定；校验当前能力、slot非终态、版本/时间/冲突/摘要。在槽位临界区内接受有效grant后，可完成该次本地事务，插入唯一审批/slot/grant对应活动及固定预算占用、规则快照和Outbox；同事务将slot标committed。事务内不调用02/模型。</li>
+<li>01提交后返回activity_id/version与operation_ref，02消费回执并对账；响应丢失时按grant/intent查询01原结果，不能换键再发布。</li>
+</ol>
+<p>grant建议有效60秒（待评审），到期后不能新进入槽位临界区受理；已持槽位锁且在到期前受理的事务可以完成，最终结果由持久slot判定，不以HTTP到达时间猜测。preview建议5分钟，资源版本变化立即失效。</p>
+<p><strong>终态屏障：</strong> 01新增finalize-expired对账写操作；授权到期后，锁同一个execution_slot并在取得锁后读取可信当前时钟。若发布事务在途，该操作等待它提交/回滚；等待超时返回unknown。若slot已committed，返回原activity；否则在锁内写closed_no_effect/terminal_revision，后续任何迟到发布必须锁slot并拒绝。只有这个已持久封闭的状态才能返回absent_after_expiry；只读GET查不到活动/slot、超时或授权到期都不能解除02冻结。服务崩溃回滚后也按此闭合。旧grant/slot关闭后不能重新打开。</p>
+<p><strong>审批次数：</strong> 一个approval_ref＋plan_version只可产生一个intent/grant和活动。结束活动后仍不允许复用审批再发布；失败终态后重试同意图只能回原失败。需要重新执行时产生新方案版本和人工审批，展示旧已核销/未付预占，明确新增预算或在原总预算扣除旧占用，不能原封复制完整预算偷偷续发。</p>
+<p><strong>冻结边界：</strong> grant签发前，成本/数据/任务/审批变化都要重算。签发后，经营快照/成本/情景作为已批准的短期执行假设冻结；新数据标记待重评，但不能在02单方面宣布在途授权已失效。01侧实时权限/capability_revision、价格、可售、库存、额度、活动状态仍在发布临界区重新校验，变化即拒绝。若要撤销审批或紧急停止未决意图，02发cancel-request，由01在同一slot屏障闭合：未提交则closed_no_effect，已提交则返回活动并要求有权人员暂停/结束；不能承诺跨数据库瞬时撤销。新方案不得绕过未决旧意图。此规则是有期限的快照授权，不宣称所有经营数据始终为最新。</p>
+<p>不通过“发送成功”证明生效，不补造activity_id。01实际结束与02回映短暂不一致时以01为准，02显示最后核对时间/待核对。回执至少一次，02按event_id去重并按activity_id/version替换；未采用消息平台，先用数据库Outbox＋有界拉取/重试。</p>
+<h2 id="architecture-8-01">8. 01活动价格、预算与订单（必需变更）</h2>
+<h3 id="architecture-81">8.1 活动叠加于常规价</h3>
+<p>推荐新增01活动域，不直接把SKU常规售价改成活动价。活动保存SKU、确认时原价/price_version、活动单价、[start,end)、活动数量上限、预算上限/固定费预算占用、方案/规则/授权版本。锁同一SKU后检查时间窗重叠；不依赖新中间件或定时器保证排他。</p>
+<p>01唯一价格解析用于商品页、购物车显示、quote与create_order校验：按可信时钟、状态和额度识别可用活动；活动单价优于原价且来源可追溯。首版有未结束活动时，常规售价变更返回冲突，需先结束活动再改价；上下架/库存变化仍须检查可售。结束后自然回到当时有效常规价，不执行“写回旧价”。</p>
+<p>报价保存base/effective unit price、activity_id/revision、规则/窗口、SKU价格版本及优惠行分摊；旧有goods_minor是优惠前商品金额、discount_minor为真实优惠、allocated_minor为实收。01现有ALLOC-LAST-UNIT-v1历史订单不重写；新直降整数单价不产生单位分摊余差。方案的订单级权重分摊只用于已有/未来订单券，不硬套进旧退款分配规则。</p>
+<h3 id="architecture-82">8.2 时间、预占与预算</h3>
+<p>活动“是否生效”按每次请求的可信时钟判断，开始含/结束不含；显示状态可派生scheduled/active/ended，Worker延迟不能延长优惠。暂停/提前结束递增活动版本，阻止新活动报价/建单，暂停前未建单报价要求重新确认；已创建订单继续按保存价与原付款有效期处理。</p>
+<p>报价只试算；建单时活动数量/让利与现有库存同事务预占。每SKU活动数量和全活动可变让利的reserved＋consumed不得超过上限；可变让利上限=方案总让利预算－固定费预算占用。固定费预算占用不是自动扣现金，实际支付费用另外导入。并发争抢失败返回重新报价，不静默按原价扣款。</p>
+<p>付款将活动预占核销，未付款取消/到期与库存释放一起释放一次；付款后退款按原订单已分摊实付进行，不恢复活动营销额度（保守上限，防循环购买）。计划预算、预算预占、已核销让利、现金费用、会计利润分开列。订单行保留活动归属，退款沿原行/原活动归属，不能按活动后新价退款。</p>
+<p>统一锁顺序须覆盖发布/恢复、SKU常规改价、quote校验/建单、支付、取消到期和退款的活动/库存行；实施前由01对现有锁顺序增量评审，不能只给新发布接口加锁。预算任何异常失败关闭，禁止用全价静默替换顾客已确认价。</p>
+<h2 id="architecture-9-agent">9. 实际经营、监控与Agent边界</h2>
+<p>01新增面向02的只读经营/活动聚合；包含store/activity/SKU/time bucket、支付/退款事件口径、销量/退货分开、预占/核销预算、库存时点、watermark、source_kind和版本。02保留完整度与迟到修订，真实业务事实不从客服周汇总推算。</p>
+<p>V1基础监控可用受控分桶拉取/导出：有真实01执行与真实实际输入，频率目标待D-04签收；如果只有回放就明示回放，不能签实时目标。风险由确定性阈值触发、Agent解释；暂停/结束仍由管理员有权点击。自动停活动仅限01确定性时间/数量/预算硬门禁，不由模型自由决定。</p>
+<p>Agent可用工具：读取获准指标/证据、运行情景测算、计算资源容量、编制草稿/任务清单、读取校验结果。确认/授权grant/活动写接口不在模型工具表。结构化输出必须实际Schema校验，引用每个工具结果与快照；缺字段不补身份、SQL、价格或利润。03接口未就绪可固定工具先开发；真实模型费用与型号未授权不调用。</p>
+<h2 id="architecture-10">10. 验证、开销与批次出口</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>批次</th>
+<th>工作与证据</th>
+<th>能宣称完成什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B0 设计/契约</td>
+<td>增量需求、身份/经营/活动共同样本、01改动签收</td>
+<td>可进入实现，不是业务完成</td>
+</tr>
+<tr>
+<td>B1 02确定性内核</td>
+<td>快照、指标、金样本、约束、容量/任务完整度、版本和权限</td>
+<td>规则层/完整方案，不是活动已生效</td>
+</tr>
+<tr>
+<td>B2 01执行域</td>
+<td>实际活动/价格统一解析/额度/报价/订单/取消退款，既有交易回归</td>
+<td>模拟店铺实际执行能力，不是02真实集成</td>
+</tr>
+<tr>
+<td>B3 统一工作台与集成</td>
+<td>同一登录、计划确认、真实预检/发布/回执、商品优惠购买、暂停/结束、实际汇总/复盘</td>
+<td>满足全部V1AC后提交用户签收</td>
+</tr>
+<tr>
+<td>B4 有界模型与交付</td>
+<td>固定小集、费用/首次失败、真实负载、恢复/部署检查</td>
+<td>仅对应证据范围；部署另需环境/目标确认</td>
+</tr>
+</tbody>
+</table></div>
+<p>报价/建单关键路径只访问01本地数据库，不能等待02/LLM；活动过期由时钟判断，不轮询模型。参考开销目标：同硬件/数据/负载，相对无活动基线P95新增≤50ms（待评审），观测锁等待/查询数、CPU/RAM与费用。02继续PRD的3秒确定性目标；错误/超时不能剔出分母。无事件量证据不提前加MQ/缓存；如需缓存，失效必须覆盖价格/活动版本和时间边界。</p>
+<p>测试优先覆盖AC-OPS-049～060及金额/权限/幂等/越权/旧订单退款回归；金样本D在真实quote→order→pay链路核对，不能仅检查UI成功文案。首个失败保留，不重跑模型掩盖协议问题。发布/支付对账与迁移回滚各自留证；撤回新入口不抹已发活动，停止活动/处理预占后再做数据兼容回滚。</p>
+<h2 id="architecture-11">11. 评审范围与当前限制</h2>
+<p>本版推荐“完整方案＋首发直降执行”，统一管理体验已获用户同意；具体首发规则、活动额度/旧订单/预算口径与接口、01修改范围仍待本轮评审。原“只改02、兄弟只读”仍有效：本文件提出01影响，未写01。没有真实数据/业务库/模型/HTTP验证，没有可运行V1或执行按钮。</p>
+<p>用户不需逐文件确认。评审应一次确认设计版本、执行范围和是否由本会话修改01或由01会话接变更单；获批后按批次完成授权工作。关键未决见 <a href="#doc-review">设计评审记录</a>，本轮截止设计材料。</p></section><section class="document" id="doc-contracts"><div class="document-top"><span>接口与01变更单</span><a href="跨项目接口与01变更单.md">Markdown源文件</a></div><h1 id="contracts-01">跨项目接口与01活动执行变更单</h1>
+<p>版本：XOPS-INTEGRATION-v0.1｜2026-10-23｜<strong>设计获用户批准；02已实现消费者，01待用户协调签收，真实联调未执行</strong>。</p>
+<p>业务输入：<a href="../01-requirements/PRD.md">REQ-OPS-v0.2</a>，设计：<a href="#doc-architecture">V1闭环设计</a>。本文件保留早期变更提案，供用户协调，不授权本会话写01或代发消息。02实际路径/字段已有调整，以<a href="../04-integration/02实际执行契约.md">实际执行契约</a>与Schema为准，不能照旧样本直接联调；01侧仍待实现/核对。</p>
+<h2 id="contracts-1-01">1. 01当前事实与最小影响面</h2>
+<p>根目录：<code>D:/codex_project/项目实战/01-ecommerce-customer-service-agent</code>。本轮只读核对：</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>当前源码</th>
+<th>证据</th>
+<th>所需增量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>frontend/src/pages/LoginPage.vue:19-25；app/router.ts:24-27</td>
+<td>shop_admin无next时进/shop，/shop角色守卫</td>
+<td>管理导航加入经营分析/店铺活动，真实会话/能力映射，顾客不可访问</td>
+</tr>
+<tr>
+<td>frontend/src/pages/ShopPage.vue:62-80、142-151、185-187</td>
+<td>常规改价/库存/整单发货；现有两个业务标签</td>
+<td>增加“店铺活动”入口/页面，完整执行方案、预检/发布/暂停/结束及未知结果核对</td>
+</tr>
+<tr>
+<td>backend/src/cs_agent/identity/api.py、service.py</td>
+<td>cs_session、/api/v1/session与Origin/CSRF，角色是customer/support/supervisor/shop_admin/knowledge_admin</td>
+<td>签收02会话消费/能力映射；01活动发布权必须后端实施，角色名不自动扩为运营能力</td>
+</tr>
+<tr>
+<td>backend/src/cs_agent/commerce/checkout.py:431-469</td>
+<td>quote用sku.price_minor，discount_minor固定0</td>
+<td>统一活动价格解析，报价保存活动/价格修订、原价/优惠/实收</td>
+</tr>
+<tr>
+<td>同文件:148-156、504-507</td>
+<td>建单校验SKU price/product_version与报价</td>
+<td>增加活动版本/时间/额度校验；活动变化不能绕过旧报价检查</td>
+</tr>
+<tr>
+<td>同文件:542-565、635以后</td>
+<td>订单行保存金额与分摊；付款有库存预占核销</td>
+<td>订单行活动归属，额度与库存一并预占/核销/释放；原分摊/退款保持兼容</td>
+</tr>
+<tr>
+<td>catalog/service.py、commerce/expiration.py、aftersales/refunds.py、cancellation相关域</td>
+<td>已有商品/常规价/订单到期/退款职责</td>
+<td>确定活动冲突策略、未付释放、付款/退款额度口径，不复制整套支付</td>
+</tr>
+</tbody>
+</table></div>
+<p>未读取/重跑01历史全量验收；没有探测数据库或当前HTTP。01当前版本指纹、迁移最大号需实施前重查，不把旧交接中的001x/0020或PID当未来固定值。</p>
+<p>建议新增01活动域（拟名activity.service/pricing/api及相应表），由01执行者在实际代码结构内定文件；已有模块按上述路径增量调用。不整仓复制到02；02不改01钱包/库存账本归属。改动必须补既有无活动购买、改价、库存、取消/退款回归。</p>
+<h2 id="contracts-2">2. 权威与边界</h2>
+<ul>
+<li>02生产：不可变运营方案、测算/资源检查、审批、执行任务、短期执行授权。</li>
+<li>01生产：预检、活动权威状态/修订、优惠报价/订单、数量/预算额度与执行回执、经营实际聚合。</li>
+<li>01↔02身份：可信用户/店铺/在线能力授予及撤销、capability_revision以01为单一权威；02定义经营能力并保存投影/审计，不能独立扩权；01在执行事务核对当前主体/能力版本，不接受前端actor_id或SQL授予权限。</li>
+<li>服务凭据限定用途/店铺，只在后端引用。客服聚合密钥不复用为方案/活动写身份。服务认证不代替管理员显式发布，后端服务身份不能任意创建活动。</li>
+<li>03不提供活动接口，不持有数据库执行权。客服周聚合照原边界消费，实时经营另开只读契约。</li>
+</ul>
+<h2 id="contracts-3">3. 拟新增接口清单</h2>
+<p>统一错误envelope建议包含request_id、error.code/message、retryable、operation_ref；成功含data及版本。请求金额为CNY整数分字符串，时间带时区，行/币种/数量严格校验。内部路径仅后端可达，未声明公网入口。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>生产方/路径（全部提案）</th>
+<th>调用方与用途</th>
+<th>权限/输入要点</th>
+<th>输出要点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>02 GET /api/ops/v1/session-context</td>
+<td>02页面识别获准能力</td>
+<td>通过白名单01会话校验，01新增能力投影为权威；不信任URL身份</td>
+<td>当前主体引用/店铺、经营能力、capability_revision、有效期、CSRF；无密码/Cookie正文</td>
+</tr>
+<tr>
+<td>02 POST /api/ops/v1/plans、/{id}/evaluate、/{id}/confirm</td>
+<td>管理工作台建/评估/确认</td>
+<td>edit/confirm/cost权限，expected_version/幂等键；确认前检查第3.5节完整度与01纯预检</td>
+<td>不可变版本、validation_scope/results、missing_conditions、approval_ref</td>
+</tr>
+<tr>
+<td>02 GET /api/ops/v1/internal/plan-revisions/{id}</td>
+<td>01取得受控方案快照</td>
+<td>专用只读服务身份，store/plan/version/hash投影；草稿只能预检</td>
+<td>执行所需字段与检查摘要；confirmed标记/审批，不返回顾客明细或不必要成本</td>
+</tr>
+<tr>
+<td>01 POST /api/v1/shop/activity-previews</td>
+<td>管理员对草稿或已确认方案纯预检</td>
+<td>真实用户/本店/preview能力、Origin/CSRF；plan引用/摘要，SKU基准版本</td>
+<td>preview_ref、scope=dry_run、pass/fail/unknown、资源版本/期限；不创建活动或扣额度</td>
+</tr>
+<tr>
+<td>02 POST /api/ops/v1/internal/execution-grants</td>
+<td>01持久创建审批版本唯一slot后申请冻结意图</td>
+<td>发布桥身份＋01核验actor/store/auth/capability_revision；只接受confirmed plan及01生成intent；(store,plan,version,approval)唯一</td>
+<td>同审批恒定slot/intent/grant；manifest/hash、actor/store、issued/expires、固定规则/额度；未知不给grant</td>
+</tr>
+<tr>
+<td>01 POST /api/v1/shop/activities</td>
+<td>管理员发布已确认方案</td>
+<td>明确用户动作、activity.publish、CSRF、preview/plan/intent/expected_version；01后端申请并使用grant</td>
+<td>activity_id、activity_revision、phase、operation_ref、grant_ref、committed_at</td>
+</tr>
+<tr>
+<td>01 POST /api/v1/shop/activities/{id}/pause、/resume、/end</td>
+<td>管理员生命周期控制</td>
+<td>manage能力、expected_revision、原因、幂等键；resume重查时效/冲突/资源</td>
+<td>新修订与权威状态；end不可逆恢复，需新活动</td>
+</tr>
+<tr>
+<td>01 GET /api/v1/shop/activities、/{id}</td>
+<td>店铺活动页/结果核对</td>
+<td>可信本店、必要字段投影</td>
+<td>活动规则/阶段、计划引用、额度余额、最后操作；不可见他店</td>
+</tr>
+<tr>
+<td>01 GET /api/v1/internal/activity-executions/by-intent/{intent_id}</td>
+<td>02读取权威执行结果</td>
+<td>仅对账身份/固定store</td>
+<td>committed/closed_no_effect/pending/unknown与slot终态修订；不存在/到期不能直接判无效果</td>
+</tr>
+<tr>
+<td>01 POST /api/v1/internal/activity-executions/{intent_id}/finalize-expired</td>
+<td>02在授权到期后封闭未决意图</td>
+<td>专用对账写能力，固定store/intent/grant；与发布相同slot锁，取得锁后验时钟</td>
+<td>在途等待/超时unknown；已提交回activity；否则持久closed_no_effect后才返absent_after_expiry，后续发布拒绝</td>
+</tr>
+<tr>
+<td>01 POST /api/v1/internal/activity-executions/{intent_id}/cancel-request</td>
+<td>02请求取消未决审批执行</td>
+<td>专用能力＋可信原撤销权限；相同slot屏障，不能单方面宣布取消</td>
+<td>未提交封闭；已提交回活动需人工暂停/结束；在途仍unknown，02显示取消待核对</td>
+</tr>
+<tr>
+<td>01 GET /api/v1/internal/stores/{store_id}/operations-snapshot</td>
+<td>02读取全店/活动经营快照</td>
+<td>专用经营只读身份，获准字段、activity/time/bucket/截止时点</td>
+<td>明确粒度/口径/币种、支付/退款/库存/活动实际、watermark/revision/source_kind</td>
+</tr>
+</tbody>
+</table></div>
+<p>经营快照第一版可以按已签收数据量做轮询/分页导出；不能用现有 <code>/support-summary</code> 的周窗或其身份获取经营明细。逻辑Schema/字段包仍按PRD第8节签收，服务没有快照时明确not_ready而不是填0。</p>
+<h2 id="contracts-4">4. 方案执行授权样本（合成协议样本，不是已运行结果）</h2>
+<pre><code class="language-json">{
+  &quot;contract_version&quot;: &quot;XOPS-ACTIVITY-v0.1&quot;,
+  &quot;grant_ref&quot;: &quot;grant_demo_001&quot;,
+  &quot;execution_intent_id&quot;: &quot;intent_demo_001&quot;,
+  &quot;store_id&quot;: &quot;store_demo&quot;,
+  &quot;actor_ref&quot;: &quot;staff_demo&quot;,
+  &quot;auth_version&quot;: 3,
+  &quot;capability_revision&quot;: 5,
+  &quot;plan_ref&quot;: &quot;plan_demo&quot;,
+  &quot;plan_version&quot;: 2,
+  &quot;approval_ref&quot;: &quot;approval_demo&quot;,
+  &quot;manifest_digest&quot;: &quot;sha256-of-canonical-manifest&quot;,
+  &quot;source_kind&quot;: &quot;synthetic&quot;,
+  &quot;validation_scope&quot;: &quot;selected_skus_in_stock_direct_price_v1&quot;,
+  &quot;issued_at&quot;: &quot;2026-11-10T09:00:00+08:00&quot;,
+  &quot;expires_at&quot;: &quot;2026-11-10T09:01:00+08:00&quot;,
+  &quot;activity&quot;: {
+    &quot;start_at&quot;: &quot;2026-11-11T00:00:00+08:00&quot;,
+    &quot;end_at&quot;: &quot;2026-11-12T00:00:00+08:00&quot;,
+    &quot;currency&quot;: &quot;CNY&quot;,
+    &quot;promotion_budget_minor&quot;: &quot;100000&quot;,
+    &quot;fixed_budget_allocated_minor&quot;: &quot;10000&quot;,
+    &quot;items&quot;: [{
+      &quot;sku_id&quot;: &quot;sku_demo_A&quot;,
+      &quot;expected_price_version&quot;: 4,
+      &quot;base_unit_price_minor&quot;: &quot;10000&quot;,
+      &quot;activity_unit_price_minor&quot;: &quot;9200&quot;,
+      &quot;quantity_cap&quot;: 100
+    }]
+  }
+}
+</code></pre>
+<p>金额字段是上限与确认规则，不代表已支付费用或现实需求预测。样本manifest_digest是说明占位，不允许以该字符串做实现中的合法摘要。实际摘要覆盖全部关键字段，密钥/签名或固定认证通道、规范化格式需双方设计签收。真实发布用户必须是任务指定执行人或已记录的授权替代者。</p>
+<p>审批版本唯一键为(store_id,plan_ref,plan_version,approval_ref)，两边均执行：01先持久创建唯一execution_slot/服务器intent，02只授一次grant；01活动同时对slot/grant唯一并存body摘要。同一审批即使换幂等键、双客户端或旧活动结束，也不能创建第二活动。失败终态也不重开；需新方案版本/人工审批，展示旧预算已核销与未付预占，明确批准新增预算或扣除旧占用。</p>
+<p>发布临界区先锁主体/能力再锁slot，验grant未到期并受理后可完成本地事务；finalize-expired必须锁相同slot，等原事务提交/回滚后才能返committed或写closed_no_effect。在取得锁后验时钟，锁等待超时返回unknown。没有slot、查不到活动或过期本身不是无效果证明；只有持久closed_no_effect＋terminal_revision才可解除02冻结，迟到旧请求被该slot拒绝。</p>
+<p>发布冻结的经营快照/成本/情景是有期限的批准假设：新数据标待重评，不允许02单方面作在途撤销承诺；01的权限/能力版本、基准价、可售、库存/额度与活动状态仍在本地临界区实时校验。撤销审批必须通过cancel-request同槽位屏障：先成功闭合才显示取消；已提交则返回活动由有权人员暂停/结束。修订草稿不覆盖原授权，不重新授同审批grant。</p>
+<h2 id="contracts-5">5. 活动/价格/额度语义</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>规则</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>发布时间早于开始</td>
+<td>活动已持久发布但phase=scheduled，不能显示已经享受折扣</td>
+</tr>
+<tr>
+<td>生效时间</td>
+<td>每次报价/建单按[start,end)与状态/修订/额度判断，可信时钟来源01</td>
+</tr>
+<tr>
+<td>直降价格</td>
+<td>0&lt;活动价&lt;基准价，整数分；基准价和price_version必须与审批/预检一致；没有优惠收益时保留原价方案，但不虚构降价活动</td>
+</tr>
+<tr>
+<td>同SKU活动重叠</td>
+<td>发布/恢复在SKU锁下检查，不支持叠加；冲突拒绝而不任意覆盖</td>
+</tr>
+<tr>
+<td>有未结束活动时常规改价</td>
+<td>V1拒绝并要求先结束活动；不把活动结束当“恢复旧价”的盲写</td>
+</tr>
+<tr>
+<td>库存/额度变化</td>
+<td>建单事务内重查；quote不占额度，可能因竞争变为stale，须用户重报价，不自动全价下单</td>
+</tr>
+<tr>
+<td>订单预占</td>
+<td>使用01现有商品/SKU锁和库存预占，在同一事务预占活动qty与让利；固定费预算占用与变动让利分别记</td>
+</tr>
+<tr>
+<td>付款/未付取消/过期</td>
+<td>分别核销/释放同一reservation，幂等；活动暂停后已有订单不丢已承诺的价格</td>
+</tr>
+<tr>
+<td>付款后退款</td>
+<td>按订单原allocated/paid金额和原分摊退款；活动额度不自动回补，实际退款及经济影响另列</td>
+</tr>
+<tr>
+<td>暂停/结束</td>
+<td>新活动quote/建单停止；已有未付订单仍按原付款期限，已付订单不改；恢复须预检，结束不能恢复</td>
+</tr>
+</tbody>
+</table></div>
+<p>不将“已确认可行”承诺为实际销量或利润保证。运行中超数量/让利预算是01硬门禁；经营利润低于监控阈值先提示并允许有权人员暂停，不让LLM修改交易价格或退款。</p>
+<h2 id="contracts-6">6. 错误与最小样本包</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>类别</th>
+<th>HTTP建议/处理</th>
+<th>必测样本</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>unauthenticated / forbidden / not_found</td>
+<td>401/403/404；无权不泄露其他店；不重试</td>
+<td>顾客/普通运营/跨店/撤权，伪造actor或服务身份</td>
+</tr>
+<tr>
+<td>invalid_input / unsupported_rule</td>
+<td>422；字段、币种、价格、窗口错误；不近似</td>
+<td>非整数分、混币、负价、跨SKU券、缺任务/资源</td>
+</tr>
+<tr>
+<td>plan_not_ready / version_conflict / activity_overlap</td>
+<td>409；补数据/重算/新预检</td>
+<td>cost NULL、执行不支持、旧plan/SKU/activity、重叠窗</td>
+</tr>
+<tr>
+<td>budget_or_quota_exhausted / inventory_changed</td>
+<td>409；重新报价/补数</td>
+<td>并发超1件/1分、库存变化，不静默全价</td>
+</tr>
+<tr>
+<td>grant_expired / contract_mismatch</td>
+<td>409/422；拒绝，不造字段或换版本重发</td>
+<td>到期、未知版本/摘要、重复键不同body</td>
+</tr>
+<tr>
+<td>timeout / unavailable / rate_limited</td>
+<td>504/503/429；有界重试/退避，写结果未知先对账</td>
+<td>提交后断连、Outbox重放、服务重启、01暂不可达</td>
+</tr>
+<tr>
+<td>not_ready / partial / late</td>
+<td>经营快照用明确状态/错误，空与0分开</td>
+<td>未生成、水位滞后、迟到退款、重复修订、历史过期</td>
+</tr>
+</tbody>
+</table></div>
+<p>双方签收包至少含：正常草稿预检、确认后发布/回执、空经营快照、缺成本/资源、执行不支持、未知版本、错摘要、越权、重复幂等、写后超时、活动暂停/结束、两种修订到达顺序；附source_kind与金额单位。事件event_id强制必填、资源revision递增；客服旧契约required遗漏另行对齐，不传播到新执行契约。</p>
+<h2 id="contracts-7-01">7. 01需要落地的改动与回归（待用户协调）</h2>
+<ol>
+<li>活动业务域、生命周期/额度表与版本化迁移，迁移编号取实际01最大号之后；保留无活动历史订单/退款兼容。</li>
+<li>统一价格解析进入商品展示/quote/create_order，新增活动版本与订单行归属；不得只改商品列表显示价格。</li>
+<li>活动/库存同事务预占、付款核销、未付取消/过期释放、付款后退款不回补营销额度；所有写入口统一锁顺序。</li>
+<li>店铺活动页与真实预检/发布/暂停/恢复/结束按钮、未知结果对账，接入02完整计划投影；登录导航与能力映射。</li>
+<li>全店经营/活动实际只读出口、Outbox回执与按grant核对；不扩大客服周聚合到个人明细。</li>
+<li>补AC-OPS-048～060真实集成及既有商品/购物车/报价/建单/付款/取消/退款/发货回归。记录首次失败、数据与源码/服务版本，不复制01旧测试数作验收。</li>
+</ol>
+<p>本轮没有代改上述内容或向01会话发消息。若授权由本会话实施，应明确解除原“只修改02”的目录限制，限本变更单的01相关模块及其必要测试/迁移/文档；若由01会话实施，用户将本单协调给01并签收实际契约。完成哪一方代码都不能代签另一方真实联调。</p></section><section class="document" id="doc-review"><div class="document-top"><span>设计评审记录</span><a href="设计评审记录.md">Markdown源文件</a></div><h1 id="review-_1">设计评审记录</h1>
+<p>版本：REVIEW-DESIGN-OPS-v0.1｜2026-10-23｜状态：<strong>已获用户批准，仅本会话实施02；真实跨项目验收待办</strong>。</p>
+<p>用户原文：“批准设计，01由我协调，本会话仅实施02”。随后要求：由02给出可转发联调提示词，用户交01确认，双方分别验收各自部分；按模块开发，提高效率而不减少完成度；UI暖白橙同01；子代理仅gpt-6.1-sol medium、父验收。02已执行，见<a href="../06-acceptance/02模块验收记录.md">模块验收</a>。以下“待决定/批准后”段落是当时初稿历史，不再作为停止02实施的理由；真实数据/费用/部署仍未授权。</p>
+<p>输入为REQ-OPS-v0.2及用户连续澄清：“可以，继续执行”→最终要确认可行运营方案→V1要有店铺活动执行方案和按钮。已确认目标与产品主线，不将各项设计提案代签为批准。</p>
+<h2 id="review-_2">历史评审材料（设计批准前；以下提问与待批准措辞保留历史身份）</h2>
+<p>当前批准状态以上文为准，01接口实物/差异以实际契约为准，不据下文重新索取已批准权限。</p>
+<h3 id="review-_3">当时评审材料</h3>
+<ul>
+<li><a href="#doc-architecture">V1闭环设计</a>：统一管理入口、身份、02模块/数据、完整方案、发布状态、01价格/预算/订单保护、性能与批次出口。</li>
+<li><a href="#doc-contracts">跨项目接口与01变更单</a>：实际01证据、拟新增接口/样本/错误、01改动与回归范围。</li>
+<li><a href="../01-requirements/需求追踪与验收矩阵.md">需求与验收矩阵</a>：V1新增AC-OPS-049～060；所有业务AC未执行。</li>
+</ul>
+<h2 id="review-_4">已确定与设计建议</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>事项</th>
+<th>结论</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>产品目标</td>
+<td>同一管理产品中交付确认可行的运营方案及店铺活动执行闭环</td>
+<td>用户明确要求</td>
+</tr>
+<tr>
+<td>项目归属</td>
+<td>02负责计划/检查/审批，01负责真实活动/报价/订单/额度；03仅SQL</td>
+<td>沿用既有边界，新增01执行能力需共同签收</td>
+</tr>
+<tr>
+<td>首发活动</td>
+<td>推荐确定活动单价的SKU直降、现货不补货、基础岗位容量充足；券/采购/广告不入首发执行</td>
+<td>本版建议，待整体评审</td>
+</tr>
+<tr>
+<td>交付门槛</td>
+<td>P0测算不是V1；真实登录/发布/购买优惠/暂停结束/实际回传必须验收</td>
+<td>按用户执行目标落实</td>
+</tr>
+<tr>
+<td>实现结构</td>
+<td>同一站点入口，01/02按API分别维护；02自用库，01本地交易执行；无新MQ/向量库/多Agent</td>
+<td>本版建议，依赖版本/物理部署留实施前核对</td>
+</tr>
+<tr>
+<td>发布一致性</td>
+<td>不可变方案授权、01本地事务、唯一grant活动、未知结果对账；发布中先核对再替换</td>
+<td>本版建议，需双方样本验证</td>
+</tr>
+<tr>
+<td>报价与预算</td>
+<td>统一有效价格；数量/让利/库存同事务预占；暂停结束不改旧订单；退款不自动恢复营销额度</td>
+<td>影响交易，必须评审并回归</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="review-_5">集中需要用户决定</h2>
+<ol>
+<li><strong>本版V1范围</strong>：是否采用首发直降、现货、基础岗位容量、真实发布/暂停/结束及实际回传。完整业务目标保留，复杂券等后续扩展。</li>
+<li><strong>01落地责任/目录授权</strong>：原指令仅改02；此V1必须改01管理端、报价/订单、活动额度和只读实际出口。可由本会话获准后按变更单实施，或用户交01会话实施。当前未改01，未发消息。</li>
+<li><strong>运行数据与真实费用</strong>：建议先有标记的模拟店铺快照/成本/容量跑真实联调，再另验真实经营数据；模型型号/预算、生产资源、时效和保留策略仍待相应阶段确认，无授权不付费调用/上线。</li>
+</ol>
+<p>以上是同一轮设计评审，不要求逐文件许可。数据源、费用和数值未确认时可做获批的确定性开发，但不能签收真实收益/模型/生产目标。尚未获得设计批准，不写业务代码、安装或迁移数据库。</p>
+<h2 id="review-_6">评审与验证记录</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>事件</th>
+<th>结果</th>
+<th>限制</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>设计初稿</td>
+<td>待用户评审</td>
+<td>未批准实现/跨项目写入</td>
+</tr>
+<tr>
+<td>独立可实施性检查</td>
+<td>首轮发现终态对账缺互斥屏障、同审批可多意图、发布冻结/撤销权威不完整；已修订，复核结论为nothing important left</td>
+<td>仅文档可实施性复核，未写代码或调用真实服务/模型/数据库；不是用户批准或业务通过</td>
+</tr>
+<tr>
+<td>文档一致性</td>
+<td>由.runtime/update_review_documents.py核对并输出静态报告</td>
+<td>正反映射/链接/金样本/HTML来源检查，不是渲染/业务验收；此前file被浏览器策略拒绝，不重试/绕过</td>
+</tr>
+</tbody>
+</table></div>
+<p>修订决定：01/02均以审批版本唯一绑定执行意图；01持久execution_slot与发布/取消/过期终结共用锁，查不到不等于未执行；在线能力以01为单一权威，经营假设的短期冻结与实时交易约束分开。见设计第7节、接口第4节及AC-OPS-055/060。上述为技术设计提案，未新增收费或生产授权。</p>
+<p>批准后按B0契约→B1确定性内核→B2执行域→B3真实集成→B4有界模型/交付推进，阶段内授权工作自主完成。任何生产/付费/跨目录授权以用户具体范围为准。</p></section></main><footer><p>Markdown为权威正文；当前状态以HANDOFF为准。仅静态生成/一致性检查，HTML未做浏览器渲染验收。</p><details><summary>来源SHA256（归一UTF-8）</summary><ul><li>docs\02-design\V1闭环设计.md<br><code>afa409599d4508251fb5e403925e00f3a071567aacd5cdda0c53c18fe49a16c2</code></li><li>docs\02-design\跨项目接口与01变更单.md<br><code>cb82cbdd71e546b8fe7d78332dfd810feae031c98b1973823fba532fc4d3592f</code></li><li>docs\02-design\设计评审记录.md<br><code>3355a2feaebb85b62f96e7a91336691248739cd3afffe2f9512d08d021a81e65</code></li></ul></details></footer></body></html>

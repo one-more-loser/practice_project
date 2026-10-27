@@ -1,0 +1,553 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ops02:XOPS-ACTIVITY-v0.1",
+  "title": "02 execution bridge data objects. HTTP success wraps object under data",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/preview_request"
+    },
+    {
+      "$ref": "#/$defs/preview_response"
+    },
+    {
+      "$ref": "#/$defs/grant_request"
+    },
+    {
+      "$ref": "#/$defs/grant_response"
+    },
+    {
+      "$ref": "#/$defs/receipt"
+    },
+    {
+      "$ref": "#/$defs/actuals"
+    }
+  ],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "money": {
+      "type": "string",
+      "pattern": "^[0-9]{1,19}$",
+      "description": "Integer minor units; numeric value <= 9223372036854775807"
+    },
+    "positive": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9223372036854775807
+    },
+    "nonnegative": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9223372036854775807
+    },
+    "version": {
+      "const": "XOPS-ACTIVITY-v0.1"
+    },
+    "time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source": {
+      "enum": [
+        "synthetic",
+        "business_import",
+        "derived"
+      ]
+    },
+    "phase": {
+      "enum": [
+        "scheduled",
+        "active",
+        "paused",
+        "ended"
+      ]
+    },
+    "line": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sku_id",
+        "base_price_minor",
+        "activity_price_minor",
+        "quantity_cap",
+        "price_version"
+      ],
+      "properties": {
+        "sku_id": {
+          "$ref": "#/$defs/id"
+        },
+        "base_price_minor": {
+          "$ref": "#/$defs/money"
+        },
+        "activity_price_minor": {
+          "$ref": "#/$defs/money"
+        },
+        "quantity_cap": {
+          "$ref": "#/$defs/positive"
+        },
+        "price_version": {
+          "$ref": "#/$defs/positive"
+        }
+      }
+    },
+    "manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract_version",
+        "store_id",
+        "plan_id",
+        "plan_version",
+        "rule",
+        "currency",
+        "start_at",
+        "end_at",
+        "scenario_policy",
+        "budget_cap_minor",
+        "fixed_fee_minor",
+        "variable_budget_cap_minor",
+        "lines",
+        "source_snapshot_id",
+        "source_snapshot_revision",
+        "source_kind"
+      ],
+      "properties": {
+        "contract_version": {
+          "$ref": "#/$defs/version"
+        },
+        "store_id": {
+          "$ref": "#/$defs/id"
+        },
+        "plan_id": {
+          "$ref": "#/$defs/id"
+        },
+        "plan_version": {
+          "$ref": "#/$defs/positive"
+        },
+        "rule": {
+          "const": "direct"
+        },
+        "currency": {
+          "const": "CNY"
+        },
+        "start_at": {
+          "$ref": "#/$defs/time"
+        },
+        "end_at": {
+          "$ref": "#/$defs/time"
+        },
+        "scenario_policy": {
+          "enum": [
+            "low",
+            "base",
+            "high",
+            "all"
+          ]
+        },
+        "budget_cap_minor": {
+          "$ref": "#/$defs/money"
+        },
+        "fixed_fee_minor": {
+          "$ref": "#/$defs/money"
+        },
+        "variable_budget_cap_minor": {
+          "$ref": "#/$defs/money"
+        },
+        "lines": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/line"
+          }
+        },
+        "source_snapshot_id": {
+          "$ref": "#/$defs/id"
+        },
+        "source_snapshot_revision": {
+          "$ref": "#/$defs/positive"
+        },
+        "source_kind": {
+          "$ref": "#/$defs/source"
+        }
+      }
+    },
+    "preview_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract_version",
+        "store_id",
+        "plan_id",
+        "plan_version",
+        "manifest_digest",
+        "manifest"
+      ],
+      "properties": {
+        "contract_version": {
+          "$ref": "#/$defs/version"
+        },
+        "store_id": {
+          "$ref": "#/$defs/id"
+        },
+        "plan_id": {
+          "$ref": "#/$defs/id"
+        },
+        "plan_version": {
+          "$ref": "#/$defs/positive"
+        },
+        "manifest_digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "manifest": {
+          "$ref": "#/$defs/manifest"
+        }
+      }
+    },
+    "preview_response": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract_version",
+        "store_id",
+        "plan_id",
+        "plan_version",
+        "manifest_digest",
+        "preview_ref",
+        "status",
+        "expires_at"
+      ],
+      "properties": {
+        "contract_version": {
+          "$ref": "#/$defs/version"
+        },
+        "store_id": {
+          "$ref": "#/$defs/id"
+        },
+        "plan_id": {
+          "$ref": "#/$defs/id"
+        },
+        "plan_version": {
+          "$ref": "#/$defs/positive"
+        },
+        "manifest_digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "preview_ref": {
+          "$ref": "#/$defs/id"
+        },
+        "status": {
+          "const": "passed"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/time"
+        },
+        "evidence_kind": {
+          "enum": [
+            "integration",
+            "contract_stub"
+          ]
+        }
+      }
+    },
+    "grant_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "store_id",
+        "plan_id",
+        "approval_ref",
+        "intent_id",
+        "manifest_digest",
+        "actor_ref",
+        "auth_version",
+        "capability_revision",
+        "preview_ref"
+      ],
+      "properties": {
+        "store_id": {
+          "$ref": "#/$defs/id"
+        },
+        "plan_id": {
+          "$ref": "#/$defs/id"
+        },
+        "approval_ref": {
+          "$ref": "#/$defs/id"
+        },
+        "intent_id": {
+          "$ref": "#/$defs/id"
+        },
+        "manifest_digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "actor_ref": {
+          "$ref": "#/$defs/id"
+        },
+        "auth_version": {
+          "$ref": "#/$defs/positive"
+        },
+        "capability_revision": {
+          "$ref": "#/$defs/positive"
+        },
+        "preview_ref": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "grant_response": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "store_id",
+        "plan_id",
+        "approval_ref",
+        "intent_id",
+        "manifest_digest",
+        "actor_ref",
+        "auth_version",
+        "capability_revision",
+        "preview_ref",
+        "contract_version",
+        "grant_ref",
+        "plan_version",
+        "manifest",
+        "issued_at",
+        "expires_at"
+      ],
+      "properties": {
+        "store_id": {
+          "$ref": "#/$defs/id"
+        },
+        "plan_id": {
+          "$ref": "#/$defs/id"
+        },
+        "approval_ref": {
+          "$ref": "#/$defs/id"
+        },
+        "intent_id": {
+          "$ref": "#/$defs/id"
+        },
+        "manifest_digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "actor_ref": {
+          "$ref": "#/$defs/id"
+        },
+        "auth_version": {
+          "$ref": "#/$defs/positive"
+        },
+        "capability_revision": {
+          "$ref": "#/$defs/positive"
+        },
+        "preview_ref": {
+          "$ref": "#/$defs/id"
+        },
+        "contract_version": {
+          "$ref": "#/$defs/version"
+        },
+        "grant_ref": {
+          "$ref": "#/$defs/id"
+        },
+        "plan_version": {
+          "$ref": "#/$defs/positive"
+        },
+        "manifest": {
+          "$ref": "#/$defs/manifest"
+        },
+        "issued_at": {
+          "$ref": "#/$defs/time"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/time"
+        }
+      }
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract_version",
+        "event_id",
+        "store_id",
+        "intent_id",
+        "approval_ref",
+        "manifest_digest",
+        "status",
+        "terminal_revision",
+        "activity_id",
+        "activity_revision",
+        "phase"
+      ],
+      "properties": {
+        "contract_version": {
+          "$ref": "#/$defs/version"
+        },
+        "event_id": {
+          "$ref": "#/$defs/id"
+        },
+        "store_id": {
+          "$ref": "#/$defs/id"
+        },
+        "intent_id": {
+          "$ref": "#/$defs/id"
+        },
+        "approval_ref": {
+          "$ref": "#/$defs/id"
+        },
+        "manifest_digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "status": {
+          "enum": [
+            "committed",
+            "closed_no_effect"
+          ]
+        },
+        "terminal_revision": {
+          "$ref": "#/$defs/positive"
+        },
+        "activity_id": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "activity_revision": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/positive"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "phase": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/phase"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "closed_no_effect"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "activity_id": {
+                "type": "null"
+              },
+              "activity_revision": {
+                "type": "null"
+              },
+              "phase": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "activity_id": {
+                "$ref": "#/$defs/id"
+              },
+              "activity_revision": {
+                "$ref": "#/$defs/positive"
+              },
+              "phase": {
+                "$ref": "#/$defs/phase"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "actuals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract_version",
+        "store_id",
+        "snapshot_id",
+        "activity_id",
+        "revision",
+        "source_kind",
+        "watermark",
+        "window_start",
+        "window_end",
+        "bucket",
+        "payment_minor",
+        "refund_minor",
+        "consumed_discount_minor",
+        "reserved_discount_minor",
+        "paid_units"
+      ],
+      "properties": {
+        "contract_version": {
+          "$ref": "#/$defs/version"
+        },
+        "store_id": {
+          "$ref": "#/$defs/id"
+        },
+        "snapshot_id": {
+          "$ref": "#/$defs/id"
+        },
+        "activity_id": {
+          "$ref": "#/$defs/id"
+        },
+        "revision": {
+          "$ref": "#/$defs/positive"
+        },
+        "source_kind": {
+          "$ref": "#/$defs/source"
+        },
+        "watermark": {
+          "$ref": "#/$defs/time"
+        },
+        "window_start": {
+          "$ref": "#/$defs/time"
+        },
+        "window_end": {
+          "$ref": "#/$defs/time"
+        },
+        "bucket": {
+          "const": "activity_cumulative"
+        },
+        "payment_minor": {
+          "$ref": "#/$defs/money"
+        },
+        "refund_minor": {
+          "$ref": "#/$defs/money"
+        },
+        "consumed_discount_minor": {
+          "$ref": "#/$defs/money"
+        },
+        "reserved_discount_minor": {
+          "$ref": "#/$defs/money"
+        },
+        "paid_units": {
+          "$ref": "#/$defs/nonnegative"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,567 @@
+{
+  "dataset_id": "GRAPH-SCRIPT-B2-v1",
+  "source_kind": "synthetic_scripted_gateway",
+  "real_model_quality": false,
+  "cases": [
+    {
+      "id": "G01",
+      "name": "日常招呼",
+      "text": "你好",
+      "steps": [
+        {
+          "kind": "answer",
+          "text": "模型草稿，不能代替业务事实。"
+        }
+      ],
+      "expected_status": "completed",
+      "expected_text": "您好",
+      "principal": "customer_a"
+    },
+    {
+      "id": "G02",
+      "name": "余额事实核验",
+      "text": "我的余额",
+      "steps": [
+        {
+          "kind": "tool_call",
+          "tool": "wallet.summary",
+          "arguments": {}
+        },
+        {
+          "kind": "answer",
+          "text": "余额999999元"
+        }
+      ],
+      "expected_status": "completed",
+      "expected_text": "0.00",
+      "principal": "customer_a"
+    },
+    {
+      "id": "G03",
+      "name": "空订单",
+      "text": "查订单",
+      "steps": [
+        {
+          "kind": "tool_call",
+          "tool": "orders.list",
+          "arguments": {}
+        },
+        {
+          "kind": "answer",
+          "text": "模型草稿，不能代替业务事实。"
+        }
+      ],
+      "expected_status": "completed",
+      "expected_text": "没有本人订单",
+      "principal": "customer_a"
+    },
+    {
+      "id": "G04",
+      "name": "无权订单统一不存在",
+      "text": "查询订单",
+      "steps": [
+        {
+          "kind": "tool_call",
+          "tool": "orders.detail",
+          "arguments": {
+            "order_id": "nonexistent"
+          }
+        },
+        {
+          "kind": "answer",
+          "text": "模型草稿，不能代替业务事实。"
+        }
+      ],
+      "expected_status": "completed",
+      "expected_text": "未找到可访问",
+      "principal": "customer_a"
+    },
+    {
+      "id": "G05",
+      "name": "拒绝模型注入owner",
+      "text": "查询订单",
+      "steps": [
+        {
+          "kind": "tool_call",
+          "tool": "orders.list",
+          "arguments": {
+            "owner_id": "customer_b"
+          }
+        },
+        {
+          "kind": "answer",
+          "text": "模型草稿，不能代替业务事实。"
+        }
+      ],
+      "expected_status": "completed",
+      "expected_text": "查询条件",
+      "principal": "customer_a"
+    },
+    {
+      "id": "G06",
+      "name": "分页错误",
+      "text": "查询订单",
+      "steps": [
+        {
+          "kind": "tool_call",
+          "tool": "orders.list",
+          "arguments": {
+            "limit": "bad"
+          }
+        },
+        {
+          "kind": "answer",
+          "text": "模型草稿，不能代替业务事实。"
+        }
+      ],
+      "expected_status": "completed",
+      "expected_text": "查询条件",
+      "principal": "customer_a"
+    },
+    {
+      "id": "G07",
+      "name": "写工具未授权",
+      "text": "帮我充值",
+      "steps": [
+        {
+          "kind": "tool_call",
+          "tool": "wallet.topup",
+          "arguments": {
+            "amount_minor": "100"
+          }
+        }
+      ],
+      "expected_status": "failed",
+      "expected_text": null,
+      "principal": "customer_a"
+    },
+    {
+      "id": "G08",
+      "name": "退款未授权",
+      "text": "退款",
+      "steps": [
+        {
+          "kind": "tool_call",
+          "tool": "refund.execute",
+          "arguments": {}
+        }
+      ],
+      "expected_status": "failed",
+      "expected_text": null,
+      "principal": "customer_a"
+    },
+    {
+      "id": "G09",
+      "name": "非法JSON",
+      "text": "你好",
+      "steps": [
+        "not-json"
+      ],
+      "expected_status": "failed",
+      "expected_text": null,
+      "principal": "customer_a"
+    },
+    {
+      "id": "G10",
+      "name": "空回答",
+      "text": "你好",
+      "steps": [
+        {
+          "kind": "answer",
+          "text": ""
+        }
+      ],
+      "expected_status": "failed",
+      "expected_text": null,
+      "principal": "customer_a"
+    },
+    {
+      "id": "G11",
+      "name": "完整地址不外发",
+      "text": "你好",
+      "steps": [
+        {
+          "kind": "answer",
+          "text": "收货地址是某街某楼"
+        }
+      ],
+      "expected_status": "failed",
+      "expected_text": null,
+      "principal": "customer_a"
+    },
+    {
+      "id": "G12",
+      "name": "身份槽位不受模型控制",
+      "text": "你好",
+      "steps": [
+        {
+          "kind": "answer",
+          "text": "你好",
+          "slots": {
+            "owner_id": "customer_b"
+          }
+        }
+      ],
+      "expected_status": "failed",
+      "expected_text": null,
+      "principal": "customer_a"
+    },
+    {
+      "id": "G13",
+      "name": "非法槽位类型",
+      "text": "你好",
+      "steps": [
+        {
+          "kind": "answer",
+          "text": "你好",
+          "slots": []
+        }
+      ],
+      "expected_status": "failed",
+      "expected_text": null,
+      "principal": "customer_a"
+    },
+    {
+      "id": "G14",
+      "name": "单轮澄清",
+      "text": "查一下",
+      "steps": [
+        {
+          "kind": "clarify",
+          "text": "请说明订单",
+          "slots": {
+            "intent": "order"
+          }
+        }
+      ],
+      "expected_status": "waiting",
+      "expected_text": "请补充",
+      "principal": "customer_a"
+    },
+    {
+      "id": "G15",
+      "name": "无知识证据",
+      "text": "没有依据的保修年限",
+      "steps": [
+        {
+          "kind": "tool_call",
+          "tool": "knowledge.search",
+          "arguments": {
+            "query": "保修年限"
+          }
+        }
+      ],
+      "expected_status": "completed",
+      "expected_text": "没有可用",
+      "principal": "customer_a"
+    },
+    {
+      "id": "G16",
+      "name": "游客不能读余额",
+      "text": "我的余额",
+      "steps": [
+        {
+          "kind": "tool_call",
+          "tool": "wallet.summary",
+          "arguments": {}
+        },
+        {
+          "kind": "answer",
+          "text": "模型草稿，不能代替业务事实。"
+        }
+      ],
+      "expected_status": "completed",
+      "expected_text": "请先登录",
+      "principal": "guest"
+    },
+    {
+      "id": "G17",
+      "name": "游客不能读订单",
+      "text": "订单",
+      "steps": [
+        {
+          "kind": "tool_call",
+          "tool": "orders.list",
+          "arguments": {}
+        },
+        {
+          "kind": "answer",
+          "text": "模型草稿，不能代替业务事实。"
+        }
+      ],
+      "expected_status": "completed",
+      "expected_text": "请先登录",
+      "principal": "guest"
+    },
+    {
+      "id": "G18",
+      "name": "游客查询动态商品",
+      "text": "商品",
+      "steps": [
+        {
+          "kind": "tool_call",
+          "tool": "catalog.read",
+          "arguments": {}
+        },
+        {
+          "kind": "answer",
+          "text": "模型草稿，不能代替业务事实。"
+        }
+      ],
+      "expected_status": "completed",
+      "expected_text": "当前售价",
+      "principal": "guest"
+    },
+    {
+      "id": "G19",
+      "name": "不存在商品",
+      "text": "商品",
+      "steps": [
+        {
+          "kind": "tool_call",
+          "tool": "catalog.read",
+          "arguments": {
+            "query": "完全不存在商品"
+          }
+        },
+        {
+          "kind": "answer",
+          "text": "模型草稿，不能代替业务事实。"
+        }
+      ],
+      "expected_status": "completed",
+      "expected_text": "没有找到",
+      "principal": "customer_a"
+    },
+    {
+      "id": "G20",
+      "name": "SQL服务缺失不伪造查询",
+      "text": "本人消费统计",
+      "steps": [
+        {
+          "kind": "tool_call",
+          "tool": "sql.query",
+          "arguments": {
+            "question": "我的消费统计"
+          }
+        },
+        {
+          "kind": "answer",
+          "text": "模型草稿，不能代替业务事实。"
+        }
+      ],
+      "expected_status": "completed",
+      "expected_text": "未能完成",
+      "principal": "customer_a"
+    },
+    {
+      "id": "G21",
+      "name": "工具数超限",
+      "text": "多个查询",
+      "steps": [
+        {
+          "kind": "tool_call",
+          "tool": "orders.list",
+          "arguments": {}
+        },
+        {
+          "kind": "tool_call",
+          "tool": "orders.list",
+          "arguments": {}
+        },
+        {
+          "kind": "tool_call",
+          "tool": "orders.list",
+          "arguments": {}
+        },
+        {
+          "kind": "tool_call",
+          "tool": "orders.list",
+          "arguments": {}
+        }
+      ],
+      "expected_status": "completed",
+      "expected_text": "上限",
+      "principal": "customer_a"
+    },
+    {
+      "id": "G22",
+      "name": "多意图部分失败",
+      "text": "余额和不存在的订单",
+      "steps": [
+        {
+          "kind": "tool_call",
+          "tool": "wallet.summary",
+          "arguments": {}
+        },
+        {
+          "kind": "tool_call",
+          "tool": "orders.detail",
+          "arguments": {
+            "order_id": "none"
+          }
+        },
+        {
+          "kind": "answer",
+          "text": "模型草稿，不能代替业务事实。"
+        }
+      ],
+      "expected_status": "completed",
+      "expected_text": "0.00",
+      "principal": "customer_a"
+    },
+    {
+      "id": "G23",
+      "name": "清除旧条件",
+      "text": "换个问题",
+      "steps": [
+        {
+          "kind": "clarify",
+          "text": "请补充",
+          "slots": {
+            "status": "paid"
+          },
+          "reset_slots": true
+        }
+      ],
+      "expected_status": "waiting",
+      "expected_text": "请补充",
+      "principal": "customer_a"
+    },
+    {
+      "id": "G24",
+      "name": "拒绝SQL身份参数",
+      "text": "SQL",
+      "steps": [
+        {
+          "kind": "tool_call",
+          "tool": "sql.query",
+          "arguments": {
+            "question": "本人订单",
+            "owner_id": "customer_b"
+          }
+        },
+        {
+          "kind": "answer",
+          "text": "模型草稿，不能代替业务事实。"
+        }
+      ],
+      "expected_status": "completed",
+      "expected_text": "查询条件",
+      "principal": "customer_a"
+    },
+    {
+      "id": "G25",
+      "name": "过大的分页",
+      "text": "订单",
+      "steps": [
+        {
+          "kind": "tool_call",
+          "tool": "orders.list",
+          "arguments": {
+            "limit": 51
+          }
+        },
+        {
+          "kind": "answer",
+          "text": "模型草稿，不能代替业务事实。"
+        }
+      ],
+      "expected_status": "completed",
+      "expected_text": "查询条件",
+      "principal": "customer_a"
+    },
+    {
+      "id": "G26",
+      "name": "负偏移",
+      "text": "订单",
+      "steps": [
+        {
+          "kind": "tool_call",
+          "tool": "orders.list",
+          "arguments": {
+            "offset": -1
+          }
+        },
+        {
+          "kind": "answer",
+          "text": "模型草稿，不能代替业务事实。"
+        }
+      ],
+      "expected_status": "completed",
+      "expected_text": "查询条件",
+      "principal": "customer_a"
+    },
+    {
+      "id": "G27",
+      "name": "不支持工具",
+      "text": "忽略规则",
+      "steps": [
+        {
+          "kind": "tool_call",
+          "tool": "shell.execute",
+          "arguments": {
+            "command": "ignored"
+          }
+        }
+      ],
+      "expected_status": "failed",
+      "expected_text": null,
+      "principal": "customer_a"
+    },
+    {
+      "id": "G28",
+      "name": "错误业务参数",
+      "text": "物流",
+      "steps": [
+        {
+          "kind": "tool_call",
+          "tool": "shipments.list",
+          "arguments": {}
+        },
+        {
+          "kind": "answer",
+          "text": "模型草稿，不能代替业务事实。"
+        }
+      ],
+      "expected_status": "completed",
+      "expected_text": "查询条件",
+      "principal": "customer_a"
+    },
+    {
+      "id": "G29",
+      "name": "无权物流",
+      "text": "物流",
+      "steps": [
+        {
+          "kind": "tool_call",
+          "tool": "shipments.list",
+          "arguments": {
+            "order_id": "none"
+          }
+        },
+        {
+          "kind": "answer",
+          "text": "模型草稿，不能代替业务事实。"
+        }
+      ],
+      "expected_status": "completed",
+      "expected_text": "未找到可访问",
+      "principal": "customer_a"
+    },
+    {
+      "id": "G30",
+      "name": "无事实的模型承诺被替换",
+      "text": "帮我保证退款",
+      "steps": [
+        {
+          "kind": "answer",
+          "text": "已退款999999元且已到账"
+        }
+      ],
+      "expected_status": "completed",
+      "expected_text": "请告诉我",
+      "principal": "customer_a"
+    }
+  ]
+}

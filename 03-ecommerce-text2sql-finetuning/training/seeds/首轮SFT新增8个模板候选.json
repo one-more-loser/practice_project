@@ -1,0 +1,162 @@
+[
+  {
+    "id": "N01",
+    "question": "2026年11月创建的订单，按交易状态分别有多少单？",
+    "sql": "SELECT trade_status, count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at GROUP BY trade_status ORDER BY trade_status",
+    "parameter_names": [
+      "start_at",
+      "end_at"
+    ],
+    "parameters": {},
+    "window": {
+      "start": "2026-11-01T00:00:00+08:00",
+      "end": "2026-12-01T00:00:00+08:00"
+    },
+    "semantic_note": "按交易状态计创建单数；包含未付、取消，不当已支付订单指标",
+    "expected_kind": "query",
+    "profile": "customer_self",
+    "split": "train",
+    "source": "coordinator_candidate_seed",
+    "review_status": "candidate_unreviewed"
+  },
+  {
+    "id": "N02",
+    "question": "列出2026年11月创建、当前待付款的订单，返回订单号、状态、实付分和创建时间，按创建时间倒序最多20条。",
+    "sql": "SELECT order_id, trade_status, paid_minor, created_at FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status = :status ORDER BY created_at DESC, order_id LIMIT 20",
+    "parameter_names": [
+      "start_at",
+      "end_at",
+      "status"
+    ],
+    "parameters": {
+      "status": "awaiting_payment"
+    },
+    "window": {
+      "start": "2026-11-01T00:00:00+08:00",
+      "end": "2026-12-01T00:00:00+08:00"
+    },
+    "semantic_note": "status由后端绑定；状态筛选与创建时间窗",
+    "expected_kind": "query",
+    "profile": "customer_self",
+    "split": "train",
+    "source": "coordinator_candidate_seed",
+    "review_status": "candidate_unreviewed"
+  },
+  {
+    "id": "N03",
+    "question": "列出2026年11月创建且已支付的订单中SKU sku_1的商品明细，返回明细号、订单号、下单件数和商品实付分，按明细号排序最多20条。",
+    "sql": "SELECT i.order_item_id, i.order_id, i.ordered_qty, i.paid_goods_minor FROM cs_order_item_self i JOIN cs_order_self o ON i.order_id = o.order_id WHERE o.created_at >= :start_at AND o.created_at < :end_at AND i.sku_id = :sku_id AND o.trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND o.paid_minor > 0 ORDER BY i.order_item_id LIMIT 20",
+    "parameter_names": [
+      "start_at",
+      "end_at",
+      "sku_id"
+    ],
+    "parameters": {
+      "sku_id": "sku_1"
+    },
+    "window": {
+      "start": "2026-11-01T00:00:00+08:00",
+      "end": "2026-12-01T00:00:00+08:00"
+    },
+    "semantic_note": "指定SKU的已付订单商品明细；不做连接后聚合，不称商品支付件数指标",
+    "expected_kind": "query",
+    "profile": "customer_self",
+    "split": "train",
+    "source": "coordinator_candidate_seed",
+    "review_status": "candidate_unreviewed"
+  },
+  {
+    "id": "N04",
+    "question": "2026年11月创建的订单，按交易状态分别汇总整单实付金额，单位分。",
+    "sql": "SELECT trade_status, COALESCE(SUM(paid_minor),0) AS paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at GROUP BY trade_status ORDER BY trade_status",
+    "parameter_names": [
+      "start_at",
+      "end_at"
+    ],
+    "parameters": {},
+    "window": {
+      "start": "2026-11-01T00:00:00+08:00",
+      "end": "2026-12-01T00:00:00+08:00"
+    },
+    "semantic_note": "订单单表按状态汇总实付分；包含未付款状态，不当付款发生额，不与明细连接后求和",
+    "expected_kind": "query",
+    "profile": "customer_self",
+    "split": "train",
+    "source": "coordinator_candidate_seed",
+    "review_status": "candidate_unreviewed"
+  },
+  {
+    "id": "N05",
+    "question": "2026年11月创建且已支付的订单中，按整单实付分从高到低列出前5单的订单号和实付分。",
+    "sql": "SELECT order_id, paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0 ORDER BY paid_minor DESC, order_id LIMIT 5",
+    "parameter_names": [
+      "start_at",
+      "end_at"
+    ],
+    "parameters": {},
+    "window": {
+      "start": "2026-11-01T00:00:00+08:00",
+      "end": "2026-12-01T00:00:00+08:00"
+    },
+    "semantic_note": "创建月paid cohort整单实付排名；同额按订单号",
+    "expected_kind": "query",
+    "profile": "customer_self",
+    "split": "train",
+    "source": "coordinator_candidate_seed",
+    "review_status": "candidate_unreviewed"
+  },
+  {
+    "id": "N06",
+    "question": "公开商品中，可售库存最多的前5个SKU分别是什么？返回SKU、名称、现价分和可售数量。",
+    "sql": "SELECT sku_id, name, price_minor, available_qty FROM cs_product_public ORDER BY available_qty DESC, sku_id LIMIT 5",
+    "parameter_names": [],
+    "parameters": {},
+    "window": null,
+    "semantic_note": "SKU现态；不称历史库存、购买历史或销量",
+    "expected_kind": "query",
+    "profile": "customer_self",
+    "split": "train",
+    "source": "coordinator_candidate_seed",
+    "review_status": "candidate_unreviewed"
+  },
+  {
+    "id": "N07",
+    "question": "列出我2026年11月钱包支付流水的流水号、支付分和发生时间，按时间倒序最多20条。",
+    "sql": "SELECT entry_id, amount_minor, occurred_at FROM cs_wallet_entry_self WHERE kind = 'payment' AND occurred_at >= :start_at AND occurred_at < :end_at ORDER BY occurred_at DESC, entry_id LIMIT 20",
+    "parameter_names": [
+      "start_at",
+      "end_at"
+    ],
+    "parameters": {},
+    "window": {
+      "start": "2026-11-01T00:00:00+08:00",
+      "end": "2026-12-01T00:00:00+08:00"
+    },
+    "semantic_note": "钱包payment发生额；不称订单实付或退款净额",
+    "expected_kind": "query",
+    "profile": "customer_self",
+    "split": "train",
+    "source": "coordinator_candidate_seed",
+    "review_status": "candidate_unreviewed"
+  },
+  {
+    "id": "N08",
+    "question": "2026年11月退款到账钱包的金额合计是多少分？",
+    "sql": "SELECT COALESCE(SUM(amount_minor),0) AS amount_minor FROM cs_wallet_entry_self WHERE kind = 'refund' AND occurred_at >= :start_at AND occurred_at < :end_at",
+    "parameter_names": [
+      "start_at",
+      "end_at"
+    ],
+    "parameters": {},
+    "window": {
+      "start": "2026-11-01T00:00:00+08:00",
+      "end": "2026-12-01T00:00:00+08:00"
+    },
+    "semantic_note": "钱包退款到账；不称订单累计退款",
+    "expected_kind": "query",
+    "profile": "customer_self",
+    "split": "train",
+    "source": "coordinator_candidate_seed",
+    "review_status": "candidate_unreviewed"
+  }
+]

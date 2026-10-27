@@ -1,0 +1,56 @@
+[
+  {
+    "schema_revision": "OPS-QUERY-SQLITE-MIN-v1",
+    "schema_digest": "f80b87c1e97b010452c65dac9e9d61a8eda4ec61b68a8d7d27885e5c3d5ca46a",
+    "metric_revision": "OPS-METRIC-PAYMENT-MIN-v1",
+    "metric_id": "payment_minor",
+    "snapshot": {
+      "snapshot_id": "query-fixture",
+      "revision": 1
+    },
+    "parameters": {
+      "start_at": "2026-11-01T00:00:00+08:00",
+      "end_at": "2026-11-10T00:00:00+08:00",
+      "as_of": "2026-11-10T12:00:00+00:00"
+    },
+    "sql": "SELECT COALESCE(SUM(paid_minor), 0) AS payment_minor FROM ops_order",
+    "parameter_names": []
+  },
+  {
+    "schema_revision": "OPS-QUERY-SQLITE-MIN-v1",
+    "schema_digest": "f80b87c1e97b010452c65dac9e9d61a8eda4ec61b68a8d7d27885e5c3d5ca46a",
+    "metric_revision": "OPS-METRIC-PAYMENT-MIN-v1",
+    "metric_id": "paid_order_count",
+    "snapshot": {
+      "snapshot_id": "query-fixture",
+      "revision": 1
+    },
+    "parameters": {
+      "start_at": "2026-11-01T00:00:00+08:00",
+      "end_at": "2026-11-10T00:00:00+08:00",
+      "as_of": "2026-11-10T12:00:00+00:00"
+    },
+    "sql": "SELECT COUNT(*) AS paid_order_count FROM ops_order",
+    "parameter_names": []
+  },
+  {
+    "schema_revision": "OPS-QUERY-SQLITE-MIN-v1",
+    "schema_digest": "f80b87c1e97b010452c65dac9e9d61a8eda4ec61b68a8d7d27885e5c3d5ca46a",
+    "metric_revision": "OPS-METRIC-PAYMENT-MIN-v1",
+    "metric_id": "paid_units",
+    "snapshot": {
+      "snapshot_id": "query-fixture",
+      "revision": 1
+    },
+    "parameters": {
+      "start_at": "2026-11-01T00:00:00+08:00",
+      "end_at": "2026-11-10T00:00:00+08:00",
+      "as_of": "2026-11-10T12:00:00+00:00",
+      "sku_id": "A"
+    },
+    "sql": "SELECT COALESCE(SUM(qty), 0) AS paid_units FROM ops_order_item WHERE sku_id = :sku_id",
+    "parameter_names": [
+      "sku_id"
+    ]
+  }
+]

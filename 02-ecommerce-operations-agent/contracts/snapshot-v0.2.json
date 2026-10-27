@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "OPS-SNAPSHOT-v0.2 extension",
+  "description": "业务输入完整字段由domain.validate_snapshot严格校验；v0.2新增可回放父链。01不使用扩展时保持v0.1兼容。",
+  "type": "object",
+  "required": [
+    "snapshot_id",
+    "revision",
+    "store_id",
+    "source_kind",
+    "as_of",
+    "currency",
+    "skus",
+    "orders",
+    "refunds"
+  ],
+  "properties": {
+    "snapshot_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "store_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_kind": {
+      "enum": [
+        "synthetic",
+        "business_import",
+        "derived"
+      ]
+    },
+    "as_of": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "currency": {
+      "const": "CNY"
+    },
+    "skus": {
+      "type": "array"
+    },
+    "orders": {
+      "type": "array"
+    },
+    "refunds": {
+      "type": "array"
+    },
+    "execution_supported_rules": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "schema_version": {
+      "enum": [
+        "OPS-SNAPSHOT-v0.1",
+        "OPS-SNAPSHOT-v0.2"
+      ]
+    },
+    "source_metadata": {
+      "type": "object",
+      "required": [
+        "producer",
+        "source_revision",
+        "cost_basis",
+        "capacity_basis"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "producer": {
+          "type": "string"
+        },
+        "source_revision": {
+          "type": "string"
+        },
+        "cost_basis": {
+          "type": "string"
+        },
+        "capacity_basis": {
+          "type": "string"
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "parents",
+        "transformation",
+        "inputs_version"
+      ],
+      "properties": {
+        "transformation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "inputs_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "parents": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 20,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "snapshot_id",
+              "revision",
+              "digest"
+            ],
+            "properties": {
+              "snapshot_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "digest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "source_kind": {
+            "const": "derived"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "schema_version",
+          "provenance"
+        ],
+        "properties": {
+          "schema_version": {
+            "const": "OPS-SNAPSHOT-v0.2"
+          }
+        }
+      }
+    }
+  ]
+}

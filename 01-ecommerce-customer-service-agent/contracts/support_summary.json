@@ -1,0 +1,21 @@
+{
+  "contract_version": "XCS-SUPPORT-v0.1",
+  "status": "01_producer_draft_not_jointly_approved",
+  "timezone": "Asia/Shanghai",
+  "window": "Monday 00:00 inclusive to next Monday 00:00 exclusive; ended weeks only",
+  "required": ["snapshot_id", "revision", "contract_version", "store_id", "window_start", "window_end", "timezone", "data_batch_id", "batch_generation", "source_kind", "generated_at", "dimensions", "metrics", "privacy", "completeness", "metric_revision", "lineage_digest", "supersedes_revision"],
+  "revision": {"stable_snapshot_id_per_window": true, "replace_previous_revision": true, "do_not_add_revisions": true, "correction_min_changed_subjects": 5, "correction_min_hours": 24},
+  "metrics": {
+    "customer_message_count": "distinct accepted customer message IDs; stream fragments excluded",
+    "ticket_count": "distinct ticket IDs, grouped by current ticket category",
+    "human_handoff_conversation_count": "distinct conversation IDs with a takeover in this window, repeated takeovers do not add conversations",
+    "feedback_count": "distinct customer feedback IDs; declared multi-topic cells overlap",
+    "tool_failure_count": "distinct runs with an error; not automatically classified as knowledge gaps"
+  },
+  "privacy": {"min_units": 5, "min_distinct_subjects": 5, "small_count": null, "secondary_suppression": true, "denominators_and_totals": null, "forbidden": ["customer_id", "owner_id", "conversation_id", "order_id", "source_ids", "raw_text", "phone", "address", "internal_notes"]},
+  "read": {"path": "/api/v1/internal/stores/{store_id}/support-summary", "authentication": "dedicated backend Bearer secret and configured store binding; fail closed when missing", "draft_integration_path": "/integration/v1/support-summaries; alias and service token contract await joint review"},
+  "events": ["support_summary.ready", "support_summary.corrected"],
+  "consumer": "deduplicate event_id; replace by snapshot_id/revision; never query personal records to fill suppressed values",
+  "local_view_alias": "counts/privacy are the supervisor UI projection; metrics is the shared metric projection",
+  "external_validation": "project 02 not contacted; no real consumer acceptance claimed"
+}

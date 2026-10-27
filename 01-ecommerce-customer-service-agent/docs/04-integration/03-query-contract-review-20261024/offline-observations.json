@@ -1,0 +1,585 @@
+{
+  "scope": "offline source-backed probes, no PostgreSQL/network/model execution",
+  "versions": {
+    "schema_revision": "CS-QUERY-B2-v1",
+    "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+    "metric_revision": "CS-METRIC-B2-v1",
+    "sqlglot": "30.24.0",
+    "SQLAlchemy": "2.0.55",
+    "python": "3.12.14"
+  },
+  "schema": {
+    "cs_order_self": {
+      "order_id": "TEXT",
+      "created_at": "TIMESTAMPTZ",
+      "paid_at": "TIMESTAMPTZ",
+      "received_at": "TIMESTAMPTZ",
+      "trade_status": "TEXT",
+      "fulfillment_status": "TEXT",
+      "goods_minor": "BIGINT",
+      "discount_minor": "BIGINT",
+      "freight_minor": "BIGINT",
+      "payable_minor": "BIGINT",
+      "paid_minor": "BIGINT",
+      "refunded_minor": "BIGINT",
+      "net_paid_minor": "BIGINT",
+      "currency": "TEXT"
+    },
+    "cs_order_item_self": {
+      "order_item_id": "TEXT",
+      "order_id": "TEXT",
+      "sku_id": "TEXT",
+      "product_name": "TEXT",
+      "ordered_qty": "INT",
+      "paid_goods_minor": "BIGINT",
+      "refunded_qty": "INT",
+      "refunded_goods_minor": "BIGINT",
+      "remaining_qty": "INT",
+      "remaining_goods_minor": "BIGINT"
+    },
+    "cs_shipment_self": {
+      "shipment_id": "TEXT",
+      "order_id": "TEXT",
+      "carrier": "TEXT",
+      "status": "TEXT",
+      "shipped_at": "TIMESTAMPTZ",
+      "carrier_signed_at": "TIMESTAMPTZ",
+      "tracking_updated_at": "TIMESTAMPTZ"
+    },
+    "cs_wallet_summary_self": {
+      "account_id": "TEXT",
+      "balance_minor": "BIGINT",
+      "currency": "TEXT",
+      "status": "TEXT"
+    },
+    "cs_wallet_entry_self": {
+      "entry_id": "TEXT",
+      "kind": "TEXT",
+      "amount_minor": "BIGINT",
+      "sequence": "BIGINT",
+      "balance_before_minor": "BIGINT",
+      "balance_after_minor": "BIGINT",
+      "occurred_at": "TIMESTAMPTZ",
+      "currency": "TEXT"
+    },
+    "cs_product_public": {
+      "product_id": "TEXT",
+      "sku_id": "TEXT",
+      "name": "TEXT",
+      "category": "TEXT",
+      "price_minor": "BIGINT",
+      "currency": "TEXT",
+      "available_qty": "INT",
+      "price_version": "INT",
+      "as_of": "TIMESTAMPTZ"
+    }
+  },
+  "view_column_counts": {
+    "cs_order_self": 14,
+    "cs_order_item_self": 10,
+    "cs_shipment_self": 7,
+    "cs_wallet_summary_self": 4,
+    "cs_wallet_entry_self": 8,
+    "cs_product_public": 9
+  },
+  "metrics": {
+    "orders.count": {
+      "grain": "one row per customer_order",
+      "definition": "orders created in the requested half-open time window, excluding unpaid and unpaid-cancelled orders",
+      "time_field": "created_at",
+      "amount_unit": null
+    },
+    "orders.paid_minor": {
+      "grain": "one row per customer_order",
+      "definition": "sum of original paid_minor for paid orders created in the requested window",
+      "time_field": "created_at",
+      "amount_unit": "CNY minor units"
+    },
+    "orders.refunded_minor": {
+      "grain": "one row per customer_order",
+      "definition": "sum of refunded_minor for those same paid orders, independent of refund-entry count",
+      "time_field": "created_at",
+      "amount_unit": "CNY minor units"
+    },
+    "orders.net_paid_minor": {
+      "grain": "one row per customer_order",
+      "definition": "sum of paid_minor minus refunded_minor for those same paid orders",
+      "time_field": "created_at",
+      "amount_unit": "CNY minor units"
+    }
+  },
+  "validator": {
+    "all_created_count": {
+      "accepted": true,
+      "sql_in": "SELECT count(*) AS order_count FROM cs_order_self WHERE created_at>=:start_at AND created_at<:end_at",
+      "sql_out": "SELECT COUNT(*) AS \"order_count\" FROM \"cs_order_self\" AS \"cs_order_self\" WHERE \"cs_order_self\".\"created_at\" >= :start_at AND \"cs_order_self\".\"created_at\" < :end_at LIMIT 20",
+      "parameters": [
+        "end_at",
+        "start_at"
+      ],
+      "columns": [
+        "order_count"
+      ]
+    },
+    "paid_cohort_count": {
+      "accepted": true,
+      "sql_in": "SELECT count(*) AS order_count FROM cs_order_self WHERE created_at>=:start_at AND created_at<:end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor>0",
+      "sql_out": "SELECT COUNT(*) AS \"order_count\" FROM \"cs_order_self\" AS \"cs_order_self\" WHERE \"cs_order_self\".\"created_at\" >= :start_at AND \"cs_order_self\".\"created_at\" < :end_at AND \"cs_order_self\".\"trade_status\" IN ('paid', 'completed', 'cancelled_refunded', 'closed_refunded') AND \"cs_order_self\".\"paid_minor\" > 0 LIMIT 20",
+      "parameters": [
+        "end_at",
+        "start_at"
+      ],
+      "columns": [
+        "order_count"
+      ]
+    },
+    "registered_sums": {
+      "accepted": true,
+      "sql_in": "SELECT count(*) AS order_count,coalesce(sum(paid_minor),0) AS paid_minor,coalesce(sum(refunded_minor),0) AS refunded_minor,coalesce(sum(net_paid_minor),0) AS net_paid_minor FROM cs_order_self WHERE created_at>=:start_at AND created_at<:end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor>0",
+      "sql_out": "SELECT COUNT(*) AS \"order_count\", COALESCE(SUM(\"cs_order_self\".\"paid_minor\"), 0) AS \"paid_minor\", COALESCE(SUM(\"cs_order_self\".\"refunded_minor\"), 0) AS \"refunded_minor\", COALESCE(SUM(\"cs_order_self\".\"net_paid_minor\"), 0) AS \"net_paid_minor\" FROM \"cs_order_self\" AS \"cs_order_self\" WHERE \"cs_order_self\".\"created_at\" >= :start_at AND \"cs_order_self\".\"created_at\" < :end_at AND \"cs_order_self\".\"trade_status\" IN ('paid', 'completed', 'cancelled_refunded', 'closed_refunded') AND \"cs_order_self\".\"paid_minor\" > 0 LIMIT 20",
+      "parameters": [
+        "end_at",
+        "start_at"
+      ],
+      "columns": [
+        "order_count",
+        "paid_minor",
+        "refunded_minor",
+        "net_paid_minor"
+      ]
+    },
+    "wallet_cash_refund": {
+      "accepted": true,
+      "sql_in": "SELECT coalesce(sum(amount_minor),0) AS refund_minor FROM cs_wallet_entry_self WHERE kind='refund' AND occurred_at>=:start_at AND occurred_at<:end_at",
+      "sql_out": "SELECT COALESCE(SUM(\"cs_wallet_entry_self\".\"amount_minor\"), 0) AS \"refund_minor\" FROM \"cs_wallet_entry_self\" AS \"cs_wallet_entry_self\" WHERE \"cs_wallet_entry_self\".\"kind\" = 'refund' AND \"cs_wallet_entry_self\".\"occurred_at\" >= :start_at AND \"cs_wallet_entry_self\".\"occurred_at\" < :end_at LIMIT 20",
+      "parameters": [
+        "end_at",
+        "start_at"
+      ],
+      "columns": [
+        "refund_minor"
+      ]
+    },
+    "sku_semijoin": {
+      "accepted": true,
+      "sql_in": "SELECT sku_id,sum(paid_goods_minor) AS paid_goods_minor FROM cs_order_item_self WHERE order_id IN (SELECT order_id FROM cs_order_self WHERE created_at>=:start_at AND created_at<:end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor>0) GROUP BY sku_id ORDER BY sku_id LIMIT 50",
+      "sql_out": "SELECT \"cs_order_item_self\".\"sku_id\" AS \"sku_id\", SUM(\"cs_order_item_self\".\"paid_goods_minor\") AS \"paid_goods_minor\" FROM \"cs_order_item_self\" AS \"cs_order_item_self\" WHERE \"cs_order_item_self\".\"order_id\" IN (SELECT \"cs_order_self\".\"order_id\" AS \"order_id\" FROM \"cs_order_self\" AS \"cs_order_self\" WHERE \"cs_order_self\".\"created_at\" >= :start_at AND \"cs_order_self\".\"created_at\" < :end_at AND \"cs_order_self\".\"trade_status\" IN ('paid', 'completed', 'cancelled_refunded', 'closed_refunded') AND \"cs_order_self\".\"paid_minor\" > 0) GROUP BY \"cs_order_item_self\".\"sku_id\" ORDER BY \"sku_id\" LIMIT 50",
+      "parameters": [
+        "end_at",
+        "start_at"
+      ],
+      "columns": [
+        "sku_id",
+        "paid_goods_minor"
+      ]
+    },
+    "order_sku_sum_join": {
+      "accepted": false,
+      "sql_in": "SELECT i.sku_id,sum(i.paid_goods_minor) AS paid_goods_minor FROM cs_order_item_self i JOIN cs_order_self o ON i.order_id=o.order_id GROUP BY i.sku_id",
+      "error_code": "ambiguous_grain",
+      "http_status": 422
+    },
+    "preaggregate_join": {
+      "accepted": true,
+      "sql_in": "WITH i AS (SELECT order_id,sum(paid_goods_minor) AS goods_minor FROM cs_order_item_self GROUP BY order_id) SELECT o.order_id,o.paid_minor,i.goods_minor FROM cs_order_self o JOIN i ON o.order_id=i.order_id",
+      "sql_out": "WITH \"i\" AS (SELECT \"cs_order_item_self\".\"order_id\" AS \"order_id\", SUM(\"cs_order_item_self\".\"paid_goods_minor\") AS \"goods_minor\" FROM \"cs_order_item_self\" AS \"cs_order_item_self\" GROUP BY \"cs_order_item_self\".\"order_id\") SELECT \"o\".\"order_id\" AS \"order_id\", \"o\".\"paid_minor\" AS \"paid_minor\", \"i\".\"goods_minor\" AS \"goods_minor\" FROM \"cs_order_self\" AS \"o\" JOIN \"i\" AS \"i\" ON \"o\".\"order_id\" = \"i\".\"order_id\" LIMIT 20",
+      "parameters": [],
+      "columns": [
+        "order_id",
+        "paid_minor",
+        "goods_minor"
+      ]
+    },
+    "utc_day": {
+      "accepted": true,
+      "sql_in": "SELECT date_trunc('day',created_at) AS bucket,count(*) AS order_count FROM cs_order_self WHERE created_at>=:start_at AND created_at<:end_at GROUP BY bucket ORDER BY bucket LIMIT 50",
+      "sql_out": "SELECT DATE_TRUNC('DAY', \"cs_order_self\".\"created_at\") AS \"bucket\", COUNT(*) AS \"order_count\" FROM \"cs_order_self\" AS \"cs_order_self\" WHERE \"cs_order_self\".\"created_at\" >= :start_at AND \"cs_order_self\".\"created_at\" < :end_at GROUP BY DATE_TRUNC('DAY', \"cs_order_self\".\"created_at\") ORDER BY \"bucket\" LIMIT 50",
+      "parameters": [
+        "end_at",
+        "start_at"
+      ],
+      "columns": [
+        "bucket",
+        "order_count"
+      ]
+    },
+    "utc_week": {
+      "accepted": true,
+      "sql_in": "SELECT date_trunc('week',created_at) AS bucket,count(*) AS order_count FROM cs_order_self GROUP BY date_trunc('week',created_at) ORDER BY bucket",
+      "sql_out": "SELECT DATE_TRUNC('WEEK', \"cs_order_self\".\"created_at\") AS \"bucket\", COUNT(*) AS \"order_count\" FROM \"cs_order_self\" AS \"cs_order_self\" GROUP BY DATE_TRUNC('WEEK', \"cs_order_self\".\"created_at\") ORDER BY \"bucket\" LIMIT 20",
+      "parameters": [],
+      "columns": [
+        "bucket",
+        "order_count"
+      ]
+    },
+    "shanghai_at_time_zone": {
+      "accepted": false,
+      "sql_in": "SELECT date_trunc('day',created_at AT TIME ZONE 'Asia/Shanghai') AS bucket FROM cs_order_self",
+      "error_code": "unsafe_query",
+      "http_status": 422
+    },
+    "shanghai_three_arg": {
+      "accepted": false,
+      "sql_in": "SELECT date_trunc('day',created_at,'Asia/Shanghai') AS bucket FROM cs_order_self",
+      "error_code": "unsafe_query",
+      "http_status": 422
+    },
+    "three_arg_overloaded_status": {
+      "accepted": true,
+      "sql_in": "SELECT date_trunc('day',created_at,:status) AS bucket FROM cs_order_self",
+      "sql_out": "SELECT DATE_TRUNC('DAY', \"cs_order_self\".\"created_at\", :status) AS \"bucket\" FROM \"cs_order_self\" AS \"cs_order_self\" LIMIT 20",
+      "parameters": [
+        "status"
+      ],
+      "columns": [
+        "bucket"
+      ]
+    },
+    "shanghai_interval_shift": {
+      "accepted": false,
+      "sql_in": "SELECT date_trunc('day',created_at+INTERVAL '8 hours') AS bucket FROM cs_order_self",
+      "error_code": "unsafe_query",
+      "http_status": 422
+    },
+    "amount_ratio_guarded": {
+      "accepted": true,
+      "sql_in": "SELECT sum(refunded_minor)/sum(paid_minor) AS refund_amount_rate FROM cs_order_self WHERE created_at>=:start_at AND created_at<:end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor>0 HAVING sum(paid_minor)>0",
+      "sql_out": "SELECT SUM(\"cs_order_self\".\"refunded_minor\") / SUM(\"cs_order_self\".\"paid_minor\") AS \"refund_amount_rate\" FROM \"cs_order_self\" AS \"cs_order_self\" WHERE \"cs_order_self\".\"created_at\" >= :start_at AND \"cs_order_self\".\"created_at\" < :end_at AND \"cs_order_self\".\"trade_status\" IN ('paid', 'completed', 'cancelled_refunded', 'closed_refunded') AND \"cs_order_self\".\"paid_minor\" > 0 HAVING SUM(\"cs_order_self\".\"paid_minor\") > 0 LIMIT 20",
+      "parameters": [
+        "end_at",
+        "start_at"
+      ],
+      "columns": [
+        "refund_amount_rate"
+      ]
+    },
+    "order_ratio_scalar": {
+      "accepted": true,
+      "sql_in": "SELECT (SELECT count(*) FROM cs_order_self WHERE created_at>=:start_at AND created_at<:end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor>0 AND refunded_minor>0)*1.0/(SELECT count(*) FROM cs_order_self WHERE created_at>=:start_at AND created_at<:end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor>0) AS refund_order_rate WHERE (SELECT count(*) FROM cs_order_self WHERE created_at>=:start_at AND created_at<:end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor>0)>0",
+      "sql_out": "SELECT (SELECT COUNT(*) AS \"_col_0\" FROM \"cs_order_self\" AS \"cs_order_self\" WHERE \"cs_order_self\".\"created_at\" >= :start_at AND \"cs_order_self\".\"created_at\" < :end_at AND \"cs_order_self\".\"trade_status\" IN ('paid', 'completed', 'cancelled_refunded', 'closed_refunded') AND \"cs_order_self\".\"paid_minor\" > 0 AND \"cs_order_self\".\"refunded_minor\" > 0) * 1.0 / (SELECT COUNT(*) AS \"_col_0\" FROM \"cs_order_self\" AS \"cs_order_self\" WHERE \"cs_order_self\".\"created_at\" >= :start_at AND \"cs_order_self\".\"created_at\" < :end_at AND \"cs_order_self\".\"trade_status\" IN ('paid', 'completed', 'cancelled_refunded', 'closed_refunded') AND \"cs_order_self\".\"paid_minor\" > 0) AS \"refund_order_rate\" WHERE (SELECT COUNT(*) AS \"_col_0\" FROM \"cs_order_self\" AS \"cs_order_self\" WHERE \"cs_order_self\".\"created_at\" >= :start_at AND \"cs_order_self\".\"created_at\" < :end_at AND \"cs_order_self\".\"trade_status\" IN ('paid', 'completed', 'cancelled_refunded', 'closed_refunded') AND \"cs_order_self\".\"paid_minor\" > 0) > 0 LIMIT 20",
+      "parameters": [
+        "end_at",
+        "start_at"
+      ],
+      "columns": [
+        "refund_order_rate"
+      ]
+    },
+    "ratio_nullif": {
+      "accepted": false,
+      "sql_in": "SELECT sum(refunded_minor)/nullif(sum(paid_minor),0) AS refund_rate FROM cs_order_self",
+      "error_code": "unsafe_query",
+      "http_status": 422
+    },
+    "old_original_paid": {
+      "accepted": false,
+      "sql_in": "SELECT original_paid_minor FROM cs_order_self",
+      "error_code": "unsafe_query",
+      "http_status": 422
+    },
+    "old_row_limit": {
+      "accepted": false,
+      "sql_in": "SELECT order_id FROM cs_order_self LIMIT :row_limit",
+      "error_code": "unsafe_query",
+      "http_status": 422
+    },
+    "colon_order": {
+      "accepted": true,
+      "sql_in": "SELECT order_id FROM cs_order_self WHERE order_id=:order_id",
+      "sql_out": "SELECT \"cs_order_self\".\"order_id\" AS \"order_id\" FROM \"cs_order_self\" AS \"cs_order_self\" WHERE \"cs_order_self\".\"order_id\" = :order_id LIMIT 20",
+      "parameters": [
+        "order_id"
+      ],
+      "columns": [
+        "order_id"
+      ]
+    },
+    "psycopg_order": {
+      "accepted": true,
+      "sql_in": "SELECT order_id FROM cs_order_self WHERE order_id=%(order_id)s",
+      "sql_out": "SELECT \"cs_order_self\".\"order_id\" AS \"order_id\" FROM \"cs_order_self\" AS \"cs_order_self\" WHERE \"cs_order_self\".\"order_id\" = :order_id LIMIT 20",
+      "parameters": [
+        "order_id"
+      ],
+      "columns": [
+        "order_id"
+      ]
+    },
+    "dollar_order": {
+      "accepted": false,
+      "sql_in": "SELECT order_id FROM cs_order_self WHERE order_id=$1",
+      "error_code": "unsafe_query",
+      "http_status": 422
+    },
+    "question_order": {
+      "accepted": false,
+      "sql_in": "SELECT order_id FROM cs_order_self WHERE order_id=?",
+      "error_code": "unsafe_query",
+      "http_status": 422
+    },
+    "id_literal": {
+      "accepted": false,
+      "sql_in": "SELECT order_id FROM cs_order_self WHERE order_id='order_A'",
+      "error_code": "unsafe_query",
+      "http_status": 422
+    },
+    "limit_above": {
+      "accepted": true,
+      "sql_in": "SELECT order_id FROM cs_order_self LIMIT 99999",
+      "sql_out": "SELECT \"cs_order_self\".\"order_id\" AS \"order_id\" FROM \"cs_order_self\" AS \"cs_order_self\" LIMIT 50",
+      "parameters": [],
+      "columns": [
+        "order_id"
+      ]
+    },
+    "limit_param_status": {
+      "accepted": true,
+      "sql_in": "SELECT order_id FROM cs_order_self LIMIT :status",
+      "sql_out": "SELECT \"cs_order_self\".\"order_id\" AS \"order_id\" FROM \"cs_order_self\" AS \"cs_order_self\" LIMIT 20",
+      "parameters": [
+        "status"
+      ],
+      "columns": [
+        "order_id"
+      ]
+    },
+    "limit_zero": {
+      "accepted": false,
+      "sql_in": "SELECT order_id FROM cs_order_self LIMIT 0",
+      "error_code": "unsafe_query",
+      "http_status": 422
+    },
+    "limit_decimal": {
+      "accepted": false,
+      "sql_in": "SELECT order_id FROM cs_order_self LIMIT 1.5",
+      "error_code": "unsafe_query",
+      "http_status": 422
+    },
+    "offset_negative": {
+      "accepted": false,
+      "sql_in": "SELECT order_id FROM cs_order_self OFFSET -1",
+      "error_code": "unsafe_query",
+      "http_status": 422
+    },
+    "offset_too_big": {
+      "accepted": false,
+      "sql_in": "SELECT order_id FROM cs_order_self OFFSET 10001",
+      "error_code": "unsafe_query",
+      "http_status": 422
+    },
+    "left_shipments": {
+      "accepted": true,
+      "sql_in": "SELECT o.order_id,s.shipment_id FROM cs_order_self o LEFT JOIN cs_shipment_self s ON o.order_id=s.order_id WHERE s.shipment_id IS NULL",
+      "sql_out": "SELECT \"o\".\"order_id\" AS \"order_id\", \"s\".\"shipment_id\" AS \"shipment_id\" FROM \"cs_order_self\" AS \"o\" LEFT JOIN \"cs_shipment_self\" AS \"s\" ON \"o\".\"order_id\" = \"s\".\"order_id\" WHERE \"s\".\"shipment_id\" IS NULL LIMIT 20",
+      "parameters": [],
+      "columns": [
+        "order_id",
+        "shipment_id"
+      ]
+    },
+    "count_join_not_grain_blocked": {
+      "accepted": true,
+      "sql_in": "SELECT count(*) AS order_count FROM cs_order_self o JOIN cs_order_item_self i ON o.order_id=i.order_id",
+      "sql_out": "SELECT COUNT(*) AS \"order_count\" FROM \"cs_order_self\" AS \"o\" JOIN \"cs_order_item_self\" AS \"i\" ON \"o\".\"order_id\" = \"i\".\"order_id\" LIMIT 20",
+      "parameters": [],
+      "columns": [
+        "order_count"
+      ]
+    },
+    "same_named_wrong_fk": {
+      "accepted": false,
+      "sql_in": "SELECT o.order_id FROM cs_order_self o JOIN cs_product_public p ON o.order_id=p.sku_id",
+      "error_code": "unsafe_query",
+      "http_status": 422
+    },
+    "output_duplicate": {
+      "accepted": false,
+      "sql_in": "SELECT o.order_id,i.order_id FROM cs_order_self o JOIN cs_order_item_self i ON o.order_id=i.order_id",
+      "error_code": "unsafe_query",
+      "http_status": 422
+    },
+    "write": {
+      "accepted": false,
+      "sql_in": "UPDATE cs_order_self SET trade_status='closed_refunded'",
+      "error_code": "unsafe_query",
+      "http_status": 422
+    },
+    "star": {
+      "accepted": false,
+      "sql_in": "SELECT * FROM cs_order_self",
+      "error_code": "unsafe_query",
+      "http_status": 422
+    },
+    "no_table_constant": {
+      "accepted": true,
+      "sql_in": "SELECT 1 AS order_count",
+      "sql_out": "SELECT 1 AS \"order_count\" LIMIT 20",
+      "parameters": [],
+      "columns": [
+        "order_count"
+      ]
+    },
+    "status_literal_other_column": {
+      "accepted": true,
+      "sql_in": "SELECT order_id FROM cs_order_self WHERE trade_status='topup'",
+      "sql_out": "SELECT \"cs_order_self\".\"order_id\" AS \"order_id\" FROM \"cs_order_self\" AS \"cs_order_self\" WHERE \"cs_order_self\".\"trade_status\" = 'topup' LIMIT 20",
+      "parameters": [],
+      "columns": [
+        "order_id"
+      ]
+    }
+  },
+  "actual_project_sql_request": {
+    "contract_version": "XCS-SQL-v0.1",
+    "question": "2026年11月创建了多少订单",
+    "dialect": "postgresql",
+    "consumer_profile": "customer_self",
+    "schema_revision": "CS-QUERY-B2-v1",
+    "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+    "metric_revision": "CS-METRIC-B2-v1",
+    "resources": {
+      "cs_order_self": {
+        "order_id": "TEXT",
+        "created_at": "TIMESTAMPTZ",
+        "paid_at": "TIMESTAMPTZ",
+        "received_at": "TIMESTAMPTZ",
+        "trade_status": "TEXT",
+        "fulfillment_status": "TEXT",
+        "goods_minor": "BIGINT",
+        "discount_minor": "BIGINT",
+        "freight_minor": "BIGINT",
+        "payable_minor": "BIGINT",
+        "paid_minor": "BIGINT",
+        "refunded_minor": "BIGINT",
+        "net_paid_minor": "BIGINT",
+        "currency": "TEXT"
+      },
+      "cs_order_item_self": {
+        "order_item_id": "TEXT",
+        "order_id": "TEXT",
+        "sku_id": "TEXT",
+        "product_name": "TEXT",
+        "ordered_qty": "INT",
+        "paid_goods_minor": "BIGINT",
+        "refunded_qty": "INT",
+        "refunded_goods_minor": "BIGINT",
+        "remaining_qty": "INT",
+        "remaining_goods_minor": "BIGINT"
+      },
+      "cs_shipment_self": {
+        "shipment_id": "TEXT",
+        "order_id": "TEXT",
+        "carrier": "TEXT",
+        "status": "TEXT",
+        "shipped_at": "TIMESTAMPTZ",
+        "carrier_signed_at": "TIMESTAMPTZ",
+        "tracking_updated_at": "TIMESTAMPTZ"
+      },
+      "cs_wallet_summary_self": {
+        "account_id": "TEXT",
+        "balance_minor": "BIGINT",
+        "currency": "TEXT",
+        "status": "TEXT"
+      },
+      "cs_wallet_entry_self": {
+        "entry_id": "TEXT",
+        "kind": "TEXT",
+        "amount_minor": "BIGINT",
+        "sequence": "BIGINT",
+        "balance_before_minor": "BIGINT",
+        "balance_after_minor": "BIGINT",
+        "occurred_at": "TIMESTAMPTZ",
+        "currency": "TEXT"
+      },
+      "cs_product_public": {
+        "product_id": "TEXT",
+        "sku_id": "TEXT",
+        "name": "TEXT",
+        "category": "TEXT",
+        "price_minor": "BIGINT",
+        "currency": "TEXT",
+        "available_qty": "INT",
+        "price_version": "INT",
+        "as_of": "TIMESTAMPTZ"
+      }
+    },
+    "parameters": {},
+    "limits": {
+      "max_rows": 50,
+      "read_only": true
+    }
+  },
+  "graph": {
+    "absolute_month_question": {
+      "rows": [],
+      "captured": {
+        "parameters": {
+          "end_at": "2026-12-10T00:00:00+00:00",
+          "start_at": "2026-11-10T00:00:00+00:00"
+        },
+        "as_of": "2026-12-10T00:00:00+00:00"
+      }
+    },
+    "order_id_parameter": {
+      "kind": "clarify",
+      "missing": [
+        "order_id"
+      ]
+    },
+    "structured_clarify": {
+      "kind": "clarify",
+      "message": "需补充查询条件"
+    }
+  },
+  "executor_adapter": {
+    "rows": [
+      {
+        "paid_minor": "100",
+        "average": "1.25",
+        "paid_at": null
+      }
+    ],
+    "schema_revision": "CS-QUERY-B2-v1",
+    "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+    "plan_cost": 10.0,
+    "source": "controlled_postgresql",
+    "as_of": "2026-12-10T00:00:00+00:00"
+  },
+  "executor_context_keys": [
+    "cs.owner",
+    "cs.store",
+    "cs.batch",
+    "cs.generation",
+    "cs.role",
+    "cs.start",
+    "cs.end"
+  ],
+  "executor_parameter_errors": {
+    "extra_param": "invalid_parameters",
+    "missing_param": "invalid_parameters",
+    "unpaired_time": "invalid_range",
+    "string_times": "invalid_range"
+  },
+  "time_boundaries": [
+    {
+      "local": "2026-11-01T00:00:00+08:00",
+      "utc": "2026-10-31T16:00:00+00:00"
+    },
+    {
+      "local": "2026-12-01T00:00:00+08:00",
+      "utc": "2026-11-30T16:00:00+00:00"
+    },
+    {
+      "local": "2026-11-02T00:00:00+08:00",
+      "utc": "2026-11-01T16:00:00+00:00"
+    }
+  ],
+  "enum_count": 20,
+  "rls_store_scope_observation": {
+    "scope": "SQLGlot lexical qualification only, not PG policy execution",
+    "original_select": "SELECT o.order_id FROM customer_order o WHERE EXISTS (SELECT 1 FROM store s WHERE s.store_id=store_id AND s.status='active')",
+    "qualified_select": "SELECT \"o\".\"order_id\" AS \"order_id\" FROM \"customer_order\" AS \"o\" WHERE EXISTS(SELECT 1 AS \"1\" FROM \"store\" AS \"s\" WHERE \"s\".\"store_id\" = \"s\".\"store_id\" AND \"s\".\"status\" = 'active')",
+    "status": "needs isolated PG verification; do not assert inactive-store RLS test passed"
+  }
+}

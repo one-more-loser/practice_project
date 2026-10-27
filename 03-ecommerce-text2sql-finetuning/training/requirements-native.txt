@@ -1,0 +1,13 @@
+# Python 3.11, Linux x86_64. Install manually inside a project venv.
+# cu128 is intentional: older CUDA builds do not cover Blackwell sm_120.
+--extra-index-url https://download.pytorch.org/whl/cu128
+torch==2.7.1+cu128
+transformers==4.51.3
+tokenizers==0.21.1
+huggingface-hub==0.30.2
+safetensors==0.5.3
+datasets==3.5.0
+numpy==2.2.5
+sqlglot==27.20.0
+psycopg[binary]==3.2.9
+pgserver==0.1.4

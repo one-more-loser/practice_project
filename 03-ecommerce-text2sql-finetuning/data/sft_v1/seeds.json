@@ -1,0 +1,5115 @@
+{
+  "version": "sft-v1",
+  "seed": 20261024,
+  "extra_seeds": [
+    {
+      "id": "N01",
+      "question": "2026年11月创建的订单，按交易状态分别有多少单？",
+      "sql": "SELECT trade_status, count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at GROUP BY trade_status ORDER BY trade_status",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "semantic_note": "按交易状态计创建单数；包含未付、取消，不当已支付订单指标",
+      "expected_kind": "query",
+      "profile": "customer_self",
+      "split": "train",
+      "source": "coordinator_candidate_seed",
+      "review_status": "candidate_unreviewed"
+    },
+    {
+      "id": "N02",
+      "question": "列出2026年11月创建、当前待付款的订单，返回订单号、状态、实付分和创建时间，按创建时间倒序最多20条。",
+      "sql": "SELECT order_id, trade_status, paid_minor, created_at FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status = :status ORDER BY created_at DESC, order_id LIMIT 20",
+      "parameter_names": [
+        "start_at",
+        "end_at",
+        "status"
+      ],
+      "parameters": {
+        "status": "awaiting_payment"
+      },
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "semantic_note": "status由后端绑定；状态筛选与创建时间窗",
+      "expected_kind": "query",
+      "profile": "customer_self",
+      "split": "train",
+      "source": "coordinator_candidate_seed",
+      "review_status": "candidate_unreviewed"
+    },
+    {
+      "id": "N03",
+      "question": "列出2026年11月创建且已支付的订单中SKU sku_1的商品明细，返回明细号、订单号、下单件数和商品实付分，按明细号排序最多20条。",
+      "sql": "SELECT i.order_item_id, i.order_id, i.ordered_qty, i.paid_goods_minor FROM cs_order_item_self i JOIN cs_order_self o ON i.order_id = o.order_id WHERE o.created_at >= :start_at AND o.created_at < :end_at AND i.sku_id = :sku_id AND o.trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND o.paid_minor > 0 ORDER BY i.order_item_id LIMIT 20",
+      "parameter_names": [
+        "start_at",
+        "end_at",
+        "sku_id"
+      ],
+      "parameters": {
+        "sku_id": "sku_1"
+      },
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "semantic_note": "指定SKU的已付订单商品明细；不做连接后聚合，不称商品支付件数指标",
+      "expected_kind": "query",
+      "profile": "customer_self",
+      "split": "train",
+      "source": "coordinator_candidate_seed",
+      "review_status": "candidate_unreviewed"
+    },
+    {
+      "id": "N04",
+      "question": "2026年11月创建的订单，按交易状态分别汇总整单实付金额，单位分。",
+      "sql": "SELECT trade_status, COALESCE(SUM(paid_minor),0) AS paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at GROUP BY trade_status ORDER BY trade_status",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "semantic_note": "订单单表按状态汇总实付分；包含未付款状态，不当付款发生额，不与明细连接后求和",
+      "expected_kind": "query",
+      "profile": "customer_self",
+      "split": "train",
+      "source": "coordinator_candidate_seed",
+      "review_status": "candidate_unreviewed"
+    },
+    {
+      "id": "N05",
+      "question": "2026年11月创建且已支付的订单中，按整单实付分从高到低列出前5单的订单号和实付分。",
+      "sql": "SELECT order_id, paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0 ORDER BY paid_minor DESC, order_id LIMIT 5",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "semantic_note": "创建月paid cohort整单实付排名；同额按订单号",
+      "expected_kind": "query",
+      "profile": "customer_self",
+      "split": "train",
+      "source": "coordinator_candidate_seed",
+      "review_status": "candidate_unreviewed"
+    },
+    {
+      "id": "N06",
+      "question": "公开商品中，可售库存最多的前5个SKU分别是什么？返回SKU、名称、现价分和可售数量。",
+      "sql": "SELECT sku_id, name, price_minor, available_qty FROM cs_product_public ORDER BY available_qty DESC, sku_id LIMIT 5",
+      "parameter_names": [],
+      "parameters": {},
+      "window": null,
+      "semantic_note": "SKU现态；不称历史库存、购买历史或销量",
+      "expected_kind": "query",
+      "profile": "customer_self",
+      "split": "train",
+      "source": "coordinator_candidate_seed",
+      "review_status": "candidate_unreviewed"
+    },
+    {
+      "id": "N07",
+      "question": "列出我2026年11月钱包支付流水的流水号、支付分和发生时间，按时间倒序最多20条。",
+      "sql": "SELECT entry_id, amount_minor, occurred_at FROM cs_wallet_entry_self WHERE kind = 'payment' AND occurred_at >= :start_at AND occurred_at < :end_at ORDER BY occurred_at DESC, entry_id LIMIT 20",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "semantic_note": "钱包payment发生额；不称订单实付或退款净额",
+      "expected_kind": "query",
+      "profile": "customer_self",
+      "split": "train",
+      "source": "coordinator_candidate_seed",
+      "review_status": "candidate_unreviewed"
+    },
+    {
+      "id": "N08",
+      "question": "2026年11月退款到账钱包的金额合计是多少分？",
+      "sql": "SELECT COALESCE(SUM(amount_minor),0) AS amount_minor FROM cs_wallet_entry_self WHERE kind = 'refund' AND occurred_at >= :start_at AND occurred_at < :end_at",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "semantic_note": "钱包退款到账；不称订单累计退款",
+      "expected_kind": "query",
+      "profile": "customer_self",
+      "split": "train",
+      "source": "coordinator_candidate_seed",
+      "review_status": "candidate_unreviewed"
+    }
+  ],
+  "groups": [
+    {
+      "group_id": "G01",
+      "template_id": "T01",
+      "split": "train",
+      "label": {
+        "expected_kind": "query",
+        "sql": "SELECT count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at",
+        "parameter_names": [
+          "start_at",
+          "end_at"
+        ],
+        "parameters": {},
+        "fixture": "fx_a",
+        "window": {
+          "start": "2026-11-01T00:00:00+08:00",
+          "end": "2026-12-01T00:00:00+08:00"
+        }
+      },
+      "questions": [
+        "2026年11月我总共下了多少单？",
+        "统计我 2026 年 11 月创建的订单数。",
+        "帮我看下我 2026 年 11 月下了几笔订单。",
+        "我在 2026 年 11 月创建了多少个订单？",
+        "2026-11-30 上海时间当天创建了多少订单？",
+        "按上海时区统计 2026 年 11 月 30 日创建的订单数。",
+        "2026 年 11 月 30 日（上海）我下了几单？",
+        "2026年11月30日当天（上海时区）创建的订单数量。"
+      ],
+      "windows": [
+        {
+          "start": "2026-11-01T00:00:00+08:00",
+          "end": "2026-12-01T00:00:00+08:00"
+        },
+        {
+          "start": "2026-11-01T00:00:00+08:00",
+          "end": "2026-12-01T00:00:00+08:00"
+        },
+        {
+          "start": "2026-11-01T00:00:00+08:00",
+          "end": "2026-12-01T00:00:00+08:00"
+        },
+        {
+          "start": "2026-11-01T00:00:00+08:00",
+          "end": "2026-12-01T00:00:00+08:00"
+        },
+        {
+          "start": "2026-11-30T00:00:00+08:00",
+          "end": "2026-12-01T00:00:00+08:00"
+        },
+        {
+          "start": "2026-11-30T00:00:00+08:00",
+          "end": "2026-12-01T00:00:00+08:00"
+        },
+        {
+          "start": "2026-11-30T00:00:00+08:00",
+          "end": "2026-12-01T00:00:00+08:00"
+        },
+        {
+          "start": "2026-11-30T00:00:00+08:00",
+          "end": "2026-12-01T00:00:00+08:00"
+        }
+      ]
+    },
+    {
+      "group_id": "G02",
+      "template_id": "T02",
+      "split": "train",
+      "label": {
+        "expected_kind": "query",
+        "sql": "SELECT count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+        "parameter_names": [
+          "start_at",
+          "end_at"
+        ],
+        "parameters": {},
+        "fixture": "fx_a",
+        "window": {
+          "start": "2026-11-01T00:00:00+08:00",
+          "end": "2026-12-01T00:00:00+08:00"
+        }
+      },
+      "questions": [
+        "2026年11月创建的订单中，已支付的有几单？",
+        "统计我 2026 年 11 月创建的已支付订单数量。",
+        "2026 年 11 月创建的已支付订单有几单？",
+        "2026 年 11 月创建的订单中，已支付的订单数是多少？",
+        "2026年11月创建、已支付的订单有几笔？",
+        "统计2026年11月创建订单里已支付单量。",
+        "2026年11月创建的paid cohort订单数是多少？",
+        "帮我数一下2026年11月创建且已支付的订单。"
+      ],
+      "windows": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "group_id": "G03",
+      "template_id": "T03",
+      "split": "train",
+      "label": {
+        "expected_kind": "query",
+        "sql": "SELECT COALESCE(SUM(paid_minor),0) AS paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+        "parameter_names": [
+          "start_at",
+          "end_at"
+        ],
+        "parameters": {},
+        "fixture": "fx_a",
+        "window": {
+          "start": "2026-11-01T00:00:00+08:00",
+          "end": "2026-12-01T00:00:00+08:00"
+        }
+      },
+      "questions": [
+        "2026年11月创建且已支付的订单，实付金额合计是多少？",
+        "统计我 2026 年 11 月创建的已支付订单实付金额。",
+        "2026 年 11 月创建的订单中，已支付订单的实付合计是多少？",
+        "我 2026 年 11 月创建且已支付订单的实付金额是多少？",
+        "2026年11月创建且已支付的订单，实付合计多少钱？",
+        "汇总2026年11月创建、已支付订单的实付分。",
+        "算2026年11月创建、已支付订单的实付总额。",
+        "2026年11月创建订单中已支付部分的实付合计。"
+      ],
+      "windows": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "group_id": "G25",
+      "template_id": "T04",
+      "split": "train",
+      "label": {
+        "expected_kind": "query",
+        "sql": "SELECT COALESCE(SUM(net_paid_minor),0) AS net_paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+        "parameter_names": [
+          "start_at",
+          "end_at"
+        ],
+        "parameters": {},
+        "fixture": "fx_a",
+        "window": {
+          "start": "2026-11-01T00:00:00+08:00",
+          "end": "2026-12-01T00:00:00+08:00"
+        }
+      },
+      "questions": [
+        "2026年11月创建且已支付订单的净支付金额是多少？",
+        "2026 年 11 月创建的已支付订单扣掉退款后的净额。",
+        "算一下我 2026 年 11 月创建且已支付订单的净支付金额。",
+        "我 2026 年 11 月创建且已支付订单实际净付了多少钱？",
+        "2026年11月创建且已支付订单的净实付分合计是多少？",
+        "算一下2026年11月创建、已支付订单扣除退款后的净额。",
+        "2026年11月创建、已支付订单的净支付金额合计（分）。",
+        "我2026年11月创建且已支付的订单，退款后净付多少？"
+      ],
+      "windows": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "group_id": "G05",
+      "template_id": "T05",
+      "split": "train",
+      "label": {
+        "expected_kind": "query",
+        "sql": "SELECT product_id, sku_id, name, price_minor, available_qty FROM cs_product_public WHERE sku_id = :sku_id",
+        "parameter_names": [
+          "sku_id"
+        ],
+        "parameters": {
+          "sku_id": "sku_1"
+        },
+        "fixture": "fx_a"
+      },
+      "questions": [
+        "查一下 SKU sku_1 的公开名称、现价和可售库存。",
+        "sku_1 现在卖多少钱，还有多少可售？",
+        "给我看下商品 sku_1 的公开价格和库存。",
+        "SKU sku_1 的现价与 available_qty 是多少？",
+        "查一下SKU sku_2的公开名称、现价和可售库存。",
+        "sku_2现在卖多少钱，库存还有多少？",
+        "给我看sku_2的公开价格和可售数量。",
+        "SKU sku_2的现价与available_qty。"
+      ],
+      "windows": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "group_id": "G06",
+      "template_id": "T07",
+      "split": "train",
+      "label": {
+        "expected_kind": "query",
+        "sql": "SELECT balance_minor, currency, status FROM cs_wallet_summary_self",
+        "parameter_names": [],
+        "parameters": {},
+        "fixture": "fx_a"
+      },
+      "questions": [
+        "我的账户余额和状态。",
+        "查一下我的钱包余额。",
+        "我现在账户里还有多少钱？",
+        "我的钱包当前余额和币种是什么？",
+        "我的钱包余额、币种和状态是什么？",
+        "查我账户当前余额和可用状态。",
+        "我的账户现在余额多少，是什么币种？",
+        "给我钱包摘要：余额和状态。"
+      ],
+      "windows": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "group_id": "G07",
+      "template_id": "T08",
+      "split": "train",
+      "label": {
+        "expected_kind": "query",
+        "sql": "SELECT entry_id, amount_minor, occurred_at FROM cs_wallet_entry_self WHERE kind = 'refund' AND occurred_at >= :start_at AND occurred_at < :end_at ORDER BY occurred_at DESC",
+        "parameter_names": [
+          "start_at",
+          "end_at"
+        ],
+        "parameters": {},
+        "fixture": "fx_a",
+        "window": {
+          "start": "2026-11-01T00:00:00+08:00",
+          "end": "2026-12-01T00:00:00+08:00"
+        }
+      },
+      "questions": [
+        "2026年11月钱包退款到账明细，按时间倒序。",
+        "我 2026 年 11 月退款到钱包的记录有哪些？",
+        "列一下我 2026 年 11 月钱包收到的退款，最新的在前。",
+        "2026 年 11 月钱包退款到账流水。",
+        "列出2026年11月退款进入钱包的流水，按时间倒序。",
+        "2026年11月钱包退款到账记录，最新在前。",
+        "查我2026年11月退款到账的钱包流水。",
+        "2026年11月钱包收到的退款明细。"
+      ],
+      "windows": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "group_id": "G09",
+      "template_id": "N01",
+      "split": "train",
+      "label": {
+        "expected_kind": "query",
+        "sql": "SELECT trade_status, count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at GROUP BY trade_status ORDER BY trade_status",
+        "parameter_names": [
+          "start_at",
+          "end_at"
+        ],
+        "parameters": {},
+        "fixture": "fx_a",
+        "window": {
+          "start": "2026-11-01T00:00:00+08:00",
+          "end": "2026-12-01T00:00:00+08:00"
+        }
+      },
+      "questions": [
+        "2026年11月创建的订单，按交易状态分别有多少单？",
+        "2026年11月创建的订单按交易状态分组计数。",
+        "统计我2026年11月创建订单的各状态单量。",
+        "2026年11月下的订单，按交易状态分别有多少笔？",
+        "看一下2026年11月创建订单的状态分布。",
+        "按trade_status汇总2026年11月创建的订单数。",
+        "2026年11月创建订单的状态计数是多少？",
+        "帮我数2026年11月创建订单，按交易状态分。"
+      ],
+      "windows": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "group_id": "G10",
+      "template_id": "N02",
+      "split": "train",
+      "label": {
+        "expected_kind": "query",
+        "sql": "SELECT order_id, trade_status, paid_minor, created_at FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status = :status ORDER BY created_at DESC, order_id LIMIT 20",
+        "parameter_names": [
+          "start_at",
+          "end_at",
+          "status"
+        ],
+        "parameters": {
+          "status": "awaiting_payment"
+        },
+        "fixture": "fx_a",
+        "window": {
+          "start": "2026-11-01T00:00:00+08:00",
+          "end": "2026-12-01T00:00:00+08:00"
+        }
+      },
+      "questions": [
+        "列出2026年11月创建、当前待付款的订单，返回订单号、状态、实付分和创建时间，按创建时间倒序最多20条。",
+        "列出2026年11月创建、当前待付款的订单，按创建时间倒序，最多20条。",
+        "2026年11月创建且待付款的订单明细，返回订单号、状态、实付和创建时间。",
+        "查我2026年11月创建、还没付款的订单，最多20条。",
+        "给我2026年11月创建的待付款订单列表（订单号/状态/实付分/创建时间）。",
+        "2026年11月创建、状态为awaiting_payment的订单，按创建时间从新到旧，限20条。",
+        "列出我2026年11月创建、当前待支付的订单及金额。",
+        "2026年11月创建但尚未付款的订单有哪些？返回订单号、状态、实付分、创建时间。"
+      ],
+      "windows": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "group_id": "G11",
+      "template_id": "N03",
+      "split": "train",
+      "label": {
+        "expected_kind": "query",
+        "sql": "SELECT i.order_item_id, i.order_id, i.ordered_qty, i.paid_goods_minor FROM cs_order_item_self i JOIN cs_order_self o ON i.order_id = o.order_id WHERE o.created_at >= :start_at AND o.created_at < :end_at AND i.sku_id = :sku_id AND o.trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND o.paid_minor > 0 ORDER BY i.order_item_id LIMIT 20",
+        "parameter_names": [
+          "start_at",
+          "end_at",
+          "sku_id"
+        ],
+        "parameters": {
+          "sku_id": "sku_1"
+        },
+        "fixture": "fx_a",
+        "window": {
+          "start": "2026-11-01T00:00:00+08:00",
+          "end": "2026-12-01T00:00:00+08:00"
+        }
+      },
+      "questions": [
+        "列出2026年11月创建且已支付的订单中SKU sku_1的商品明细，返回明细号、订单号、下单件数和商品实付分，按明细号排序最多20条。",
+        "列出2026年11月创建且已支付订单中sku_1的明细，含明细号、订单号、件数、商品实付分。",
+        "2026年11月创建且已支付订单里sku_1的商品行，按明细号排序，最多20条。",
+        "查2026年11月创建、已支付订单中SKU sku_1的明细和实付。",
+        "2026年11月创建且已支付的订单里，sku_2的明细行有哪些？",
+        "列出2026年11月创建且已支付订单中sku_2的商品明细和件数。",
+        "查2026年11月创建、已支付订单中SKU sku_2的明细与商品实付分。",
+        "2026年11月创建且已支付订单里SKU sku_2的明细，按明细号排序最多20条。"
+      ],
+      "windows": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "group_id": "G12",
+      "template_id": "N04",
+      "split": "train",
+      "label": {
+        "expected_kind": "query",
+        "sql": "SELECT trade_status, COALESCE(SUM(paid_minor),0) AS paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at GROUP BY trade_status ORDER BY trade_status",
+        "parameter_names": [
+          "start_at",
+          "end_at"
+        ],
+        "parameters": {},
+        "fixture": "fx_a",
+        "window": {
+          "start": "2026-11-01T00:00:00+08:00",
+          "end": "2026-12-01T00:00:00+08:00"
+        }
+      },
+      "questions": [
+        "2026年11月创建的订单，按交易状态分别汇总整单实付金额，单位分。",
+        "2026年11月创建的订单，按交易状态汇总整单实付分。",
+        "统计2026年11月创建订单各交易状态的实付金额合计。",
+        "按状态汇总我2026年11月创建订单的实付分。",
+        "2026年11月创建订单，分交易状态算paid_minor合计。",
+        "给我2026年11月创建订单按交易状态的整单实付金额。",
+        "2026年11月创建订单各状态的实付总额是多少？",
+        "汇总2026年11月创建订单的整单实付分，按状态分组。"
+      ],
+      "windows": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "group_id": "G13",
+      "template_id": "N05",
+      "split": "train",
+      "label": {
+        "expected_kind": "query",
+        "sql": "SELECT order_id, paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0 ORDER BY paid_minor DESC, order_id LIMIT 5",
+        "parameter_names": [
+          "start_at",
+          "end_at"
+        ],
+        "parameters": {},
+        "fixture": "fx_a",
+        "window": {
+          "start": "2026-11-01T00:00:00+08:00",
+          "end": "2026-12-01T00:00:00+08:00"
+        }
+      },
+      "questions": [
+        "2026年11月创建且已支付的订单中，按整单实付分从高到低列出前5单的订单号和实付分。",
+        "2026年11月创建且已支付订单中，整单实付最高的5单。",
+        "按整单实付分降序列出2026年11月创建且已支付订单前5。",
+        "2026年11月创建已支付订单，实付金额前5名。",
+        "给我2026年11月创建、已支付订单实付分最高的5单。",
+        "2026年11月创建且已支付订单按paid_minor从高到低取5条。",
+        "列出我2026年11月创建已支付订单里实付最多的5笔。",
+        "2026年11月创建、已支付订单实付分TOP5。"
+      ],
+      "windows": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "group_id": "G14",
+      "template_id": "N06",
+      "split": "train",
+      "label": {
+        "expected_kind": "query",
+        "sql": "SELECT sku_id, name, price_minor, available_qty FROM cs_product_public ORDER BY available_qty DESC, sku_id LIMIT 5",
+        "parameter_names": [],
+        "parameters": {},
+        "fixture": "fx_a"
+      },
+      "questions": [
+        "公开商品中，可售库存最多的前5个SKU分别是什么？返回SKU、名称、现价分和可售数量。",
+        "公开商品中可售数量最多的5个SKU。",
+        "按available_qty倒序列出公开商品前5个SKU。",
+        "当前公开商品库存最多的5个SKU及价格。",
+        "给我公开商品可售库存TOP5（SKU/名称/现价/可售数）。",
+        "哪些公开SKU当前可售数量最多？取前5。",
+        "公开商品里库存最多的5个SKU是什么？",
+        "按可售库存从高到低列5个公开SKU。"
+      ],
+      "windows": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "group_id": "G15",
+      "template_id": "N07",
+      "split": "train",
+      "label": {
+        "expected_kind": "query",
+        "sql": "SELECT entry_id, amount_minor, occurred_at FROM cs_wallet_entry_self WHERE kind = 'payment' AND occurred_at >= :start_at AND occurred_at < :end_at ORDER BY occurred_at DESC, entry_id LIMIT 20",
+        "parameter_names": [
+          "start_at",
+          "end_at"
+        ],
+        "parameters": {},
+        "fixture": "fx_a",
+        "window": {
+          "start": "2026-11-01T00:00:00+08:00",
+          "end": "2026-12-01T00:00:00+08:00"
+        }
+      },
+      "questions": [
+        "列出我2026年11月钱包支付流水的流水号、支付分和发生时间，按时间倒序最多20条。",
+        "列出我2026年11月钱包支付流水（流水号、金额、时间），最新在前。",
+        "2026年11月钱包payment类型的流水明细，按时间倒序限20条。",
+        "查我2026年11月钱包支付记录，返回entry_id/amount/occurred_at。",
+        "2026年11月钱包扣款流水有哪些？按发生时间倒序。",
+        "给我2026年11月钱包payment流水，最新20条。",
+        "列出2026年11月钱包支付的流水号、支付分和发生时间。",
+        "2026年11月钱包支付明细，按时间从新到旧。"
+      ],
+      "windows": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "group_id": "G16",
+      "template_id": "N08",
+      "split": "train",
+      "label": {
+        "expected_kind": "query",
+        "sql": "SELECT COALESCE(SUM(amount_minor),0) AS amount_minor FROM cs_wallet_entry_self WHERE kind = 'refund' AND occurred_at >= :start_at AND occurred_at < :end_at",
+        "parameter_names": [
+          "start_at",
+          "end_at"
+        ],
+        "parameters": {},
+        "fixture": "fx_a",
+        "window": {
+          "start": "2026-11-01T00:00:00+08:00",
+          "end": "2026-12-01T00:00:00+08:00"
+        }
+      },
+      "questions": [
+        "2026年11月退款到账钱包的金额合计是多少分？",
+        "2026年11月钱包refund发生额合计是多少分？",
+        "统计我2026年11月钱包退款到账总额（分）。",
+        "2026年11月退款进入钱包的金额合计。",
+        "算2026年11月钱包refund流水金额总和。",
+        "2026年11月钱包收到的退款合计多少分？",
+        "汇总2026年11月钱包退款发生额。",
+        "2026年11月钱包退款到账总金额（单位分）。"
+      ],
+      "windows": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "group_id": "G17",
+      "template_id": "T09",
+      "split": "train",
+      "label": {
+        "expected_kind": "clarify",
+        "clarify_slots": [
+          "refund_scope"
+        ],
+        "reason_code": "refund_scope_ambiguous"
+      },
+      "questions": [
+        "2026年11月我退款了多少钱？",
+        "我 2026 年 11 月退了多少钱？",
+        "2026 年 11 月退款金额是多少？",
+        "统计一下我 2026 年 11 月的退款金额。",
+        "2026年11月退款金额按哪个口径算？",
+        "我2026年11月退的钱，是订单累计还是钱包到账？",
+        "2026年11月退款总额是多少？",
+        "帮我统计2026年11月退款金额。"
+      ],
+      "windows": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "group_id": "G18",
+      "template_id": "T10",
+      "split": "train",
+      "label": {
+        "expected_kind": "clarify",
+        "clarify_slots": [
+          "start_at",
+          "end_at",
+          "amount_scope"
+        ],
+        "reason_code": "missing_time_and_amount_scope"
+      },
+      "questions": [
+        "我最近花了多少钱？",
+        "看看我花了多少。",
+        "我最近花费是多少？",
+        "帮我算算最近花掉的钱。",
+        "我花了多少钱？",
+        "帮我算算总花费。",
+        "我最近消费了多少？",
+        "看一下我的花费金额。"
+      ],
+      "windows": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "group_id": "G19",
+      "template_id": "T11",
+      "split": "train",
+      "label": {
+        "expected_kind": "clarify",
+        "clarify_slots": [
+          "order_id"
+        ],
+        "reason_code": "missing_order_scope"
+      },
+      "questions": [
+        "查一下我的订单。",
+        "看看我的订单情况。",
+        "帮我查订单。",
+        "我的订单怎么样？",
+        "帮我看看订单。",
+        "我的订单状态是什么？",
+        "查一下我的订单信息。",
+        "订单现在怎么样？"
+      ],
+      "windows": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "group_id": "G20",
+      "template_id": "T12",
+      "split": "train",
+      "label": {
+        "expected_kind": "unsupported",
+        "reason_code": "write_operation_not_supported"
+      },
+      "questions": [
+        "帮我把订单 O1 退款。",
+        "给订单 O1 发起退款。",
+        "把 O1 取消并退款。",
+        "我要退款订单 O1，直接处理。",
+        "把订单O1退款。",
+        "给O1办理退款。",
+        "取消O1并退款。",
+        "帮我退掉O1。"
+      ],
+      "windows": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "id": "T01-01",
+      "profile": "customer_self",
+      "question": "2026年11月我总共下了多少单？",
+      "template_id": "T01",
+      "group_id": "G01",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T01-02",
+      "profile": "customer_self",
+      "question": "统计我 2026 年 11 月创建的订单数。",
+      "template_id": "T01",
+      "group_id": "G01",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T01-03",
+      "profile": "customer_self",
+      "question": "帮我看下我 2026 年 11 月下了几笔订单。",
+      "template_id": "T01",
+      "group_id": "G01",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T01-04",
+      "profile": "customer_self",
+      "question": "我在 2026 年 11 月创建了多少个订单？",
+      "template_id": "T01",
+      "group_id": "G01",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T01-05",
+      "profile": "customer_self",
+      "question": "2026-11-30 上海时间当天创建了多少订单？",
+      "template_id": "T01",
+      "group_id": "G01",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-30T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T01-06",
+      "profile": "customer_self",
+      "question": "按上海时区统计 2026 年 11 月 30 日创建的订单数。",
+      "template_id": "T01",
+      "group_id": "G01",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-30T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T01-07",
+      "profile": "customer_self",
+      "question": "2026 年 11 月 30 日（上海）我下了几单？",
+      "template_id": "T01",
+      "group_id": "G01",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-30T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T01-08",
+      "profile": "customer_self",
+      "question": "2026年11月30日当天（上海时区）创建的订单数量。",
+      "template_id": "T01",
+      "group_id": "G01",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-30T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T02-01",
+      "profile": "customer_self",
+      "question": "2026年11月创建的订单中，已支付的有几单？",
+      "template_id": "T02",
+      "group_id": "G02",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T02-02",
+      "profile": "customer_self",
+      "question": "统计我 2026 年 11 月创建的已支付订单数量。",
+      "template_id": "T02",
+      "group_id": "G02",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T02-03",
+      "profile": "customer_self",
+      "question": "2026 年 11 月创建的已支付订单有几单？",
+      "template_id": "T02",
+      "group_id": "G02",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T02-04",
+      "profile": "customer_self",
+      "question": "2026 年 11 月创建的订单中，已支付的订单数是多少？",
+      "template_id": "T02",
+      "group_id": "G02",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T02-05",
+      "profile": "customer_self",
+      "question": "2026年11月创建、已支付的订单有几笔？",
+      "template_id": "T02",
+      "group_id": "G02",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T02-06",
+      "profile": "customer_self",
+      "question": "统计2026年11月创建订单里已支付单量。",
+      "template_id": "T02",
+      "group_id": "G02",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T02-07",
+      "profile": "customer_self",
+      "question": "2026年11月创建的paid cohort订单数是多少？",
+      "template_id": "T02",
+      "group_id": "G02",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T02-08",
+      "profile": "customer_self",
+      "question": "帮我数一下2026年11月创建且已支付的订单。",
+      "template_id": "T02",
+      "group_id": "G02",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T03-01",
+      "profile": "customer_self",
+      "question": "2026年11月创建且已支付的订单，实付金额合计是多少？",
+      "template_id": "T03",
+      "group_id": "G03",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT COALESCE(SUM(paid_minor),0) AS paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T03-02",
+      "profile": "customer_self",
+      "question": "统计我 2026 年 11 月创建的已支付订单实付金额。",
+      "template_id": "T03",
+      "group_id": "G03",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT COALESCE(SUM(paid_minor),0) AS paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T03-03",
+      "profile": "customer_self",
+      "question": "2026 年 11 月创建的订单中，已支付订单的实付合计是多少？",
+      "template_id": "T03",
+      "group_id": "G03",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT COALESCE(SUM(paid_minor),0) AS paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T03-04",
+      "profile": "customer_self",
+      "question": "我 2026 年 11 月创建且已支付订单的实付金额是多少？",
+      "template_id": "T03",
+      "group_id": "G03",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT COALESCE(SUM(paid_minor),0) AS paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T03-05",
+      "profile": "customer_self",
+      "question": "2026年11月创建且已支付的订单，实付合计多少钱？",
+      "template_id": "T03",
+      "group_id": "G03",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT COALESCE(SUM(paid_minor),0) AS paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T03-06",
+      "profile": "customer_self",
+      "question": "汇总2026年11月创建、已支付订单的实付分。",
+      "template_id": "T03",
+      "group_id": "G03",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT COALESCE(SUM(paid_minor),0) AS paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T03-07",
+      "profile": "customer_self",
+      "question": "算2026年11月创建、已支付订单的实付总额。",
+      "template_id": "T03",
+      "group_id": "G03",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT COALESCE(SUM(paid_minor),0) AS paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T03-08",
+      "profile": "customer_self",
+      "question": "2026年11月创建订单中已支付部分的实付合计。",
+      "template_id": "T03",
+      "group_id": "G03",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT COALESCE(SUM(paid_minor),0) AS paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T04-01",
+      "profile": "customer_self",
+      "question": "2026年11月创建且已支付订单的净支付金额是多少？",
+      "template_id": "T04",
+      "group_id": "G25",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT COALESCE(SUM(net_paid_minor),0) AS net_paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T04-02",
+      "profile": "customer_self",
+      "question": "2026 年 11 月创建的已支付订单扣掉退款后的净额。",
+      "template_id": "T04",
+      "group_id": "G25",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT COALESCE(SUM(net_paid_minor),0) AS net_paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T04-03",
+      "profile": "customer_self",
+      "question": "算一下我 2026 年 11 月创建且已支付订单的净支付金额。",
+      "template_id": "T04",
+      "group_id": "G25",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT COALESCE(SUM(net_paid_minor),0) AS net_paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T04-04",
+      "profile": "customer_self",
+      "question": "我 2026 年 11 月创建且已支付订单实际净付了多少钱？",
+      "template_id": "T04",
+      "group_id": "G25",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT COALESCE(SUM(net_paid_minor),0) AS net_paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T04-05",
+      "profile": "customer_self",
+      "question": "2026年11月创建且已支付订单的净实付分合计是多少？",
+      "template_id": "T04",
+      "group_id": "G25",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT COALESCE(SUM(net_paid_minor),0) AS net_paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T04-06",
+      "profile": "customer_self",
+      "question": "算一下2026年11月创建、已支付订单扣除退款后的净额。",
+      "template_id": "T04",
+      "group_id": "G25",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT COALESCE(SUM(net_paid_minor),0) AS net_paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T04-07",
+      "profile": "customer_self",
+      "question": "2026年11月创建、已支付订单的净支付金额合计（分）。",
+      "template_id": "T04",
+      "group_id": "G25",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT COALESCE(SUM(net_paid_minor),0) AS net_paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T04-08",
+      "profile": "customer_self",
+      "question": "我2026年11月创建且已支付的订单，退款后净付多少？",
+      "template_id": "T04",
+      "group_id": "G25",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT COALESCE(SUM(net_paid_minor),0) AS net_paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T05-01",
+      "profile": "customer_self",
+      "question": "查一下 SKU sku_1 的公开名称、现价和可售库存。",
+      "template_id": "T05",
+      "group_id": "G05",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT product_id, sku_id, name, price_minor, available_qty FROM cs_product_public WHERE sku_id = :sku_id",
+      "parameter_names": [
+        "sku_id"
+      ],
+      "parameters": {
+        "sku_id": "sku_1"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T05-02",
+      "profile": "customer_self",
+      "question": "sku_1 现在卖多少钱，还有多少可售？",
+      "template_id": "T05",
+      "group_id": "G05",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT product_id, sku_id, name, price_minor, available_qty FROM cs_product_public WHERE sku_id = :sku_id",
+      "parameter_names": [
+        "sku_id"
+      ],
+      "parameters": {
+        "sku_id": "sku_1"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T05-03",
+      "profile": "customer_self",
+      "question": "给我看下商品 sku_1 的公开价格和库存。",
+      "template_id": "T05",
+      "group_id": "G05",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT product_id, sku_id, name, price_minor, available_qty FROM cs_product_public WHERE sku_id = :sku_id",
+      "parameter_names": [
+        "sku_id"
+      ],
+      "parameters": {
+        "sku_id": "sku_1"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T05-04",
+      "profile": "customer_self",
+      "question": "SKU sku_1 的现价与 available_qty 是多少？",
+      "template_id": "T05",
+      "group_id": "G05",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT product_id, sku_id, name, price_minor, available_qty FROM cs_product_public WHERE sku_id = :sku_id",
+      "parameter_names": [
+        "sku_id"
+      ],
+      "parameters": {
+        "sku_id": "sku_1"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T05-05",
+      "profile": "customer_self",
+      "question": "查一下SKU sku_2的公开名称、现价和可售库存。",
+      "template_id": "T05",
+      "group_id": "G05",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT product_id, sku_id, name, price_minor, available_qty FROM cs_product_public WHERE sku_id = :sku_id",
+      "parameter_names": [
+        "sku_id"
+      ],
+      "parameters": {
+        "sku_id": "sku_2"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T05-06",
+      "profile": "customer_self",
+      "question": "sku_2现在卖多少钱，库存还有多少？",
+      "template_id": "T05",
+      "group_id": "G05",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT product_id, sku_id, name, price_minor, available_qty FROM cs_product_public WHERE sku_id = :sku_id",
+      "parameter_names": [
+        "sku_id"
+      ],
+      "parameters": {
+        "sku_id": "sku_2"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T05-07",
+      "profile": "customer_self",
+      "question": "给我看sku_2的公开价格和可售数量。",
+      "template_id": "T05",
+      "group_id": "G05",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT product_id, sku_id, name, price_minor, available_qty FROM cs_product_public WHERE sku_id = :sku_id",
+      "parameter_names": [
+        "sku_id"
+      ],
+      "parameters": {
+        "sku_id": "sku_2"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T05-08",
+      "profile": "customer_self",
+      "question": "SKU sku_2的现价与available_qty。",
+      "template_id": "T05",
+      "group_id": "G05",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT product_id, sku_id, name, price_minor, available_qty FROM cs_product_public WHERE sku_id = :sku_id",
+      "parameter_names": [
+        "sku_id"
+      ],
+      "parameters": {
+        "sku_id": "sku_2"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T07-01",
+      "profile": "customer_self",
+      "question": "我的账户余额和状态。",
+      "template_id": "T07",
+      "group_id": "G06",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT balance_minor, currency, status FROM cs_wallet_summary_self",
+      "parameter_names": [],
+      "parameters": {},
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T07-02",
+      "profile": "customer_self",
+      "question": "查一下我的钱包余额。",
+      "template_id": "T07",
+      "group_id": "G06",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT balance_minor, currency, status FROM cs_wallet_summary_self",
+      "parameter_names": [],
+      "parameters": {},
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T07-03",
+      "profile": "customer_self",
+      "question": "我现在账户里还有多少钱？",
+      "template_id": "T07",
+      "group_id": "G06",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT balance_minor, currency, status FROM cs_wallet_summary_self",
+      "parameter_names": [],
+      "parameters": {},
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T07-04",
+      "profile": "customer_self",
+      "question": "我的钱包当前余额和币种是什么？",
+      "template_id": "T07",
+      "group_id": "G06",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT balance_minor, currency, status FROM cs_wallet_summary_self",
+      "parameter_names": [],
+      "parameters": {},
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T07-05",
+      "profile": "customer_self",
+      "question": "我的钱包余额、币种和状态是什么？",
+      "template_id": "T07",
+      "group_id": "G06",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT balance_minor, currency, status FROM cs_wallet_summary_self",
+      "parameter_names": [],
+      "parameters": {},
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T07-06",
+      "profile": "customer_self",
+      "question": "查我账户当前余额和可用状态。",
+      "template_id": "T07",
+      "group_id": "G06",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT balance_minor, currency, status FROM cs_wallet_summary_self",
+      "parameter_names": [],
+      "parameters": {},
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T07-07",
+      "profile": "customer_self",
+      "question": "我的账户现在余额多少，是什么币种？",
+      "template_id": "T07",
+      "group_id": "G06",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT balance_minor, currency, status FROM cs_wallet_summary_self",
+      "parameter_names": [],
+      "parameters": {},
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T07-08",
+      "profile": "customer_self",
+      "question": "给我钱包摘要：余额和状态。",
+      "template_id": "T07",
+      "group_id": "G06",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT balance_minor, currency, status FROM cs_wallet_summary_self",
+      "parameter_names": [],
+      "parameters": {},
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T08-01",
+      "profile": "customer_self",
+      "question": "2026年11月钱包退款到账明细，按时间倒序。",
+      "template_id": "T08",
+      "group_id": "G07",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT entry_id, amount_minor, occurred_at FROM cs_wallet_entry_self WHERE kind = 'refund' AND occurred_at >= :start_at AND occurred_at < :end_at ORDER BY occurred_at DESC",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T08-02",
+      "profile": "customer_self",
+      "question": "我 2026 年 11 月退款到钱包的记录有哪些？",
+      "template_id": "T08",
+      "group_id": "G07",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT entry_id, amount_minor, occurred_at FROM cs_wallet_entry_self WHERE kind = 'refund' AND occurred_at >= :start_at AND occurred_at < :end_at ORDER BY occurred_at DESC",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T08-03",
+      "profile": "customer_self",
+      "question": "列一下我 2026 年 11 月钱包收到的退款，最新的在前。",
+      "template_id": "T08",
+      "group_id": "G07",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT entry_id, amount_minor, occurred_at FROM cs_wallet_entry_self WHERE kind = 'refund' AND occurred_at >= :start_at AND occurred_at < :end_at ORDER BY occurred_at DESC",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T08-04",
+      "profile": "customer_self",
+      "question": "2026 年 11 月钱包退款到账流水。",
+      "template_id": "T08",
+      "group_id": "G07",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT entry_id, amount_minor, occurred_at FROM cs_wallet_entry_self WHERE kind = 'refund' AND occurred_at >= :start_at AND occurred_at < :end_at ORDER BY occurred_at DESC",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T08-05",
+      "profile": "customer_self",
+      "question": "列出2026年11月退款进入钱包的流水，按时间倒序。",
+      "template_id": "T08",
+      "group_id": "G07",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT entry_id, amount_minor, occurred_at FROM cs_wallet_entry_self WHERE kind = 'refund' AND occurred_at >= :start_at AND occurred_at < :end_at ORDER BY occurred_at DESC",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T08-06",
+      "profile": "customer_self",
+      "question": "2026年11月钱包退款到账记录，最新在前。",
+      "template_id": "T08",
+      "group_id": "G07",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT entry_id, amount_minor, occurred_at FROM cs_wallet_entry_self WHERE kind = 'refund' AND occurred_at >= :start_at AND occurred_at < :end_at ORDER BY occurred_at DESC",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T08-07",
+      "profile": "customer_self",
+      "question": "查我2026年11月退款到账的钱包流水。",
+      "template_id": "T08",
+      "group_id": "G07",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT entry_id, amount_minor, occurred_at FROM cs_wallet_entry_self WHERE kind = 'refund' AND occurred_at >= :start_at AND occurred_at < :end_at ORDER BY occurred_at DESC",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T08-08",
+      "profile": "customer_self",
+      "question": "2026年11月钱包收到的退款明细。",
+      "template_id": "T08",
+      "group_id": "G07",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT entry_id, amount_minor, occurred_at FROM cs_wallet_entry_self WHERE kind = 'refund' AND occurred_at >= :start_at AND occurred_at < :end_at ORDER BY occurred_at DESC",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N01-01",
+      "profile": "customer_self",
+      "question": "2026年11月创建的订单，按交易状态分别有多少单？",
+      "template_id": "N01",
+      "group_id": "G09",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT trade_status, count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at GROUP BY trade_status ORDER BY trade_status",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N01-02",
+      "profile": "customer_self",
+      "question": "2026年11月创建的订单按交易状态分组计数。",
+      "template_id": "N01",
+      "group_id": "G09",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT trade_status, count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at GROUP BY trade_status ORDER BY trade_status",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N01-03",
+      "profile": "customer_self",
+      "question": "统计我2026年11月创建订单的各状态单量。",
+      "template_id": "N01",
+      "group_id": "G09",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT trade_status, count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at GROUP BY trade_status ORDER BY trade_status",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N01-04",
+      "profile": "customer_self",
+      "question": "2026年11月下的订单，按交易状态分别有多少笔？",
+      "template_id": "N01",
+      "group_id": "G09",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT trade_status, count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at GROUP BY trade_status ORDER BY trade_status",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N01-05",
+      "profile": "customer_self",
+      "question": "看一下2026年11月创建订单的状态分布。",
+      "template_id": "N01",
+      "group_id": "G09",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT trade_status, count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at GROUP BY trade_status ORDER BY trade_status",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N01-06",
+      "profile": "customer_self",
+      "question": "按trade_status汇总2026年11月创建的订单数。",
+      "template_id": "N01",
+      "group_id": "G09",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT trade_status, count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at GROUP BY trade_status ORDER BY trade_status",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N01-07",
+      "profile": "customer_self",
+      "question": "2026年11月创建订单的状态计数是多少？",
+      "template_id": "N01",
+      "group_id": "G09",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT trade_status, count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at GROUP BY trade_status ORDER BY trade_status",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N01-08",
+      "profile": "customer_self",
+      "question": "帮我数2026年11月创建订单，按交易状态分。",
+      "template_id": "N01",
+      "group_id": "G09",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT trade_status, count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at GROUP BY trade_status ORDER BY trade_status",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N02-01",
+      "profile": "customer_self",
+      "question": "列出2026年11月创建、当前待付款的订单，返回订单号、状态、实付分和创建时间，按创建时间倒序最多20条。",
+      "template_id": "N02",
+      "group_id": "G10",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT order_id, trade_status, paid_minor, created_at FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status = :status ORDER BY created_at DESC, order_id LIMIT 20",
+      "parameter_names": [
+        "start_at",
+        "end_at",
+        "status"
+      ],
+      "parameters": {
+        "status": "awaiting_payment"
+      },
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N02-02",
+      "profile": "customer_self",
+      "question": "列出2026年11月创建、当前待付款的订单，按创建时间倒序，最多20条。",
+      "template_id": "N02",
+      "group_id": "G10",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT order_id, trade_status, paid_minor, created_at FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status = :status ORDER BY created_at DESC, order_id LIMIT 20",
+      "parameter_names": [
+        "start_at",
+        "end_at",
+        "status"
+      ],
+      "parameters": {
+        "status": "awaiting_payment"
+      },
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N02-03",
+      "profile": "customer_self",
+      "question": "2026年11月创建且待付款的订单明细，返回订单号、状态、实付和创建时间。",
+      "template_id": "N02",
+      "group_id": "G10",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT order_id, trade_status, paid_minor, created_at FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status = :status ORDER BY created_at DESC, order_id LIMIT 20",
+      "parameter_names": [
+        "start_at",
+        "end_at",
+        "status"
+      ],
+      "parameters": {
+        "status": "awaiting_payment"
+      },
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N02-04",
+      "profile": "customer_self",
+      "question": "查我2026年11月创建、还没付款的订单，最多20条。",
+      "template_id": "N02",
+      "group_id": "G10",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT order_id, trade_status, paid_minor, created_at FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status = :status ORDER BY created_at DESC, order_id LIMIT 20",
+      "parameter_names": [
+        "start_at",
+        "end_at",
+        "status"
+      ],
+      "parameters": {
+        "status": "awaiting_payment"
+      },
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N02-05",
+      "profile": "customer_self",
+      "question": "给我2026年11月创建的待付款订单列表（订单号/状态/实付分/创建时间）。",
+      "template_id": "N02",
+      "group_id": "G10",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT order_id, trade_status, paid_minor, created_at FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status = :status ORDER BY created_at DESC, order_id LIMIT 20",
+      "parameter_names": [
+        "start_at",
+        "end_at",
+        "status"
+      ],
+      "parameters": {
+        "status": "awaiting_payment"
+      },
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N02-06",
+      "profile": "customer_self",
+      "question": "2026年11月创建、状态为awaiting_payment的订单，按创建时间从新到旧，限20条。",
+      "template_id": "N02",
+      "group_id": "G10",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT order_id, trade_status, paid_minor, created_at FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status = :status ORDER BY created_at DESC, order_id LIMIT 20",
+      "parameter_names": [
+        "start_at",
+        "end_at",
+        "status"
+      ],
+      "parameters": {
+        "status": "awaiting_payment"
+      },
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N02-07",
+      "profile": "customer_self",
+      "question": "列出我2026年11月创建、当前待支付的订单及金额。",
+      "template_id": "N02",
+      "group_id": "G10",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT order_id, trade_status, paid_minor, created_at FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status = :status ORDER BY created_at DESC, order_id LIMIT 20",
+      "parameter_names": [
+        "start_at",
+        "end_at",
+        "status"
+      ],
+      "parameters": {
+        "status": "awaiting_payment"
+      },
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N02-08",
+      "profile": "customer_self",
+      "question": "2026年11月创建但尚未付款的订单有哪些？返回订单号、状态、实付分、创建时间。",
+      "template_id": "N02",
+      "group_id": "G10",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT order_id, trade_status, paid_minor, created_at FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status = :status ORDER BY created_at DESC, order_id LIMIT 20",
+      "parameter_names": [
+        "start_at",
+        "end_at",
+        "status"
+      ],
+      "parameters": {
+        "status": "awaiting_payment"
+      },
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N03-01",
+      "profile": "customer_self",
+      "question": "列出2026年11月创建且已支付的订单中SKU sku_1的商品明细，返回明细号、订单号、下单件数和商品实付分，按明细号排序最多20条。",
+      "template_id": "N03",
+      "group_id": "G11",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT i.order_item_id, i.order_id, i.ordered_qty, i.paid_goods_minor FROM cs_order_item_self i JOIN cs_order_self o ON i.order_id = o.order_id WHERE o.created_at >= :start_at AND o.created_at < :end_at AND i.sku_id = :sku_id AND o.trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND o.paid_minor > 0 ORDER BY i.order_item_id LIMIT 20",
+      "parameter_names": [
+        "start_at",
+        "end_at",
+        "sku_id"
+      ],
+      "parameters": {
+        "sku_id": "sku_1"
+      },
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N03-02",
+      "profile": "customer_self",
+      "question": "列出2026年11月创建且已支付订单中sku_1的明细，含明细号、订单号、件数、商品实付分。",
+      "template_id": "N03",
+      "group_id": "G11",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT i.order_item_id, i.order_id, i.ordered_qty, i.paid_goods_minor FROM cs_order_item_self i JOIN cs_order_self o ON i.order_id = o.order_id WHERE o.created_at >= :start_at AND o.created_at < :end_at AND i.sku_id = :sku_id AND o.trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND o.paid_minor > 0 ORDER BY i.order_item_id LIMIT 20",
+      "parameter_names": [
+        "start_at",
+        "end_at",
+        "sku_id"
+      ],
+      "parameters": {
+        "sku_id": "sku_1"
+      },
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N03-03",
+      "profile": "customer_self",
+      "question": "2026年11月创建且已支付订单里sku_1的商品行，按明细号排序，最多20条。",
+      "template_id": "N03",
+      "group_id": "G11",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT i.order_item_id, i.order_id, i.ordered_qty, i.paid_goods_minor FROM cs_order_item_self i JOIN cs_order_self o ON i.order_id = o.order_id WHERE o.created_at >= :start_at AND o.created_at < :end_at AND i.sku_id = :sku_id AND o.trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND o.paid_minor > 0 ORDER BY i.order_item_id LIMIT 20",
+      "parameter_names": [
+        "start_at",
+        "end_at",
+        "sku_id"
+      ],
+      "parameters": {
+        "sku_id": "sku_1"
+      },
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N03-04",
+      "profile": "customer_self",
+      "question": "查2026年11月创建、已支付订单中SKU sku_1的明细和实付。",
+      "template_id": "N03",
+      "group_id": "G11",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT i.order_item_id, i.order_id, i.ordered_qty, i.paid_goods_minor FROM cs_order_item_self i JOIN cs_order_self o ON i.order_id = o.order_id WHERE o.created_at >= :start_at AND o.created_at < :end_at AND i.sku_id = :sku_id AND o.trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND o.paid_minor > 0 ORDER BY i.order_item_id LIMIT 20",
+      "parameter_names": [
+        "start_at",
+        "end_at",
+        "sku_id"
+      ],
+      "parameters": {
+        "sku_id": "sku_1"
+      },
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N03-05",
+      "profile": "customer_self",
+      "question": "2026年11月创建且已支付的订单里，sku_2的明细行有哪些？",
+      "template_id": "N03",
+      "group_id": "G11",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT i.order_item_id, i.order_id, i.ordered_qty, i.paid_goods_minor FROM cs_order_item_self i JOIN cs_order_self o ON i.order_id = o.order_id WHERE o.created_at >= :start_at AND o.created_at < :end_at AND i.sku_id = :sku_id AND o.trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND o.paid_minor > 0 ORDER BY i.order_item_id LIMIT 20",
+      "parameter_names": [
+        "start_at",
+        "end_at",
+        "sku_id"
+      ],
+      "parameters": {
+        "sku_id": "sku_2"
+      },
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N03-06",
+      "profile": "customer_self",
+      "question": "列出2026年11月创建且已支付订单中sku_2的商品明细和件数。",
+      "template_id": "N03",
+      "group_id": "G11",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT i.order_item_id, i.order_id, i.ordered_qty, i.paid_goods_minor FROM cs_order_item_self i JOIN cs_order_self o ON i.order_id = o.order_id WHERE o.created_at >= :start_at AND o.created_at < :end_at AND i.sku_id = :sku_id AND o.trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND o.paid_minor > 0 ORDER BY i.order_item_id LIMIT 20",
+      "parameter_names": [
+        "start_at",
+        "end_at",
+        "sku_id"
+      ],
+      "parameters": {
+        "sku_id": "sku_2"
+      },
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N03-07",
+      "profile": "customer_self",
+      "question": "查2026年11月创建、已支付订单中SKU sku_2的明细与商品实付分。",
+      "template_id": "N03",
+      "group_id": "G11",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT i.order_item_id, i.order_id, i.ordered_qty, i.paid_goods_minor FROM cs_order_item_self i JOIN cs_order_self o ON i.order_id = o.order_id WHERE o.created_at >= :start_at AND o.created_at < :end_at AND i.sku_id = :sku_id AND o.trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND o.paid_minor > 0 ORDER BY i.order_item_id LIMIT 20",
+      "parameter_names": [
+        "start_at",
+        "end_at",
+        "sku_id"
+      ],
+      "parameters": {
+        "sku_id": "sku_2"
+      },
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N03-08",
+      "profile": "customer_self",
+      "question": "2026年11月创建且已支付订单里SKU sku_2的明细，按明细号排序最多20条。",
+      "template_id": "N03",
+      "group_id": "G11",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT i.order_item_id, i.order_id, i.ordered_qty, i.paid_goods_minor FROM cs_order_item_self i JOIN cs_order_self o ON i.order_id = o.order_id WHERE o.created_at >= :start_at AND o.created_at < :end_at AND i.sku_id = :sku_id AND o.trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND o.paid_minor > 0 ORDER BY i.order_item_id LIMIT 20",
+      "parameter_names": [
+        "start_at",
+        "end_at",
+        "sku_id"
+      ],
+      "parameters": {
+        "sku_id": "sku_2"
+      },
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N04-01",
+      "profile": "customer_self",
+      "question": "2026年11月创建的订单，按交易状态分别汇总整单实付金额，单位分。",
+      "template_id": "N04",
+      "group_id": "G12",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT trade_status, COALESCE(SUM(paid_minor),0) AS paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at GROUP BY trade_status ORDER BY trade_status",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N04-02",
+      "profile": "customer_self",
+      "question": "2026年11月创建的订单，按交易状态汇总整单实付分。",
+      "template_id": "N04",
+      "group_id": "G12",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT trade_status, COALESCE(SUM(paid_minor),0) AS paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at GROUP BY trade_status ORDER BY trade_status",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N04-03",
+      "profile": "customer_self",
+      "question": "统计2026年11月创建订单各交易状态的实付金额合计。",
+      "template_id": "N04",
+      "group_id": "G12",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT trade_status, COALESCE(SUM(paid_minor),0) AS paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at GROUP BY trade_status ORDER BY trade_status",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N04-04",
+      "profile": "customer_self",
+      "question": "按状态汇总我2026年11月创建订单的实付分。",
+      "template_id": "N04",
+      "group_id": "G12",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT trade_status, COALESCE(SUM(paid_minor),0) AS paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at GROUP BY trade_status ORDER BY trade_status",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N04-05",
+      "profile": "customer_self",
+      "question": "2026年11月创建订单，分交易状态算paid_minor合计。",
+      "template_id": "N04",
+      "group_id": "G12",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT trade_status, COALESCE(SUM(paid_minor),0) AS paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at GROUP BY trade_status ORDER BY trade_status",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N04-06",
+      "profile": "customer_self",
+      "question": "给我2026年11月创建订单按交易状态的整单实付金额。",
+      "template_id": "N04",
+      "group_id": "G12",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT trade_status, COALESCE(SUM(paid_minor),0) AS paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at GROUP BY trade_status ORDER BY trade_status",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N04-07",
+      "profile": "customer_self",
+      "question": "2026年11月创建订单各状态的实付总额是多少？",
+      "template_id": "N04",
+      "group_id": "G12",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT trade_status, COALESCE(SUM(paid_minor),0) AS paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at GROUP BY trade_status ORDER BY trade_status",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N04-08",
+      "profile": "customer_self",
+      "question": "汇总2026年11月创建订单的整单实付分，按状态分组。",
+      "template_id": "N04",
+      "group_id": "G12",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT trade_status, COALESCE(SUM(paid_minor),0) AS paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at GROUP BY trade_status ORDER BY trade_status",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N05-01",
+      "profile": "customer_self",
+      "question": "2026年11月创建且已支付的订单中，按整单实付分从高到低列出前5单的订单号和实付分。",
+      "template_id": "N05",
+      "group_id": "G13",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT order_id, paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0 ORDER BY paid_minor DESC, order_id LIMIT 5",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N05-02",
+      "profile": "customer_self",
+      "question": "2026年11月创建且已支付订单中，整单实付最高的5单。",
+      "template_id": "N05",
+      "group_id": "G13",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT order_id, paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0 ORDER BY paid_minor DESC, order_id LIMIT 5",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N05-03",
+      "profile": "customer_self",
+      "question": "按整单实付分降序列出2026年11月创建且已支付订单前5。",
+      "template_id": "N05",
+      "group_id": "G13",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT order_id, paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0 ORDER BY paid_minor DESC, order_id LIMIT 5",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N05-04",
+      "profile": "customer_self",
+      "question": "2026年11月创建已支付订单，实付金额前5名。",
+      "template_id": "N05",
+      "group_id": "G13",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT order_id, paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0 ORDER BY paid_minor DESC, order_id LIMIT 5",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N05-05",
+      "profile": "customer_self",
+      "question": "给我2026年11月创建、已支付订单实付分最高的5单。",
+      "template_id": "N05",
+      "group_id": "G13",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT order_id, paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0 ORDER BY paid_minor DESC, order_id LIMIT 5",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N05-06",
+      "profile": "customer_self",
+      "question": "2026年11月创建且已支付订单按paid_minor从高到低取5条。",
+      "template_id": "N05",
+      "group_id": "G13",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT order_id, paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0 ORDER BY paid_minor DESC, order_id LIMIT 5",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N05-07",
+      "profile": "customer_self",
+      "question": "列出我2026年11月创建已支付订单里实付最多的5笔。",
+      "template_id": "N05",
+      "group_id": "G13",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT order_id, paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0 ORDER BY paid_minor DESC, order_id LIMIT 5",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N05-08",
+      "profile": "customer_self",
+      "question": "2026年11月创建、已支付订单实付分TOP5。",
+      "template_id": "N05",
+      "group_id": "G13",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT order_id, paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0 ORDER BY paid_minor DESC, order_id LIMIT 5",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N06-01",
+      "profile": "customer_self",
+      "question": "公开商品中，可售库存最多的前5个SKU分别是什么？返回SKU、名称、现价分和可售数量。",
+      "template_id": "N06",
+      "group_id": "G14",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT sku_id, name, price_minor, available_qty FROM cs_product_public ORDER BY available_qty DESC, sku_id LIMIT 5",
+      "parameter_names": [],
+      "parameters": {},
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N06-02",
+      "profile": "customer_self",
+      "question": "公开商品中可售数量最多的5个SKU。",
+      "template_id": "N06",
+      "group_id": "G14",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT sku_id, name, price_minor, available_qty FROM cs_product_public ORDER BY available_qty DESC, sku_id LIMIT 5",
+      "parameter_names": [],
+      "parameters": {},
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N06-03",
+      "profile": "customer_self",
+      "question": "按available_qty倒序列出公开商品前5个SKU。",
+      "template_id": "N06",
+      "group_id": "G14",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT sku_id, name, price_minor, available_qty FROM cs_product_public ORDER BY available_qty DESC, sku_id LIMIT 5",
+      "parameter_names": [],
+      "parameters": {},
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N06-04",
+      "profile": "customer_self",
+      "question": "当前公开商品库存最多的5个SKU及价格。",
+      "template_id": "N06",
+      "group_id": "G14",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT sku_id, name, price_minor, available_qty FROM cs_product_public ORDER BY available_qty DESC, sku_id LIMIT 5",
+      "parameter_names": [],
+      "parameters": {},
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N06-05",
+      "profile": "customer_self",
+      "question": "给我公开商品可售库存TOP5（SKU/名称/现价/可售数）。",
+      "template_id": "N06",
+      "group_id": "G14",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT sku_id, name, price_minor, available_qty FROM cs_product_public ORDER BY available_qty DESC, sku_id LIMIT 5",
+      "parameter_names": [],
+      "parameters": {},
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N06-06",
+      "profile": "customer_self",
+      "question": "哪些公开SKU当前可售数量最多？取前5。",
+      "template_id": "N06",
+      "group_id": "G14",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT sku_id, name, price_minor, available_qty FROM cs_product_public ORDER BY available_qty DESC, sku_id LIMIT 5",
+      "parameter_names": [],
+      "parameters": {},
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N06-07",
+      "profile": "customer_self",
+      "question": "公开商品里库存最多的5个SKU是什么？",
+      "template_id": "N06",
+      "group_id": "G14",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT sku_id, name, price_minor, available_qty FROM cs_product_public ORDER BY available_qty DESC, sku_id LIMIT 5",
+      "parameter_names": [],
+      "parameters": {},
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N06-08",
+      "profile": "customer_self",
+      "question": "按可售库存从高到低列5个公开SKU。",
+      "template_id": "N06",
+      "group_id": "G14",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT sku_id, name, price_minor, available_qty FROM cs_product_public ORDER BY available_qty DESC, sku_id LIMIT 5",
+      "parameter_names": [],
+      "parameters": {},
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N07-01",
+      "profile": "customer_self",
+      "question": "列出我2026年11月钱包支付流水的流水号、支付分和发生时间，按时间倒序最多20条。",
+      "template_id": "N07",
+      "group_id": "G15",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT entry_id, amount_minor, occurred_at FROM cs_wallet_entry_self WHERE kind = 'payment' AND occurred_at >= :start_at AND occurred_at < :end_at ORDER BY occurred_at DESC, entry_id LIMIT 20",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N07-02",
+      "profile": "customer_self",
+      "question": "列出我2026年11月钱包支付流水（流水号、金额、时间），最新在前。",
+      "template_id": "N07",
+      "group_id": "G15",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT entry_id, amount_minor, occurred_at FROM cs_wallet_entry_self WHERE kind = 'payment' AND occurred_at >= :start_at AND occurred_at < :end_at ORDER BY occurred_at DESC, entry_id LIMIT 20",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N07-03",
+      "profile": "customer_self",
+      "question": "2026年11月钱包payment类型的流水明细，按时间倒序限20条。",
+      "template_id": "N07",
+      "group_id": "G15",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT entry_id, amount_minor, occurred_at FROM cs_wallet_entry_self WHERE kind = 'payment' AND occurred_at >= :start_at AND occurred_at < :end_at ORDER BY occurred_at DESC, entry_id LIMIT 20",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N07-04",
+      "profile": "customer_self",
+      "question": "查我2026年11月钱包支付记录，返回entry_id/amount/occurred_at。",
+      "template_id": "N07",
+      "group_id": "G15",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT entry_id, amount_minor, occurred_at FROM cs_wallet_entry_self WHERE kind = 'payment' AND occurred_at >= :start_at AND occurred_at < :end_at ORDER BY occurred_at DESC, entry_id LIMIT 20",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N07-05",
+      "profile": "customer_self",
+      "question": "2026年11月钱包扣款流水有哪些？按发生时间倒序。",
+      "template_id": "N07",
+      "group_id": "G15",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT entry_id, amount_minor, occurred_at FROM cs_wallet_entry_self WHERE kind = 'payment' AND occurred_at >= :start_at AND occurred_at < :end_at ORDER BY occurred_at DESC, entry_id LIMIT 20",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N07-06",
+      "profile": "customer_self",
+      "question": "给我2026年11月钱包payment流水，最新20条。",
+      "template_id": "N07",
+      "group_id": "G15",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT entry_id, amount_minor, occurred_at FROM cs_wallet_entry_self WHERE kind = 'payment' AND occurred_at >= :start_at AND occurred_at < :end_at ORDER BY occurred_at DESC, entry_id LIMIT 20",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N07-07",
+      "profile": "customer_self",
+      "question": "列出2026年11月钱包支付的流水号、支付分和发生时间。",
+      "template_id": "N07",
+      "group_id": "G15",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT entry_id, amount_minor, occurred_at FROM cs_wallet_entry_self WHERE kind = 'payment' AND occurred_at >= :start_at AND occurred_at < :end_at ORDER BY occurred_at DESC, entry_id LIMIT 20",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N07-08",
+      "profile": "customer_self",
+      "question": "2026年11月钱包支付明细，按时间从新到旧。",
+      "template_id": "N07",
+      "group_id": "G15",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT entry_id, amount_minor, occurred_at FROM cs_wallet_entry_self WHERE kind = 'payment' AND occurred_at >= :start_at AND occurred_at < :end_at ORDER BY occurred_at DESC, entry_id LIMIT 20",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N08-01",
+      "profile": "customer_self",
+      "question": "2026年11月退款到账钱包的金额合计是多少分？",
+      "template_id": "N08",
+      "group_id": "G16",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT COALESCE(SUM(amount_minor),0) AS amount_minor FROM cs_wallet_entry_self WHERE kind = 'refund' AND occurred_at >= :start_at AND occurred_at < :end_at",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N08-02",
+      "profile": "customer_self",
+      "question": "2026年11月钱包refund发生额合计是多少分？",
+      "template_id": "N08",
+      "group_id": "G16",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT COALESCE(SUM(amount_minor),0) AS amount_minor FROM cs_wallet_entry_self WHERE kind = 'refund' AND occurred_at >= :start_at AND occurred_at < :end_at",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N08-03",
+      "profile": "customer_self",
+      "question": "统计我2026年11月钱包退款到账总额（分）。",
+      "template_id": "N08",
+      "group_id": "G16",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT COALESCE(SUM(amount_minor),0) AS amount_minor FROM cs_wallet_entry_self WHERE kind = 'refund' AND occurred_at >= :start_at AND occurred_at < :end_at",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N08-04",
+      "profile": "customer_self",
+      "question": "2026年11月退款进入钱包的金额合计。",
+      "template_id": "N08",
+      "group_id": "G16",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT COALESCE(SUM(amount_minor),0) AS amount_minor FROM cs_wallet_entry_self WHERE kind = 'refund' AND occurred_at >= :start_at AND occurred_at < :end_at",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N08-05",
+      "profile": "customer_self",
+      "question": "算2026年11月钱包refund流水金额总和。",
+      "template_id": "N08",
+      "group_id": "G16",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT COALESCE(SUM(amount_minor),0) AS amount_minor FROM cs_wallet_entry_self WHERE kind = 'refund' AND occurred_at >= :start_at AND occurred_at < :end_at",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N08-06",
+      "profile": "customer_self",
+      "question": "2026年11月钱包收到的退款合计多少分？",
+      "template_id": "N08",
+      "group_id": "G16",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT COALESCE(SUM(amount_minor),0) AS amount_minor FROM cs_wallet_entry_self WHERE kind = 'refund' AND occurred_at >= :start_at AND occurred_at < :end_at",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N08-07",
+      "profile": "customer_self",
+      "question": "汇总2026年11月钱包退款发生额。",
+      "template_id": "N08",
+      "group_id": "G16",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT COALESCE(SUM(amount_minor),0) AS amount_minor FROM cs_wallet_entry_self WHERE kind = 'refund' AND occurred_at >= :start_at AND occurred_at < :end_at",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "N08-08",
+      "profile": "customer_self",
+      "question": "2026年11月钱包退款到账总金额（单位分）。",
+      "template_id": "N08",
+      "group_id": "G16",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "query",
+      "sql": "SELECT COALESCE(SUM(amount_minor),0) AS amount_minor FROM cs_wallet_entry_self WHERE kind = 'refund' AND occurred_at >= :start_at AND occurred_at < :end_at",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "parameters": {},
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      },
+      "fixture": "fx_a"
+    },
+    {
+      "id": "T09-01",
+      "profile": "customer_self",
+      "question": "2026年11月我退款了多少钱？",
+      "template_id": "T09",
+      "group_id": "G17",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "clarify",
+      "clarify_slots": [
+        "refund_scope"
+      ],
+      "reason_code": "refund_scope_ambiguous"
+    },
+    {
+      "id": "T09-02",
+      "profile": "customer_self",
+      "question": "我 2026 年 11 月退了多少钱？",
+      "template_id": "T09",
+      "group_id": "G17",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "clarify",
+      "clarify_slots": [
+        "refund_scope"
+      ],
+      "reason_code": "refund_scope_ambiguous"
+    },
+    {
+      "id": "T09-03",
+      "profile": "customer_self",
+      "question": "2026 年 11 月退款金额是多少？",
+      "template_id": "T09",
+      "group_id": "G17",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "clarify",
+      "clarify_slots": [
+        "refund_scope"
+      ],
+      "reason_code": "refund_scope_ambiguous"
+    },
+    {
+      "id": "T09-04",
+      "profile": "customer_self",
+      "question": "统计一下我 2026 年 11 月的退款金额。",
+      "template_id": "T09",
+      "group_id": "G17",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "clarify",
+      "clarify_slots": [
+        "refund_scope"
+      ],
+      "reason_code": "refund_scope_ambiguous"
+    },
+    {
+      "id": "T09-05",
+      "profile": "customer_self",
+      "question": "2026年11月退款金额按哪个口径算？",
+      "template_id": "T09",
+      "group_id": "G17",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "clarify",
+      "clarify_slots": [
+        "refund_scope"
+      ],
+      "reason_code": "refund_scope_ambiguous"
+    },
+    {
+      "id": "T09-06",
+      "profile": "customer_self",
+      "question": "我2026年11月退的钱，是订单累计还是钱包到账？",
+      "template_id": "T09",
+      "group_id": "G17",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "clarify",
+      "clarify_slots": [
+        "refund_scope"
+      ],
+      "reason_code": "refund_scope_ambiguous"
+    },
+    {
+      "id": "T09-07",
+      "profile": "customer_self",
+      "question": "2026年11月退款总额是多少？",
+      "template_id": "T09",
+      "group_id": "G17",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "clarify",
+      "clarify_slots": [
+        "refund_scope"
+      ],
+      "reason_code": "refund_scope_ambiguous"
+    },
+    {
+      "id": "T09-08",
+      "profile": "customer_self",
+      "question": "帮我统计2026年11月退款金额。",
+      "template_id": "T09",
+      "group_id": "G17",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "clarify",
+      "clarify_slots": [
+        "refund_scope"
+      ],
+      "reason_code": "refund_scope_ambiguous"
+    },
+    {
+      "id": "T10-01",
+      "profile": "customer_self",
+      "question": "我最近花了多少钱？",
+      "template_id": "T10",
+      "group_id": "G18",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "clarify",
+      "clarify_slots": [
+        "start_at",
+        "end_at",
+        "amount_scope"
+      ],
+      "reason_code": "missing_time_and_amount_scope"
+    },
+    {
+      "id": "T10-02",
+      "profile": "customer_self",
+      "question": "看看我花了多少。",
+      "template_id": "T10",
+      "group_id": "G18",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "clarify",
+      "clarify_slots": [
+        "start_at",
+        "end_at",
+        "amount_scope"
+      ],
+      "reason_code": "missing_time_and_amount_scope"
+    },
+    {
+      "id": "T10-03",
+      "profile": "customer_self",
+      "question": "我最近花费是多少？",
+      "template_id": "T10",
+      "group_id": "G18",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "clarify",
+      "clarify_slots": [
+        "start_at",
+        "end_at",
+        "amount_scope"
+      ],
+      "reason_code": "missing_time_and_amount_scope"
+    },
+    {
+      "id": "T10-04",
+      "profile": "customer_self",
+      "question": "帮我算算最近花掉的钱。",
+      "template_id": "T10",
+      "group_id": "G18",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "clarify",
+      "clarify_slots": [
+        "start_at",
+        "end_at",
+        "amount_scope"
+      ],
+      "reason_code": "missing_time_and_amount_scope"
+    },
+    {
+      "id": "T10-05",
+      "profile": "customer_self",
+      "question": "我花了多少钱？",
+      "template_id": "T10",
+      "group_id": "G18",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "clarify",
+      "clarify_slots": [
+        "start_at",
+        "end_at",
+        "amount_scope"
+      ],
+      "reason_code": "missing_time_and_amount_scope"
+    },
+    {
+      "id": "T10-06",
+      "profile": "customer_self",
+      "question": "帮我算算总花费。",
+      "template_id": "T10",
+      "group_id": "G18",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "clarify",
+      "clarify_slots": [
+        "start_at",
+        "end_at",
+        "amount_scope"
+      ],
+      "reason_code": "missing_time_and_amount_scope"
+    },
+    {
+      "id": "T10-07",
+      "profile": "customer_self",
+      "question": "我最近消费了多少？",
+      "template_id": "T10",
+      "group_id": "G18",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "clarify",
+      "clarify_slots": [
+        "start_at",
+        "end_at",
+        "amount_scope"
+      ],
+      "reason_code": "missing_time_and_amount_scope"
+    },
+    {
+      "id": "T10-08",
+      "profile": "customer_self",
+      "question": "看一下我的花费金额。",
+      "template_id": "T10",
+      "group_id": "G18",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "clarify",
+      "clarify_slots": [
+        "start_at",
+        "end_at",
+        "amount_scope"
+      ],
+      "reason_code": "missing_time_and_amount_scope"
+    },
+    {
+      "id": "T11-01",
+      "profile": "customer_self",
+      "question": "查一下我的订单。",
+      "template_id": "T11",
+      "group_id": "G19",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "clarify",
+      "clarify_slots": [
+        "order_id"
+      ],
+      "reason_code": "missing_order_scope"
+    },
+    {
+      "id": "T11-02",
+      "profile": "customer_self",
+      "question": "看看我的订单情况。",
+      "template_id": "T11",
+      "group_id": "G19",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "clarify",
+      "clarify_slots": [
+        "order_id"
+      ],
+      "reason_code": "missing_order_scope"
+    },
+    {
+      "id": "T11-03",
+      "profile": "customer_self",
+      "question": "帮我查订单。",
+      "template_id": "T11",
+      "group_id": "G19",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "clarify",
+      "clarify_slots": [
+        "order_id"
+      ],
+      "reason_code": "missing_order_scope"
+    },
+    {
+      "id": "T11-04",
+      "profile": "customer_self",
+      "question": "我的订单怎么样？",
+      "template_id": "T11",
+      "group_id": "G19",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "clarify",
+      "clarify_slots": [
+        "order_id"
+      ],
+      "reason_code": "missing_order_scope"
+    },
+    {
+      "id": "T11-05",
+      "profile": "customer_self",
+      "question": "帮我看看订单。",
+      "template_id": "T11",
+      "group_id": "G19",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "clarify",
+      "clarify_slots": [
+        "order_id"
+      ],
+      "reason_code": "missing_order_scope"
+    },
+    {
+      "id": "T11-06",
+      "profile": "customer_self",
+      "question": "我的订单状态是什么？",
+      "template_id": "T11",
+      "group_id": "G19",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "clarify",
+      "clarify_slots": [
+        "order_id"
+      ],
+      "reason_code": "missing_order_scope"
+    },
+    {
+      "id": "T11-07",
+      "profile": "customer_self",
+      "question": "查一下我的订单信息。",
+      "template_id": "T11",
+      "group_id": "G19",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "clarify",
+      "clarify_slots": [
+        "order_id"
+      ],
+      "reason_code": "missing_order_scope"
+    },
+    {
+      "id": "T11-08",
+      "profile": "customer_self",
+      "question": "订单现在怎么样？",
+      "template_id": "T11",
+      "group_id": "G19",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "clarify",
+      "clarify_slots": [
+        "order_id"
+      ],
+      "reason_code": "missing_order_scope"
+    },
+    {
+      "id": "T12-01",
+      "profile": "customer_self",
+      "question": "帮我把订单 O1 退款。",
+      "template_id": "T12",
+      "group_id": "G20",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "unsupported",
+      "reason_code": "write_operation_not_supported"
+    },
+    {
+      "id": "T12-02",
+      "profile": "customer_self",
+      "question": "给订单 O1 发起退款。",
+      "template_id": "T12",
+      "group_id": "G20",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "unsupported",
+      "reason_code": "write_operation_not_supported"
+    },
+    {
+      "id": "T12-03",
+      "profile": "customer_self",
+      "question": "把 O1 取消并退款。",
+      "template_id": "T12",
+      "group_id": "G20",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "unsupported",
+      "reason_code": "write_operation_not_supported"
+    },
+    {
+      "id": "T12-04",
+      "profile": "customer_self",
+      "question": "我要退款订单 O1，直接处理。",
+      "template_id": "T12",
+      "group_id": "G20",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "unsupported",
+      "reason_code": "write_operation_not_supported"
+    },
+    {
+      "id": "T12-05",
+      "profile": "customer_self",
+      "question": "把订单O1退款。",
+      "template_id": "T12",
+      "group_id": "G20",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "unsupported",
+      "reason_code": "write_operation_not_supported"
+    },
+    {
+      "id": "T12-06",
+      "profile": "customer_self",
+      "question": "给O1办理退款。",
+      "template_id": "T12",
+      "group_id": "G20",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "unsupported",
+      "reason_code": "write_operation_not_supported"
+    },
+    {
+      "id": "T12-07",
+      "profile": "customer_self",
+      "question": "取消O1并退款。",
+      "template_id": "T12",
+      "group_id": "G20",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "unsupported",
+      "reason_code": "write_operation_not_supported"
+    },
+    {
+      "id": "T12-08",
+      "profile": "customer_self",
+      "question": "帮我退掉O1。",
+      "template_id": "T12",
+      "group_id": "G20",
+      "split": "train",
+      "source": "03_synthetic_v4",
+      "review_status": "candidate_unreviewed",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "expected_kind": "unsupported",
+      "reason_code": "write_operation_not_supported"
+    },
+    {
+      "id": "DV-D02-01",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "2026年11月创建、且11月已发货、当前仍在运输中的订单有哪些？",
+      "template_id": "D02",
+      "group_id": "DV-SHIP-TRANSIT",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "dev",
+      "expected_kind": "query",
+      "sql": "SELECT s.order_id FROM cs_shipment_self s JOIN cs_order_self o ON s.order_id = o.order_id WHERE o.created_at >= :start_at AND o.created_at < :end_at AND s.shipped_at >= :start_at AND s.shipped_at < :end_at AND s.status = 'in_transit'",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "fixture": "fx_a",
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      }
+    },
+    {
+      "id": "DV-D02-02",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "2026 年 11 月创建、11 月发货且当前运输中的订单。",
+      "template_id": "D02",
+      "group_id": "DV-SHIP-TRANSIT",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "dev",
+      "expected_kind": "query",
+      "sql": "SELECT s.order_id FROM cs_shipment_self s JOIN cs_order_self o ON s.order_id = o.order_id WHERE o.created_at >= :start_at AND o.created_at < :end_at AND s.shipped_at >= :start_at AND s.shipped_at < :end_at AND s.status = 'in_transit'",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "fixture": "fx_a",
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      }
+    },
+    {
+      "id": "DV-D02-03",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "查我 2026 年 11 月创建、11 月已发货但还没签收的订单。",
+      "template_id": "D02",
+      "group_id": "DV-SHIP-TRANSIT",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "dev",
+      "expected_kind": "query",
+      "sql": "SELECT s.order_id FROM cs_shipment_self s JOIN cs_order_self o ON s.order_id = o.order_id WHERE o.created_at >= :start_at AND o.created_at < :end_at AND s.shipped_at >= :start_at AND s.shipped_at < :end_at AND s.status = 'in_transit'",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "fixture": "fx_a",
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      }
+    },
+    {
+      "id": "DV-D03-01",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "2026年11月创建的订单中，已支付但尚未发货的订单有哪些？",
+      "template_id": "D03",
+      "group_id": "DV-UNSHIPPED-PAID",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "dev",
+      "expected_kind": "query",
+      "sql": "SELECT order_id FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status = 'paid' AND fulfillment_status = 'unshipped'",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "fixture": "fx_a",
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      }
+    },
+    {
+      "id": "DV-D03-02",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "2026 年 11 月创建的订单中，已支付但还没有发货的订单。",
+      "template_id": "D03",
+      "group_id": "DV-UNSHIPPED-PAID",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "dev",
+      "expected_kind": "query",
+      "sql": "SELECT order_id FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status = 'paid' AND fulfillment_status = 'unshipped'",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "fixture": "fx_a",
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      }
+    },
+    {
+      "id": "DV-D03-03",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "2026 年 11 月创建的订单中，哪些已支付订单尚未发货？",
+      "template_id": "D03",
+      "group_id": "DV-UNSHIPPED-PAID",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "dev",
+      "expected_kind": "query",
+      "sql": "SELECT order_id FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status = 'paid' AND fulfillment_status = 'unshipped'",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "fixture": "fx_a",
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      }
+    },
+    {
+      "id": "DV-D04-01",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "2026年11月创建、11月承运商已签收的订单数。",
+      "template_id": "D04",
+      "group_id": "DV-CARRIER-SIGNED",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "dev",
+      "expected_kind": "query",
+      "sql": "SELECT count(*) AS n FROM (SELECT DISTINCT s.order_id FROM cs_shipment_self s JOIN cs_order_self o ON s.order_id = o.order_id WHERE o.created_at >= :start_at AND o.created_at < :end_at AND s.carrier_signed_at >= :start_at AND s.carrier_signed_at < :end_at) t",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "fixture": "fx_a",
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      }
+    },
+    {
+      "id": "DV-D04-02",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "统计我2026年11月创建且11月承运商签收的订单。",
+      "template_id": "D04",
+      "group_id": "DV-CARRIER-SIGNED",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "dev",
+      "expected_kind": "query",
+      "sql": "SELECT count(*) AS n FROM (SELECT DISTINCT s.order_id FROM cs_shipment_self s JOIN cs_order_self o ON s.order_id = o.order_id WHERE o.created_at >= :start_at AND o.created_at < :end_at AND s.carrier_signed_at >= :start_at AND s.carrier_signed_at < :end_at) t",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "fixture": "fx_a",
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      }
+    },
+    {
+      "id": "DV-D04-03",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "2026年11月创建、承运商在11月签收的订单有几单？",
+      "template_id": "D04",
+      "group_id": "DV-CARRIER-SIGNED",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "dev",
+      "expected_kind": "query",
+      "sql": "SELECT count(*) AS n FROM (SELECT DISTINCT s.order_id FROM cs_shipment_self s JOIN cs_order_self o ON s.order_id = o.order_id WHERE o.created_at >= :start_at AND o.created_at < :end_at AND s.carrier_signed_at >= :start_at AND s.carrier_signed_at < :end_at) t",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "fixture": "fx_a",
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      }
+    },
+    {
+      "id": "DV-D05-01",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "2026年11月创建的订单中，11月本人确认收货的订单有多少？",
+      "template_id": "D05",
+      "group_id": "DV-CUSTOMER-RECEIVED",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "dev",
+      "expected_kind": "query",
+      "sql": "SELECT count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND received_at >= :start_at AND received_at < :end_at",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "fixture": "fx_a",
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      }
+    },
+    {
+      "id": "DV-D05-02",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "2026 年 11 月创建、11 月本人确认收货的订单数。",
+      "template_id": "D05",
+      "group_id": "DV-CUSTOMER-RECEIVED",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "dev",
+      "expected_kind": "query",
+      "sql": "SELECT count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND received_at >= :start_at AND received_at < :end_at",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "fixture": "fx_a",
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      }
+    },
+    {
+      "id": "DV-D05-03",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "统计我 2026 年 11 月创建、11 月本人已收货的订单数。",
+      "template_id": "D05",
+      "group_id": "DV-CUSTOMER-RECEIVED",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "dev",
+      "expected_kind": "query",
+      "sql": "SELECT count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND received_at >= :start_at AND received_at < :end_at",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "fixture": "fx_a",
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      }
+    },
+    {
+      "id": "E01-01",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "2026年11月创建、已支付订单的累计退款是多少？",
+      "template_id": "E01",
+      "group_id": "TS-REFUND",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "test",
+      "expected_kind": "query",
+      "sql": "SELECT COALESCE(SUM(refunded_minor),0) AS refunded_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "fixture": "fx_a",
+      "expected": {
+        "columns": [
+          "refunded_minor"
+        ],
+        "rows": [
+          [
+            25500
+          ]
+        ]
+      },
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      }
+    },
+    {
+      "id": "E01-02",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "按订单累计口径，2026 年 11 月创建且已支付订单的累计退款金额。",
+      "template_id": "E01",
+      "group_id": "TS-REFUND",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "test",
+      "expected_kind": "query",
+      "sql": "SELECT COALESCE(SUM(refunded_minor),0) AS refunded_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "fixture": "fx_a",
+      "expected": {
+        "columns": [
+          "refunded_minor"
+        ],
+        "rows": [
+          [
+            25500
+          ]
+        ]
+      },
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      }
+    },
+    {
+      "id": "E01-03",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "用订单累计退款口径，算 2026 年 11 月创建的已支付订单退款总额。",
+      "template_id": "E01",
+      "group_id": "TS-REFUND",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "test",
+      "expected_kind": "query",
+      "sql": "SELECT COALESCE(SUM(refunded_minor),0) AS refunded_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "fixture": "fx_a",
+      "expected": {
+        "columns": [
+          "refunded_minor"
+        ],
+        "rows": [
+          [
+            25500
+          ]
+        ]
+      },
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      }
+    },
+    {
+      "id": "E01-04",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "2026 年 11 月创建且已支付订单的累计退款合计是多少？",
+      "template_id": "E01",
+      "group_id": "TS-REFUND",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "test",
+      "expected_kind": "query",
+      "sql": "SELECT COALESCE(SUM(refunded_minor),0) AS refunded_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "fixture": "fx_a",
+      "expected": {
+        "columns": [
+          "refunded_minor"
+        ],
+        "rows": [
+          [
+            25500
+          ]
+        ]
+      },
+      "window": {
+        "start": "2026-11-01T00:00:00+08:00",
+        "end": "2026-12-01T00:00:00+08:00"
+      }
+    },
+    {
+      "id": "E02-01",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "订单 O1 的商品明细和退款数量。",
+      "template_id": "E02",
+      "group_id": "TS-DETAIL",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "test",
+      "expected_kind": "query",
+      "sql": "SELECT order_item_id, sku_id, ordered_qty, refunded_qty FROM cs_order_item_self WHERE order_id = :order_id",
+      "parameter_names": [
+        "order_id"
+      ],
+      "parameters": {
+        "order_id": "O1"
+      },
+      "fixture": "fx_a",
+      "expected": {
+        "columns": [
+          "order_item_id",
+          "sku_id",
+          "ordered_qty",
+          "refunded_qty"
+        ],
+        "rows": [
+          [
+            "OI1",
+            "sku_1",
+            1,
+            0
+          ],
+          [
+            "OI2",
+            "sku_2",
+            1,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "id": "E02-02",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "查订单 O1 的明细行、SKU 和退款件数。",
+      "template_id": "E02",
+      "group_id": "TS-DETAIL",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "test",
+      "expected_kind": "query",
+      "sql": "SELECT order_item_id, sku_id, ordered_qty, refunded_qty FROM cs_order_item_self WHERE order_id = :order_id",
+      "parameter_names": [
+        "order_id"
+      ],
+      "parameters": {
+        "order_id": "O1"
+      },
+      "fixture": "fx_a",
+      "expected": {
+        "columns": [
+          "order_item_id",
+          "sku_id",
+          "ordered_qty",
+          "refunded_qty"
+        ],
+        "rows": [
+          [
+            "OI1",
+            "sku_1",
+            1,
+            0
+          ],
+          [
+            "OI2",
+            "sku_2",
+            1,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "id": "E02-03",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "O1 里买了什么，退了几件？",
+      "template_id": "E02",
+      "group_id": "TS-DETAIL",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "test",
+      "expected_kind": "query",
+      "sql": "SELECT order_item_id, sku_id, ordered_qty, refunded_qty FROM cs_order_item_self WHERE order_id = :order_id",
+      "parameter_names": [
+        "order_id"
+      ],
+      "parameters": {
+        "order_id": "O1"
+      },
+      "fixture": "fx_a",
+      "expected": {
+        "columns": [
+          "order_item_id",
+          "sku_id",
+          "ordered_qty",
+          "refunded_qty"
+        ],
+        "rows": [
+          [
+            "OI1",
+            "sku_1",
+            1,
+            0
+          ],
+          [
+            "OI2",
+            "sku_2",
+            1,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "id": "E02-04",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "给我订单 O1 的 order_item 明细。",
+      "template_id": "E02",
+      "group_id": "TS-DETAIL",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "test",
+      "expected_kind": "query",
+      "sql": "SELECT order_item_id, sku_id, ordered_qty, refunded_qty FROM cs_order_item_self WHERE order_id = :order_id",
+      "parameter_names": [
+        "order_id"
+      ],
+      "parameters": {
+        "order_id": "O1"
+      },
+      "fixture": "fx_a",
+      "expected": {
+        "columns": [
+          "order_item_id",
+          "sku_id",
+          "ordered_qty",
+          "refunded_qty"
+        ],
+        "rows": [
+          [
+            "OI1",
+            "sku_1",
+            1,
+            0
+          ],
+          [
+            "OI2",
+            "sku_2",
+            1,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "id": "E03-01",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "订单 O2 的承运商物流状态和承运商签收时间。",
+      "template_id": "E03",
+      "group_id": "TS-DETAIL",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "test",
+      "expected_kind": "query",
+      "sql": "SELECT shipment_id, carrier, status, shipped_at, carrier_signed_at FROM cs_shipment_self WHERE order_id = :order_id",
+      "parameter_names": [
+        "order_id"
+      ],
+      "parameters": {
+        "order_id": "O2"
+      },
+      "fixture": "fx_a",
+      "expected": {
+        "columns": [
+          "shipment_id",
+          "carrier",
+          "status",
+          "shipped_at",
+          "carrier_signed_at"
+        ],
+        "rows": [
+          [
+            "SH2",
+            "SF",
+            "carrier_signed",
+            "2026-11-30T17:00:00+00:00",
+            "2026-12-02T02:00:00+00:00"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "E03-02",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "查 O2 的包裹、承运商和承运商签收时间。",
+      "template_id": "E03",
+      "group_id": "TS-DETAIL",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "test",
+      "expected_kind": "query",
+      "sql": "SELECT shipment_id, carrier, status, shipped_at, carrier_signed_at FROM cs_shipment_self WHERE order_id = :order_id",
+      "parameter_names": [
+        "order_id"
+      ],
+      "parameters": {
+        "order_id": "O2"
+      },
+      "fixture": "fx_a",
+      "expected": {
+        "columns": [
+          "shipment_id",
+          "carrier",
+          "status",
+          "shipped_at",
+          "carrier_signed_at"
+        ],
+        "rows": [
+          [
+            "SH2",
+            "SF",
+            "carrier_signed",
+            "2026-11-30T17:00:00+00:00",
+            "2026-12-02T02:00:00+00:00"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "E03-03",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "O2 发货了吗，承运商什么时候签收的？",
+      "template_id": "E03",
+      "group_id": "TS-DETAIL",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "test",
+      "expected_kind": "query",
+      "sql": "SELECT shipment_id, carrier, status, shipped_at, carrier_signed_at FROM cs_shipment_self WHERE order_id = :order_id",
+      "parameter_names": [
+        "order_id"
+      ],
+      "parameters": {
+        "order_id": "O2"
+      },
+      "fixture": "fx_a",
+      "expected": {
+        "columns": [
+          "shipment_id",
+          "carrier",
+          "status",
+          "shipped_at",
+          "carrier_signed_at"
+        ],
+        "rows": [
+          [
+            "SH2",
+            "SF",
+            "carrier_signed",
+            "2026-11-30T17:00:00+00:00",
+            "2026-12-02T02:00:00+00:00"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "E03-04",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "订单 O2 的 shipment 记录。",
+      "template_id": "E03",
+      "group_id": "TS-DETAIL",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "test",
+      "expected_kind": "query",
+      "sql": "SELECT shipment_id, carrier, status, shipped_at, carrier_signed_at FROM cs_shipment_self WHERE order_id = :order_id",
+      "parameter_names": [
+        "order_id"
+      ],
+      "parameters": {
+        "order_id": "O2"
+      },
+      "fixture": "fx_a",
+      "expected": {
+        "columns": [
+          "shipment_id",
+          "carrier",
+          "status",
+          "shipped_at",
+          "carrier_signed_at"
+        ],
+        "rows": [
+          [
+            "SH2",
+            "SF",
+            "carrier_signed",
+            "2026-11-30T17:00:00+00:00",
+            "2026-12-02T02:00:00+00:00"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "E04-01",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "2026年11月我的退款率是多少？",
+      "template_id": "E04",
+      "group_id": "TS-CLARIFY",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "test",
+      "expected_kind": "clarify",
+      "clarify_slots": [
+        "refund_rate_scope"
+      ],
+      "reason_code": "refund_rate_definition_ambiguous"
+    },
+    {
+      "id": "E04-02",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "算一下我 2026 年 11 月的退款率。",
+      "template_id": "E04",
+      "group_id": "TS-CLARIFY",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "test",
+      "expected_kind": "clarify",
+      "clarify_slots": [
+        "refund_rate_scope"
+      ],
+      "reason_code": "refund_rate_definition_ambiguous"
+    },
+    {
+      "id": "E04-03",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "2026 年 11 月退款订单占比是多少？",
+      "template_id": "E04",
+      "group_id": "TS-CLARIFY",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "test",
+      "expected_kind": "clarify",
+      "clarify_slots": [
+        "refund_rate_scope"
+      ],
+      "reason_code": "refund_rate_definition_ambiguous"
+    },
+    {
+      "id": "E04-04",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "我 2026 年 11 月退款率怎么样？",
+      "template_id": "E04",
+      "group_id": "TS-CLARIFY",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "test",
+      "expected_kind": "clarify",
+      "clarify_slots": [
+        "refund_rate_scope"
+      ],
+      "reason_code": "refund_rate_definition_ambiguous"
+    },
+    {
+      "id": "E05-01",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "查一下其他顾客的订单。",
+      "template_id": "E05",
+      "group_id": "TS-UNSUPPORTED",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "test",
+      "expected_kind": "unsupported",
+      "reason_code": "cross_customer_scope_not_allowed"
+    },
+    {
+      "id": "E05-02",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "把顾客 cust_b 的订单都列出来。",
+      "template_id": "E05",
+      "group_id": "TS-UNSUPPORTED",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "test",
+      "expected_kind": "unsupported",
+      "reason_code": "cross_customer_scope_not_allowed"
+    },
+    {
+      "id": "E05-03",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "看看别人的订单和退款。",
+      "template_id": "E05",
+      "group_id": "TS-UNSUPPORTED",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "test",
+      "expected_kind": "unsupported",
+      "reason_code": "cross_customer_scope_not_allowed"
+    },
+    {
+      "id": "E05-04",
+      "profile": "customer_self",
+      "schema_revision": "CS-QUERY-B2-v1",
+      "metric_revision": "CS-METRIC-B2-v1",
+      "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+      "question": "导出所有顾客的订单。",
+      "template_id": "E05",
+      "group_id": "TS-UNSUPPORTED",
+      "source": "handwritten_seed_candidate",
+      "review_status": "candidate_unreviewed",
+      "split": "test",
+      "expected_kind": "unsupported",
+      "reason_code": "cross_customer_scope_not_allowed"
+    }
+  ]
+}

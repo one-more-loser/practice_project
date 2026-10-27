@@ -1,0 +1,11 @@
+{
+  "integration_run_id": "XOPS-20261023-01",
+  "status": "paused_by_user",
+  "captured_at": "2026-10-23T12:46:21.564568+00:00",
+  "prompt_sha256": "8354cac5e7bcf9909963470530b3107e1d316f58ddee5b2802a5ec9e885c39c4",
+  "subagents_stopped": true,
+  "joint_services_started": false,
+  "full_regression": "interrupted; existing 01-full.xml belongs to earlier collection failure",
+  "http_script_exists": false,
+  "performance_status": "framework only; execute placeholder; no measurement"
+}

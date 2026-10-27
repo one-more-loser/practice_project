@@ -1,0 +1,39 @@
+{
+  "chat": {
+    "base_url": "https://chat.example.invalid/v1",
+    "model": "deepseek-flash",
+    "service_revision": "configure-provider-revision",
+    "protocol": "deepseek-chat",
+    "secret_ref": "chat_api_key",
+    "timeout_seconds": 12,
+    "concurrency": 2
+  },
+  "sql": {
+    "base_url": "https://sql.example.invalid/v1",
+    "model": "deepseek-flash",
+    "service_revision": "configure-provider-revision",
+    "protocol": "deepseek-chat",
+    "secret_ref": "sql_api_key",
+    "timeout_seconds": 8,
+    "concurrency": 2
+  },
+  "embedding": {
+    "base_url": "https://embedding.example.invalid/v1",
+    "model": "Qwen/Qwen3-Embedding-0.6B",
+    "service_revision": "configure-provider-revision",
+    "protocol": "qwen-embeddings",
+    "secret_ref": "embedding_api_key",
+    "timeout_seconds": 5,
+    "concurrency": 2
+  },
+  "rerank": {
+    "base_url": "https://rerank.example.invalid/v1",
+    "model": "Qwen/Qwen3-Reranker-0.6B",
+    "service_revision": "configure-provider-revision",
+    "protocol": "rerank-index",
+    "secret_ref": "rerank_api_key",
+    "score_type": "provider_relevance",
+    "timeout_seconds": 5,
+    "concurrency": 2
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "revision": "SIM-CS-CATALOG-v1", "source_kind": "synthetic", "batch_id": "sim_b0_20261022", "generation": 1,
+  "seed": 20261022, "currency": "CNY", "shipping_policy": {"revision": "POL-SIM-SHIPPING-v1", "freight_minor": "0", "discount_minor": "0", "reason": "本批次模拟包邮、无促销；金额字段和版本保留，未批准促销引擎"},
+  "products": [
+    {"product_id": "product_cup", "name": "日常陶瓷杯", "category": "餐桌日用", "description": "圆润杯身与细腻哑光釉面。容量350mL，适合日常饮水。", "image_slug": "cup", "aliases": ["马克杯", "陶瓷杯"], "skus": [{"sku_id": "sku_cup_ivory", "specifications": {"颜色": "暖白", "容量": "350mL"}, "price_minor": "4000", "stock_qty": 10}, {"sku_id": "sku_cup_coral", "specifications": {"颜色": "珊瑚橙", "容量": "350mL"}, "price_minor": "4200", "stock_qty": 5}]},
+    {"product_id": "product_lamp", "name": "柔光桌灯", "category": "桌面生活", "description": "柔和漫射光，适合阅读角落。暖白灯罩，实体开关。", "image_slug": "lamp", "aliases": ["台灯"], "skus": [{"sku_id": "sku_lamp", "specifications": {"颜色": "奶油白", "光色": "暖光"}, "price_minor": "12900", "stock_qty": 8}]},
+    {"product_id": "product_bag", "name": "轻行帆布袋", "category": "轻便出行", "description": "宽肩带和内置小口袋，容纳日常随身物品。", "image_slug": "bag", "aliases": ["帆布包"], "skus": [{"sku_id": "sku_bag", "specifications": {"颜色": "原麻色"}, "price_minor": "6900", "stock_qty": 0}]},
+    {"product_id": "product_vase", "name": "小枝花器", "category": "家居摆件", "description": "小巧花器，可摆放单枝干花。高度16cm。", "image_slug": "vase", "aliases": ["花瓶"], "skus": [{"sku_id": "sku_vase", "specifications": {"颜色": "陶土橙"}, "price_minor": "3000", "stock_qty": 1}]}
+  ],
+  "optional_unknown_fields": {"cost_minor": "原始成本未知，保存NULL，不能据此分析真实毛利", "supplier_ref": "无真实供应商，保存NULL", "external_id": "无真实CSV映射，保存NULL"}
+}

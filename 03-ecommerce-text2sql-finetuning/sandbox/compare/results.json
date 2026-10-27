@@ -1,0 +1,581 @@
+{
+  "summary": {
+    "cases": 26,
+    "decision_agree": 23,
+    "decision_disagree": [
+      "N05",
+      "N13",
+      "N18"
+    ],
+    "expected_03": 26,
+    "expected_01": 23,
+    "sqlglot_03": "27.20.0",
+    "sqlglot_01": "30.24.0",
+    "boundary": "03 validator is local/target-level; 01 validator is the consumer's actual source under sqlglot>=30.24.0"
+  },
+  "rows": [
+    {
+      "id": "P01",
+      "expect": "accept",
+      "sql": "SELECT count(*) AS n FROM cs_order_self",
+      "03": {
+        "decision": "accept",
+        "code": "ok",
+        "message": "",
+        "rewritten": "SELECT count(*) AS n FROM cs_order_self",
+        "columns": null
+      },
+      "01": {
+        "decision": "accept",
+        "code": "ok",
+        "message": "",
+        "rewritten": "SELECT COUNT(*) AS \"n\" FROM \"cs_order_self\" AS \"cs_order_self\" LIMIT 20",
+        "columns": [
+          "n"
+        ],
+        "parameters": []
+      },
+      "decision_agree": true
+    },
+    {
+      "id": "P02",
+      "expect": "accept",
+      "sql": "SELECT sum(paid_minor) AS s FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at",
+      "03": {
+        "decision": "accept",
+        "code": "ok",
+        "message": "",
+        "rewritten": "SELECT sum(paid_minor) AS s FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at",
+        "columns": null
+      },
+      "01": {
+        "decision": "accept",
+        "code": "ok",
+        "message": "",
+        "rewritten": "SELECT SUM(\"cs_order_self\".\"paid_minor\") AS \"s\" FROM \"cs_order_self\" AS \"cs_order_self\" WHERE \"cs_order_self\".\"created_at\" >= :start_at AND \"cs_order_self\".\"created_at\" < :end_at LIMIT 20",
+        "columns": [
+          "s"
+        ],
+        "parameters": [
+          "end_at",
+          "start_at"
+        ]
+      },
+      "decision_agree": true
+    },
+    {
+      "id": "P03",
+      "expect": "accept",
+      "sql": "SELECT o.order_id, i.order_item_id FROM cs_order_self o JOIN cs_order_item_self i ON o.order_id = i.order_id WHERE o.order_id = :order_id LIMIT 10",
+      "03": {
+        "decision": "accept",
+        "code": "ok",
+        "message": "",
+        "rewritten": "SELECT o.order_id, i.order_item_id FROM cs_order_self o JOIN cs_order_item_self i ON o.order_id = i.order_id WHERE o.order_id = :order_id LIMIT 10",
+        "columns": null
+      },
+      "01": {
+        "decision": "accept",
+        "code": "ok",
+        "message": "",
+        "rewritten": "SELECT \"o\".\"order_id\" AS \"order_id\", \"i\".\"order_item_id\" AS \"order_item_id\" FROM \"cs_order_self\" AS \"o\" JOIN \"cs_order_item_self\" AS \"i\" ON \"o\".\"order_id\" = \"i\".\"order_id\" WHERE \"o\".\"order_id\" = :order_id LIMIT 10",
+        "columns": [
+          "order_id",
+          "order_item_id"
+        ],
+        "parameters": [
+          "order_id"
+        ]
+      },
+      "decision_agree": true
+    },
+    {
+      "id": "P04",
+      "expect": "accept",
+      "sql": "SELECT name, price_minor, available_qty FROM cs_product_public WHERE sku_id = :sku_id LIMIT 20",
+      "03": {
+        "decision": "accept",
+        "code": "ok",
+        "message": "",
+        "rewritten": "SELECT name, price_minor, available_qty FROM cs_product_public WHERE sku_id = :sku_id LIMIT 20",
+        "columns": null
+      },
+      "01": {
+        "decision": "accept",
+        "code": "ok",
+        "message": "",
+        "rewritten": "SELECT \"cs_product_public\".\"name\" AS \"name\", \"cs_product_public\".\"price_minor\" AS \"price_minor\", \"cs_product_public\".\"available_qty\" AS \"available_qty\" FROM \"cs_product_public\" AS \"cs_product_public\" WHERE \"cs_product_public\".\"sku_id\" = :sku_id LIMIT 20",
+        "columns": [
+          "name",
+          "price_minor",
+          "available_qty"
+        ],
+        "parameters": [
+          "sku_id"
+        ]
+      },
+      "decision_agree": true
+    },
+    {
+      "id": "P05",
+      "expect": "accept",
+      "sql": "SELECT date_trunc('day', created_at) AS d, count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at GROUP BY 1 LIMIT 50",
+      "03": {
+        "decision": "accept",
+        "code": "ok",
+        "message": "",
+        "rewritten": "SELECT date_trunc('day', created_at) AS d, count(*) AS n FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at GROUP BY 1 LIMIT 50",
+        "columns": null
+      },
+      "01": {
+        "decision": "accept",
+        "code": "ok",
+        "message": "",
+        "rewritten": "SELECT DATE_TRUNC('DAY', \"cs_order_self\".\"created_at\") AS \"d\", COUNT(*) AS \"n\" FROM \"cs_order_self\" AS \"cs_order_self\" WHERE \"cs_order_self\".\"created_at\" >= :start_at AND \"cs_order_self\".\"created_at\" < :end_at GROUP BY DATE_TRUNC('DAY', \"cs_order_self\".\"created_at\") LIMIT 50",
+        "columns": [
+          "d",
+          "n"
+        ],
+        "parameters": [
+          "end_at",
+          "start_at"
+        ]
+      },
+      "decision_agree": true
+    },
+    {
+      "id": "P06",
+      "expect": "accept",
+      "sql": "SELECT coalesce(sum(refunded_minor), 0) AS r FROM cs_order_self",
+      "03": {
+        "decision": "accept",
+        "code": "ok",
+        "message": "",
+        "rewritten": "SELECT coalesce(sum(refunded_minor), 0) AS r FROM cs_order_self",
+        "columns": null
+      },
+      "01": {
+        "decision": "accept",
+        "code": "ok",
+        "message": "",
+        "rewritten": "SELECT COALESCE(SUM(\"cs_order_self\".\"refunded_minor\"), 0) AS \"r\" FROM \"cs_order_self\" AS \"cs_order_self\" LIMIT 20",
+        "columns": [
+          "r"
+        ],
+        "parameters": []
+      },
+      "decision_agree": true
+    },
+    {
+      "id": "N01",
+      "expect": "reject",
+      "sql": "SELECT * FROM cs_order_self",
+      "03": {
+        "decision": "reject",
+        "code": "unsafe_query",
+        "message": "SELECT * is not allowed except count(*)",
+        "rewritten": "",
+        "columns": null
+      },
+      "01": {
+        "decision": "reject",
+        "code": "unsafe_query",
+        "message": "unsafe_query",
+        "rewritten": "",
+        "columns": null
+      },
+      "decision_agree": true
+    },
+    {
+      "id": "N02",
+      "expect": "reject",
+      "sql": "DELETE FROM cs_order_self",
+      "03": {
+        "decision": "reject",
+        "code": "unsafe_query",
+        "message": "root Delete is not a SELECT",
+        "rewritten": "",
+        "columns": null
+      },
+      "01": {
+        "decision": "reject",
+        "code": "unsafe_query",
+        "message": "unsafe_query",
+        "rewritten": "",
+        "columns": null
+      },
+      "decision_agree": true
+    },
+    {
+      "id": "N03",
+      "expect": "reject",
+      "sql": "SELECT 1; SELECT 2",
+      "03": {
+        "decision": "reject",
+        "code": "not_single_statement",
+        "message": "exactly one statement is required",
+        "rewritten": "",
+        "columns": null
+      },
+      "01": {
+        "decision": "reject",
+        "code": "unsafe_query",
+        "message": "unsafe_query",
+        "rewritten": "",
+        "columns": null
+      },
+      "decision_agree": true
+    },
+    {
+      "id": "N04",
+      "expect": "reject",
+      "sql": "SELECT o.order_id FROM cs_order_self o JOIN cs_order_item_self i ON TRUE",
+      "03": {
+        "decision": "reject",
+        "code": "unsafe_query",
+        "message": "JOIN ON must be a single equality",
+        "rewritten": "",
+        "columns": null
+      },
+      "01": {
+        "decision": "reject",
+        "code": "unsafe_query",
+        "message": "unsafe_query",
+        "rewritten": "",
+        "columns": null
+      },
+      "decision_agree": true
+    },
+    {
+      "id": "N05",
+      "expect": "reject",
+      "sql": "SELECT o.order_id FROM cs_order_self o JOIN cs_order_item_self i ON o.order_id = o.order_id",
+      "03": {
+        "decision": "reject",
+        "code": "unsafe_query",
+        "message": "JOIN self-comparison is not allowed",
+        "rewritten": "",
+        "columns": null
+      },
+      "01": {
+        "decision": "accept",
+        "code": "ok",
+        "message": "",
+        "rewritten": "SELECT \"o\".\"order_id\" AS \"order_id\" FROM \"cs_order_self\" AS \"o\" JOIN \"cs_order_item_self\" AS \"i\" ON \"o\".\"order_id\" = \"o\".\"order_id\" LIMIT 20",
+        "columns": [
+          "order_id"
+        ],
+        "parameters": []
+      },
+      "decision_agree": false
+    },
+    {
+      "id": "N06",
+      "expect": "reject",
+      "sql": "SELECT o.order_id FROM cs_order_self o JOIN cs_order_item_self i ON o.order_id = i.order_item_id",
+      "03": {
+        "decision": "reject",
+        "code": "unsafe_query",
+        "message": "JOIN must compare the same key name",
+        "rewritten": "",
+        "columns": null
+      },
+      "01": {
+        "decision": "reject",
+        "code": "unsafe_query",
+        "message": "unsafe_query",
+        "rewritten": "",
+        "columns": null
+      },
+      "decision_agree": true
+    },
+    {
+      "id": "N07",
+      "expect": "reject",
+      "sql": "SELECT sum(o.paid_minor) FROM cs_order_self o JOIN cs_order_item_self i ON o.order_id = i.order_id",
+      "03": {
+        "decision": "reject",
+        "code": "ambiguous_grain",
+        "message": "aggregate over a multi-view join requires GROUP BY",
+        "rewritten": "",
+        "columns": null
+      },
+      "01": {
+        "decision": "reject",
+        "code": "ambiguous_grain",
+        "message": "ambiguous_grain",
+        "rewritten": "",
+        "columns": null
+      },
+      "decision_agree": true
+    },
+    {
+      "id": "N08",
+      "expect": "reject",
+      "sql": "SELECT lower(name) FROM cs_product_public",
+      "03": {
+        "decision": "reject",
+        "code": "unapproved_function",
+        "message": "function 'lower' is not allowed",
+        "rewritten": "",
+        "columns": null
+      },
+      "01": {
+        "decision": "reject",
+        "code": "unsafe_query",
+        "message": "unsafe_query",
+        "rewritten": "",
+        "columns": null
+      },
+      "decision_agree": true
+    },
+    {
+      "id": "N09",
+      "expect": "reject",
+      "sql": "SELECT CASE WHEN paid_minor > 0 THEN 1 ELSE 0 END AS x FROM cs_order_self",
+      "03": {
+        "decision": "reject",
+        "code": "unsafe_query",
+        "message": "CASE is not in the approved expression set",
+        "rewritten": "",
+        "columns": null
+      },
+      "01": {
+        "decision": "reject",
+        "code": "unsafe_query",
+        "message": "unsafe_query",
+        "rewritten": "",
+        "columns": null
+      },
+      "decision_agree": true
+    },
+    {
+      "id": "N10",
+      "expect": "reject",
+      "sql": "SELECT cast(paid_minor AS text) AS x FROM cs_order_self",
+      "03": {
+        "decision": "reject",
+        "code": "unsafe_query",
+        "message": "CAST is not in the approved expression set",
+        "rewritten": "",
+        "columns": null
+      },
+      "01": {
+        "decision": "reject",
+        "code": "unsafe_query",
+        "message": "unsafe_query",
+        "rewritten": "",
+        "columns": null
+      },
+      "decision_agree": true
+    },
+    {
+      "id": "N11",
+      "expect": "reject",
+      "sql": "SELECT order_id FROM cs_order_self WHERE order_id LIKE 'A%'",
+      "03": {
+        "decision": "reject",
+        "code": "unsafe_query",
+        "message": "LIKE is not in the approved expression set",
+        "rewritten": "",
+        "columns": null
+      },
+      "01": {
+        "decision": "reject",
+        "code": "unsafe_query",
+        "message": "unsafe_query",
+        "rewritten": "",
+        "columns": null
+      },
+      "decision_agree": true
+    },
+    {
+      "id": "N12",
+      "expect": "reject",
+      "sql": "SELECT order_id FROM cs_order_self WHERE trade_status = 'paid_x'",
+      "03": {
+        "decision": "reject",
+        "code": "unapproved_literal",
+        "message": "string literal 'paid_x' is not in the enum set",
+        "rewritten": "",
+        "columns": null
+      },
+      "01": {
+        "decision": "reject",
+        "code": "unsafe_query",
+        "message": "unsafe_query",
+        "rewritten": "",
+        "columns": null
+      },
+      "decision_agree": true
+    },
+    {
+      "id": "N13",
+      "expect": "reject",
+      "sql": "SELECT order_id FROM cs_order_self LIMIT 100",
+      "03": {
+        "decision": "reject",
+        "code": "invalid_limit",
+        "message": "LIMIT 100 outside 1..50",
+        "rewritten": "",
+        "columns": null
+      },
+      "01": {
+        "decision": "accept",
+        "code": "ok",
+        "message": "",
+        "rewritten": "SELECT \"cs_order_self\".\"order_id\" AS \"order_id\" FROM \"cs_order_self\" AS \"cs_order_self\" LIMIT 50",
+        "columns": [
+          "order_id"
+        ],
+        "parameters": []
+      },
+      "decision_agree": false
+    },
+    {
+      "id": "N14",
+      "expect": "reject",
+      "sql": "SELECT order_id FROM cs_order_self LIMIT :row_limit",
+      "03": {
+        "decision": "reject",
+        "code": "invalid_limit",
+        "message": "LIMIT must be an integer literal, not a parameter",
+        "rewritten": "",
+        "columns": null
+      },
+      "01": {
+        "decision": "reject",
+        "code": "unsafe_query",
+        "message": "unsafe_query",
+        "rewritten": "",
+        "columns": null
+      },
+      "decision_agree": true
+    },
+    {
+      "id": "N15",
+      "expect": "reject",
+      "sql": "SELECT order_id FROM app.customer_order",
+      "03": {
+        "decision": "reject",
+        "code": "unapproved_resource",
+        "message": "schema/catalog qualifier on customer_order",
+        "rewritten": "",
+        "columns": null
+      },
+      "01": {
+        "decision": "reject",
+        "code": "unsafe_query",
+        "message": "unsafe_query",
+        "rewritten": "",
+        "columns": null
+      },
+      "decision_agree": true
+    },
+    {
+      "id": "N16",
+      "expect": "reject",
+      "sql": "SELECT no_such_col FROM cs_order_self",
+      "03": {
+        "decision": "reject",
+        "code": "unknown_column",
+        "message": "no_such_col is not visible in cs_order_self",
+        "rewritten": "",
+        "columns": null
+      },
+      "01": {
+        "decision": "reject",
+        "code": "unsafe_query",
+        "message": "unsafe_query",
+        "rewritten": "",
+        "columns": null
+      },
+      "decision_agree": true
+    },
+    {
+      "id": "N17",
+      "expect": "reject",
+      "sql": "SELECT order_id, order_id FROM cs_order_self",
+      "03": {
+        "decision": "reject",
+        "code": "duplicate_alias",
+        "message": "projection aliases must be unique",
+        "rewritten": "",
+        "columns": null
+      },
+      "01": {
+        "decision": "reject",
+        "code": "unsafe_query",
+        "message": "unsafe_query",
+        "rewritten": "",
+        "columns": null
+      },
+      "decision_agree": true
+    },
+    {
+      "id": "N18",
+      "expect": "reject",
+      "sql": "SELECT order_id FROM cs_order_self ORDER BY :order_id",
+      "03": {
+        "decision": "reject",
+        "code": "invalid_parameters",
+        "message": "parameter cannot appear in ORDER BY",
+        "rewritten": "",
+        "columns": null
+      },
+      "01": {
+        "decision": "accept",
+        "code": "ok",
+        "message": "",
+        "rewritten": "SELECT \"cs_order_self\".\"order_id\" AS \"order_id\" FROM \"cs_order_self\" AS \"cs_order_self\" ORDER BY :order_id LIMIT 20",
+        "columns": [
+          "order_id"
+        ],
+        "parameters": [
+          "order_id"
+        ]
+      },
+      "decision_agree": false
+    },
+    {
+      "id": "N19",
+      "expect": "reject",
+      "sql": "SELECT order_id FROM cs_order_self WHERE paid_minor % 2 = 0",
+      "03": {
+        "decision": "reject",
+        "code": "unsafe_query",
+        "message": "modulo operator is not allowed",
+        "rewritten": "",
+        "columns": null
+      },
+      "01": {
+        "decision": "reject",
+        "code": "unsafe_query",
+        "message": "unsafe_query",
+        "rewritten": "",
+        "columns": null
+      },
+      "decision_agree": true
+    },
+    {
+      "id": "N20",
+      "expect": "reject",
+      "sql": "WITH a AS (SELECT 1), b AS (SELECT 2), c AS (SELECT 3) SELECT count(*) FROM cs_order_self",
+      "03": {
+        "decision": "reject",
+        "code": "sql_too_complex",
+        "message": "3 CTEs > 2",
+        "rewritten": "",
+        "columns": null
+      },
+      "01": {
+        "decision": "reject",
+        "code": "unsafe_query",
+        "message": "unsafe_query",
+        "rewritten": "",
+        "columns": null
+      },
+      "decision_agree": true
+    }
+  ]
+}

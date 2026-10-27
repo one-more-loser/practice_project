@@ -1,0 +1,270 @@
+{
+  "contract_version": "XCS-SQL-v0.1",
+  "consumer_profile": "customer_self",
+  "schema_revision": "CS-QUERY-B2-v1",
+  "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+  "metric_revision": "CS-METRIC-B2-v1",
+  "resources": {
+    "cs_order_self": {
+      "order_id": "TEXT",
+      "created_at": "TIMESTAMPTZ",
+      "paid_at": "TIMESTAMPTZ",
+      "received_at": "TIMESTAMPTZ",
+      "trade_status": "TEXT",
+      "fulfillment_status": "TEXT",
+      "goods_minor": "BIGINT",
+      "discount_minor": "BIGINT",
+      "freight_minor": "BIGINT",
+      "payable_minor": "BIGINT",
+      "paid_minor": "BIGINT",
+      "refunded_minor": "BIGINT",
+      "net_paid_minor": "BIGINT",
+      "currency": "TEXT"
+    },
+    "cs_order_item_self": {
+      "order_item_id": "TEXT",
+      "order_id": "TEXT",
+      "sku_id": "TEXT",
+      "product_name": "TEXT",
+      "ordered_qty": "INT",
+      "paid_goods_minor": "BIGINT",
+      "refunded_qty": "INT",
+      "refunded_goods_minor": "BIGINT",
+      "remaining_qty": "INT",
+      "remaining_goods_minor": "BIGINT"
+    },
+    "cs_shipment_self": {
+      "shipment_id": "TEXT",
+      "order_id": "TEXT",
+      "carrier": "TEXT",
+      "status": "TEXT",
+      "shipped_at": "TIMESTAMPTZ",
+      "carrier_signed_at": "TIMESTAMPTZ",
+      "tracking_updated_at": "TIMESTAMPTZ"
+    },
+    "cs_wallet_summary_self": {
+      "account_id": "TEXT",
+      "balance_minor": "BIGINT",
+      "currency": "TEXT",
+      "status": "TEXT"
+    },
+    "cs_wallet_entry_self": {
+      "entry_id": "TEXT",
+      "kind": "TEXT",
+      "amount_minor": "BIGINT",
+      "sequence": "BIGINT",
+      "balance_before_minor": "BIGINT",
+      "balance_after_minor": "BIGINT",
+      "occurred_at": "TIMESTAMPTZ",
+      "currency": "TEXT"
+    },
+    "cs_product_public": {
+      "product_id": "TEXT",
+      "sku_id": "TEXT",
+      "name": "TEXT",
+      "category": "TEXT",
+      "price_minor": "BIGINT",
+      "currency": "TEXT",
+      "available_qty": "INT",
+      "price_version": "INT",
+      "as_of": "TIMESTAMPTZ"
+    }
+  },
+  "column_count": 52,
+  "metric_definitions": {
+    "orders.count": {
+      "grain": "one row per customer_order",
+      "definition": "orders created in the requested half-open time window, excluding unpaid and unpaid-cancelled orders",
+      "time_field": "created_at",
+      "amount_unit": null
+    },
+    "orders.paid_minor": {
+      "grain": "one row per customer_order",
+      "definition": "sum of original paid_minor for paid orders created in the requested window",
+      "time_field": "created_at",
+      "amount_unit": "CNY minor units"
+    },
+    "orders.refunded_minor": {
+      "grain": "one row per customer_order",
+      "definition": "sum of refunded_minor for those same paid orders, independent of refund-entry count",
+      "time_field": "created_at",
+      "amount_unit": "CNY minor units"
+    },
+    "orders.net_paid_minor": {
+      "grain": "one row per customer_order",
+      "definition": "sum of paid_minor minus refunded_minor for those same paid orders",
+      "time_field": "created_at",
+      "amount_unit": "CNY minor units"
+    }
+  },
+  "paid_cohort": {
+    "trade_status": [
+      "paid",
+      "completed",
+      "cancelled_refunded",
+      "closed_refunded"
+    ],
+    "paid_minor_gt": 0,
+    "time_field": "created_at"
+  },
+  "migration_chain": [
+    {
+      "file": "backend/migrations/versions/0001_source.py",
+      "revision": "0001_source",
+      "down_revision": null,
+      "sha256": "83840d521713bf40ede7e28db4013eba3f115d0138be683db8e040c657e1d52a"
+    },
+    {
+      "file": "backend/migrations/versions/0002_identity.py",
+      "revision": "0002_identity",
+      "down_revision": "0001_source",
+      "sha256": "f0f2d1a4d1d6b2d7dd7f6ba2b6d5a6ad5784b641f15a6f46423d29063b1f4f9c"
+    },
+    {
+      "file": "backend/migrations/versions/0003_readiness_grant.py",
+      "revision": "0003_readiness_grant",
+      "down_revision": "0002_identity",
+      "sha256": "3bd41bf494899e85584c9b3adee863c2c28e040b8a94a5e7f81ee30a64d1d596"
+    },
+    {
+      "file": "backend/migrations/versions/0004_actions_wallet.py",
+      "revision": "0004_actions_wallet",
+      "down_revision": "0003_readiness_grant",
+      "sha256": "345517337d95769963b6b995f9caed7647160f9dc954d429e8713a66692e7b5f"
+    },
+    {
+      "file": "backend/migrations/versions/0005_catalog.py",
+      "revision": "0005_catalog",
+      "down_revision": "0004_actions_wallet",
+      "sha256": "93f70fe82b05006188ddca7288251f0a5084d2210f26e6db847d7779d1c97a8a"
+    },
+    {
+      "file": "backend/migrations/versions/0006_commerce.py",
+      "revision": "0006_commerce",
+      "down_revision": "0005_catalog",
+      "sha256": "39f21f71a38032ef980b391b371b5bb812c13f29e74bbba86713360a180398f5"
+    },
+    {
+      "file": "backend/migrations/versions/0007_fulfillment.py",
+      "revision": "0007_fulfillment",
+      "down_revision": "0006_commerce",
+      "sha256": "1e7d40fe544f25dedc4654e78a66195f7e3983903fd6253ab4ec335bd5f1091f"
+    },
+    {
+      "file": "backend/migrations/versions/0008_payment_allocation.py",
+      "revision": "0008_payment_allocation",
+      "down_revision": "0007_fulfillment",
+      "sha256": "fe62134d31e147f28a1d476ecbb3fa4543d6c8b64fbc02e6b41a23556d492141"
+    },
+    {
+      "file": "backend/migrations/versions/0009_shipping_input_write.py",
+      "revision": "0009_shipping_input_write",
+      "down_revision": "0008_payment_allocation",
+      "sha256": "c1ae1340cf32c875eccdb83849f6a74a8288dd77da93b7efdd39206cf1576005"
+    },
+    {
+      "file": "backend/migrations/versions/0010_business_integrity.py",
+      "revision": "0010_business_integrity",
+      "down_revision": "0009_shipping_input_write",
+      "sha256": "d7732af732db1b496d9833829717402720ab10faff7dda8f598249e18d2632cc"
+    },
+    {
+      "file": "backend/migrations/versions/0011_controlled_query.py",
+      "revision": "0011_controlled_query",
+      "down_revision": "0010_business_integrity",
+      "sha256": "00e7576a7f1e17294ef994d6cd1fed77fff6904bd1cc95c2e46538613c380555"
+    },
+    {
+      "file": "backend/migrations/versions/0012_query_scope.py",
+      "revision": "0012_query_scope",
+      "down_revision": "0011_controlled_query",
+      "sha256": "6b69d8e5565794c69b18c0e8fd42a185d7a209870a6b8d5f7c0eeee4e8dcfccf"
+    },
+    {
+      "file": "backend/migrations/versions/0013_conversation_runtime.py",
+      "revision": "0013_conversation_runtime",
+      "down_revision": "0012_query_scope",
+      "sha256": "17f994a36f2cb3dd6257d3848d42d8f6fbf882bec2c7fe904dac478f864a7bc7"
+    },
+    {
+      "file": "backend/migrations/versions/0014_runtime_knowledge.py",
+      "revision": "0014_runtime_knowledge",
+      "down_revision": "0013_conversation_runtime",
+      "sha256": "12ae679f2e43fec91495111b0e0585fd33a91a02c830bd178f3edb2e4d092901"
+    },
+    {
+      "file": "backend/migrations/versions/0015_knowledge_scope.py",
+      "revision": "0015_knowledge_scope",
+      "down_revision": "0014_runtime_knowledge",
+      "sha256": "fdfc3121d7854fb4cab673edfa60df0fbf00e8329e3419912c7b0d10d5362865"
+    },
+    {
+      "file": "backend/migrations/versions/0016_cancellation_review.py",
+      "revision": "0016_cancellation_review",
+      "down_revision": "0015_knowledge_scope",
+      "sha256": "e13e66039734d1c274377e67de34e4887be60387b143ff7936c83af901eea1f4"
+    },
+    {
+      "file": "backend/migrations/versions/0017_support_human.py",
+      "revision": "0017_support_human",
+      "down_revision": "0016_cancellation_review",
+      "sha256": "73d37b735f8234e1a581dcd009a63232f543e0c5dce5724b4effc16767096750"
+    },
+    {
+      "file": "backend/migrations/versions/0018_refund_workflows.py",
+      "revision": "0018_refund_workflows",
+      "down_revision": "0017_support_human",
+      "sha256": "d37f052abb8655fd3690cd1db677c782b2d63042b1f491adc895c7af398ad7b6"
+    },
+    {
+      "file": "backend/migrations/versions/0019_experience_feedback.py",
+      "revision": "0019_experience_feedback",
+      "down_revision": "0018_refund_workflows",
+      "sha256": "a540db552ada1c8a403f70fa6cc4b57c413d612dd67b044d5584961d71aa8833"
+    },
+    {
+      "file": "backend/migrations/versions/0020_agent_action_binding.py",
+      "revision": "0020_agent_action_binding",
+      "down_revision": "0019_experience_feedback",
+      "sha256": "7f9ef2cbaff7de0f19fc1a50db3b0affc02a82f65e0438c151d476b7af09ec94"
+    },
+    {
+      "file": "backend/migrations/versions/0021_operations_capabilities.py",
+      "revision": "0021_operations_capabilities",
+      "down_revision": "0020_agent_action_binding",
+      "sha256": "07089bc7c7031dfbca4de299d77fcf90e25ae1f5a318a70ac7093f635f106fe7"
+    },
+    {
+      "file": "backend/migrations/versions/0022_activity_execution.py",
+      "revision": "0022_activity_execution",
+      "down_revision": "0021_operations_capabilities",
+      "sha256": "3c1ad915670cfb5e6f1745b122627cc5c30bad80797265d73b9058c516d86ab7"
+    },
+    {
+      "file": "backend/migrations/versions/0023_operations_snapshot.py",
+      "revision": "0023_operations_snapshot",
+      "down_revision": "0022_activity_execution",
+      "sha256": "57bbbe2753bcf71a7b30d401e8eec2d6186fb25509cde168af3b856771debcfd"
+    }
+  ],
+  "effective_rls_source": "backend/migrations/versions/0012_query_scope.py",
+  "gucs": [
+    "cs.owner",
+    "cs.store",
+    "cs.batch",
+    "cs.generation",
+    "cs.role",
+    "cs.start",
+    "cs.end"
+  ],
+  "parameters": {
+    "start_at": "TIMESTAMPTZ",
+    "end_at": "TIMESTAMPTZ",
+    "order_id": "TEXT",
+    "sku_id": "TEXT",
+    "status": "TEXT"
+  },
+  "business_timezone": "Asia/Shanghai",
+  "window": "SQL >= start_at AND < end_at; 0 < duration <= 366 days; RLS defensive window is inclusive",
+  "verification": "source baseline only in this run; deployed catalogs not re-read"
+}

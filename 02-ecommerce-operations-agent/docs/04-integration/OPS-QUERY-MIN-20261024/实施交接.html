@@ -1,0 +1,46 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>02 最小受控 SQL 交接</title><style>body{max-width:1000px;margin:40px auto;padding:0 24px;font:16px/1.7 system-ui;color:#172033;background:#f5f7fa}pre{white-space:pre-wrap;background:white;padding:32px;border:1px solid #d9e0e8;border-radius:12px}</style><pre># 02 最小受控 SQL 实现交接（2026-10-24，待主代理独立验收）
+
+## 本次范围
+
+新增 `GET /api/ops/v1/query/schema` 和 `POST /api/ops/v1/query`。只支持付款金额 `payment_minor`、付款订单数 `paid_order_count`、指定 SKU 的付款件数 `paid_units`。四投影仍未实现：只在每请求独立内存 SQLite 建 `ops_order` 与 `ops_order_item`，真实持久存储仍为原 `ops_snapshots.body JSON`。未改 db.py/Schema版本、现库、部署或旧验收。
+
+`schema.json` 是实际运行Schema序列化，`requests.json` 给出三种完整请求（合成query-fixture，需先导入）。Schema GET需在线 `metrics.read`；POST每次在线resolve并校验metrics.read、Origin、CSRF。主体/店铺不能由正文注入。请求必须精确snapshot_id+revision；内部总是重算归档摘要并核对存储digest；可附expected digest，不匹配409。返回Schema/指标/计算/validator修订与摘要、归档digest、window、requested_as_of、visible_at、watermark、来源、query_ref/request_id、elapsed_ms、row_count/truncated。
+
+## 执行与口径
+
+1. 原业务连接只执行服务端生成的单快照SELECT，不接受候选SQL；店铺来自每次在线身份，完整主键指定归档。
+2. 验证归档digest、归档内部身份和结构，取 `visible=min(requested_as_of,snapshot.as_of,trusted_now)`。
+3. 先按status=paid、`start&lt;=paid_at&lt;end`及`paid_at&lt;=visible`筛选支付cohort；channel可选，采用strip后空转unknown的领域口径。零元paid仍计订单。
+4. 独立内存库ops_order一单一行；ops_order_item保留原生数组line_no，同订单同SKU多行不去重，避免join扇出。金额/qty存精确整数字符串，SUM由SQLite登记的Python整数aggregate实现；不是SQLite浮点SUM或BIGINT SUM。金额结果字符串，订单数/件数JSON整数。
+5. 严格小语法仅接受schema的三种SELECT（大小写/连续空白可变化），拒绝JOIN、GROUP BY、子查询、CTE、注释、多语句、字面值过滤、函数/字段/表越界。执行经校验的候选原文，通过SQLite真实aggregate取得结果；不调用固定指标工具冒充SQL。
+6. 投影建好后开启query_only与SQLite authorizer（只许指定表READ/SELECT及sum/coalesce/count），关闭后即销毁。参数仅时间窗/as_of/SKU/channel，SQL绑定仅sku_id，其他筛选由后端投影执行。金额和订单数不允许SKU筛选悄然改口径。
+
+## 预算与审计
+
+每进程最多2个并发；不排队，超额429。最多20000订单/100000订单行/8MiB归档，SQL4096字节；SQLite max_page_count=8192,page_size=4096（32MiB页），输出最多1行/4096字节。隔离执行预算1000ms，Python阶段检查与SQLite progress_handler配合，超时408。预算包含归档读取后的检查和投影，但同步业务归档SELECT本身不能被此Python软截止抢占；真实PG查询/连接timeout仍沿原DB配置，不能宣称这是生产硬时延SLA。JSON解码/验证和内存复制受归档大小上界约束；不是操作系统级进程RSS硬配额。
+
+单独JSONL审计目录默认02/data/query-audit，可用OPS_QUERY_AUDIT_DIR指定。保存请求关联、契约/SQL摘要、身份摘要和授权修订、归档/上下文摘要、行数、耗时与结果；不写SQL/参数/正文/Cookie/身份店铺明文。审计写失败停止返回结果503；业务库不新增审计行。此目录需部署者保证私有访问、容量轮转与持久存储，当前只做每日文件分区，不宣称已有全局日志留存服务。
+
+## 本次真实验证
+
+工作目录 `D:\codex_project\项目实战\02-ecommerce-operations-agent\backend`，解释器 `../.venv/Scripts/python.exe`。
+
+```powershell
+../.venv/Scripts/python.exe -m pytest tests/test_query_sync.py tests/test_domain.py -q --basetemp ../.query-sync-tmp-5 --tb=short
+```
+
+**102 passed，退出0，1.93s，1条既有Starlette/httpx弃用警告**；其中新同步SQL15项、既有domain87项。覆盖真实三指标、半开窗、可见截止/可信now、零元订单、同SKU重复原生行、旧revision/空revision、摘要篡改、跨店/撤权、写/注释/join等拒绝、准确总额18446744073709551614、SQL aggregate逐行回调证明、业务库前后逐表相同、请求连接隔离、timeout/行预算/并发、审计脱敏。不是HTTP/真实PG/03/模型联调签收。
+
+```powershell
+# 主代理独立HTTP复验（本子任务未完成）
+../.venv/Scripts/python.exe -m pytest tests/test_query_min.py tests/test_query_limits.py -q --basetemp ../.query-http-independent --tb=short
+```
+
+原有未交接 `test_query_min.py` 保留原文；本次新增 `test_query_limits.py` 4项HTTP反例。首次根cwd错误pythonpath导致ModuleNotFoundError，改backend cwd解决。默认Windows临时目录不允许创建，改独立项目内basetemp解决。随后TestClient卡在Windows asyncio的socket._fallback_socketpair/accept，faulthandler已定位且Ctrl+C结束两个测试会话；不是产品断言失败或通过。申请仅用于本地socketpair的沙箱外运行自动审核超时，命令未执行。主代理需在可用事件循环环境复跑。
+
+Ruff针对本次两个源文件和两个新测试通过。接口未对在线服务热加载，未启动worker/访问现有PG/重置业务库/付费模型/部署。测试仅独立tmp_path SQLite。
+
+## 待独立验收与后续
+
+主代理复核HTTP鉴权、CSRF、撤权、audit关联以及未来快照截断/高负载预算。退款、成本、完整四投影、PostgreSQL方言沙箱、任意分组、03训练奖励接入均不在本次成果中。这里的SQLite扩展精确SUM不是PostgreSQL NUMERIC基线，03必须按返回dialect/Schema单独标注，不能据此开展PG等价训练。
+</pre></html>

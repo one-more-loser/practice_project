@@ -1,0 +1,1440 @@
+{
+  "review_id": "CS03-RLS-REVIEW-20261024-v1",
+  "started_at": "2026-10-24T06:31:05.092684+00:00",
+  "scope": "fresh 01-owned Windows PostgreSQL only; source 0011/0012; no existing profile/03 writes",
+  "cases": [
+    {
+      "name": "0011_inactive_B_another_A_active_expected_historical_leak",
+      "scope": {
+        "store": "store_b"
+      },
+      "backend_pid": 60640,
+      "rows": {
+        "customer_order": [
+          "C3"
+        ],
+        "order_item": [
+          "I_C3"
+        ],
+        "order_shipment": [
+          "H_C3"
+        ],
+        "wallet_account": [
+          "W_C3"
+        ],
+        "wallet_entry": [
+          "E_C3"
+        ],
+        "product": [
+          "P_C3"
+        ],
+        "sku": [
+          "S_C3"
+        ],
+        "inventory": [
+          "S_C3"
+        ],
+        "cs_order_self": [
+          "C3"
+        ],
+        "cs_order_item_self": [
+          "I_C3"
+        ],
+        "cs_shipment_self": [
+          "H_C3"
+        ],
+        "cs_wallet_summary_self": [
+          "W_C3"
+        ],
+        "cs_wallet_entry_self": [
+          "E_C3"
+        ],
+        "cs_product_public": [
+          "P_C3"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "name": "0012_active_A_own_rows",
+      "scope": {},
+      "backend_pid": 60640,
+      "rows": {
+        "customer_order": [
+          "A1"
+        ],
+        "order_item": [
+          "I_A1"
+        ],
+        "order_shipment": [
+          "H_A1"
+        ],
+        "wallet_account": [
+          "W_A1"
+        ],
+        "wallet_entry": [
+          "E_A1"
+        ],
+        "product": [
+          "P_A1",
+          "P_A2"
+        ],
+        "sku": [
+          "S_A1",
+          "S_A2"
+        ],
+        "inventory": [
+          "S_A1",
+          "S_A2"
+        ],
+        "cs_order_self": [
+          "A1"
+        ],
+        "cs_order_item_self": [
+          "I_A1"
+        ],
+        "cs_shipment_self": [
+          "H_A1"
+        ],
+        "cs_wallet_summary_self": [
+          "W_A1"
+        ],
+        "cs_wallet_entry_self": [
+          "E_A1"
+        ],
+        "cs_product_public": [
+          "P_A1",
+          "P_A2"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "name": "0012_inactive_B_another_A_active",
+      "scope": {
+        "store": "store_b"
+      },
+      "backend_pid": 60640,
+      "rows": {
+        "customer_order": [],
+        "order_item": [],
+        "order_shipment": [],
+        "wallet_account": [],
+        "wallet_entry": [],
+        "product": [],
+        "sku": [],
+        "inventory": [],
+        "cs_order_self": [],
+        "cs_order_item_self": [],
+        "cs_shipment_self": [],
+        "cs_wallet_summary_self": [],
+        "cs_wallet_entry_self": [],
+        "cs_product_public": []
+      },
+      "passed": true
+    },
+    {
+      "name": "0012_other_owner_A",
+      "scope": {
+        "owner": "cust_b"
+      },
+      "backend_pid": 60640,
+      "rows": {
+        "customer_order": [
+          "A2"
+        ],
+        "order_item": [
+          "I_A2"
+        ],
+        "order_shipment": [
+          "H_A2"
+        ],
+        "wallet_account": [
+          "W_A2"
+        ],
+        "wallet_entry": [
+          "E_A2"
+        ],
+        "product": [
+          "P_A1",
+          "P_A2"
+        ],
+        "sku": [
+          "S_A1",
+          "S_A2"
+        ],
+        "inventory": [
+          "S_A1",
+          "S_A2"
+        ],
+        "cs_order_self": [
+          "A2"
+        ],
+        "cs_order_item_self": [
+          "I_A2"
+        ],
+        "cs_shipment_self": [
+          "H_A2"
+        ],
+        "cs_wallet_summary_self": [
+          "W_A2"
+        ],
+        "cs_wallet_entry_self": [
+          "E_A2"
+        ],
+        "cs_product_public": [
+          "P_A1",
+          "P_A2"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "name": "0012_unknown_owner_private_empty_public_catalog_visible",
+      "scope": {
+        "owner": "not_owner"
+      },
+      "backend_pid": 60640,
+      "rows": {
+        "customer_order": [],
+        "order_item": [],
+        "order_shipment": [],
+        "wallet_account": [],
+        "wallet_entry": [],
+        "product": [
+          "P_A1",
+          "P_A2"
+        ],
+        "sku": [
+          "S_A1",
+          "S_A2"
+        ],
+        "inventory": [
+          "S_A1",
+          "S_A2"
+        ],
+        "cs_order_self": [],
+        "cs_order_item_self": [],
+        "cs_shipment_self": [],
+        "cs_wallet_summary_self": [],
+        "cs_wallet_entry_self": [],
+        "cs_product_public": [
+          "P_A1",
+          "P_A2"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "name": "0012_other_store_no_data",
+      "scope": {
+        "store": "store_unknown"
+      },
+      "backend_pid": 60640,
+      "rows": {
+        "customer_order": [],
+        "order_item": [],
+        "order_shipment": [],
+        "wallet_account": [],
+        "wallet_entry": [],
+        "product": [],
+        "sku": [],
+        "inventory": [],
+        "cs_order_self": [],
+        "cs_order_item_self": [],
+        "cs_shipment_self": [],
+        "cs_wallet_summary_self": [],
+        "cs_wallet_entry_self": [],
+        "cs_product_public": []
+      },
+      "passed": true
+    },
+    {
+      "name": "0012_other_batch_unknown",
+      "scope": {
+        "batch": "batch_unknown"
+      },
+      "backend_pid": 60640,
+      "rows": {
+        "customer_order": [],
+        "order_item": [],
+        "order_shipment": [],
+        "wallet_account": [],
+        "wallet_entry": [],
+        "product": [],
+        "sku": [],
+        "inventory": [],
+        "cs_order_self": [],
+        "cs_order_item_self": [],
+        "cs_shipment_self": [],
+        "cs_wallet_summary_self": [],
+        "cs_wallet_entry_self": [],
+        "cs_product_public": []
+      },
+      "passed": true
+    },
+    {
+      "name": "0012_wrong_generation",
+      "scope": {
+        "gen": 2
+      },
+      "backend_pid": 60640,
+      "rows": {
+        "customer_order": [],
+        "order_item": [],
+        "order_shipment": [],
+        "wallet_account": [],
+        "wallet_entry": [],
+        "product": [],
+        "sku": [],
+        "inventory": [],
+        "cs_order_self": [],
+        "cs_order_item_self": [],
+        "cs_shipment_self": [],
+        "cs_wallet_summary_self": [],
+        "cs_wallet_entry_self": [],
+        "cs_product_public": []
+      },
+      "passed": true
+    },
+    {
+      "name": "0012_matching_second_batch_generation",
+      "scope": {
+        "owner": "cust_batch2",
+        "batch": "batch_2",
+        "gen": 2
+      },
+      "backend_pid": 60640,
+      "rows": {
+        "customer_order": [
+          "G2"
+        ],
+        "order_item": [
+          "I_G2"
+        ],
+        "order_shipment": [
+          "H_G2"
+        ],
+        "wallet_account": [
+          "W_G2"
+        ],
+        "wallet_entry": [
+          "E_G2"
+        ],
+        "product": [
+          "P_G2"
+        ],
+        "sku": [
+          "S_G2"
+        ],
+        "inventory": [
+          "S_G2"
+        ],
+        "cs_order_self": [
+          "G2"
+        ],
+        "cs_order_item_self": [
+          "I_G2"
+        ],
+        "cs_shipment_self": [
+          "H_G2"
+        ],
+        "cs_wallet_summary_self": [
+          "W_G2"
+        ],
+        "cs_wallet_entry_self": [
+          "E_G2"
+        ],
+        "cs_product_public": [
+          "P_G2"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "name": "0012_inactive_batch",
+      "scope": {
+        "owner": "cust_dead",
+        "batch": "batch_dead"
+      },
+      "backend_pid": 60640,
+      "rows": {
+        "customer_order": [],
+        "order_item": [],
+        "order_shipment": [],
+        "wallet_account": [],
+        "wallet_entry": [],
+        "product": [],
+        "sku": [],
+        "inventory": [],
+        "cs_order_self": [],
+        "cs_order_item_self": [],
+        "cs_shipment_self": [],
+        "cs_wallet_summary_self": [],
+        "cs_wallet_entry_self": [],
+        "cs_product_public": []
+      },
+      "passed": true
+    },
+    {
+      "name": "0012_no_context",
+      "scope": null,
+      "backend_pid": 60640,
+      "rows": {
+        "customer_order": [],
+        "order_item": [],
+        "order_shipment": [],
+        "wallet_account": [],
+        "wallet_entry": [],
+        "product": [],
+        "sku": [],
+        "inventory": [],
+        "cs_order_self": [],
+        "cs_order_item_self": [],
+        "cs_shipment_self": [],
+        "cs_wallet_summary_self": [],
+        "cs_wallet_entry_self": [],
+        "cs_product_public": []
+      },
+      "passed": true
+    },
+    {
+      "name": "0012_missing_start",
+      "rows": {
+        "customer_order": [],
+        "order_item": [],
+        "order_shipment": [],
+        "wallet_account": [
+          "W_A1"
+        ],
+        "wallet_entry": [],
+        "product": [
+          "P_A1",
+          "P_A2"
+        ],
+        "sku": [
+          "S_A1",
+          "S_A2"
+        ],
+        "inventory": [
+          "S_A1",
+          "S_A2"
+        ],
+        "cs_order_self": [],
+        "cs_order_item_self": [],
+        "cs_shipment_self": [],
+        "cs_wallet_summary_self": [
+          "W_A1"
+        ],
+        "cs_wallet_entry_self": [],
+        "cs_product_public": [
+          "P_A1",
+          "P_A2"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "name": "0012_missing_end",
+      "rows": {
+        "customer_order": [],
+        "order_item": [],
+        "order_shipment": [],
+        "wallet_account": [
+          "W_A1"
+        ],
+        "wallet_entry": [],
+        "product": [
+          "P_A1",
+          "P_A2"
+        ],
+        "sku": [
+          "S_A1",
+          "S_A2"
+        ],
+        "inventory": [
+          "S_A1",
+          "S_A2"
+        ],
+        "cs_order_self": [],
+        "cs_order_item_self": [],
+        "cs_shipment_self": [],
+        "cs_wallet_summary_self": [
+          "W_A1"
+        ],
+        "cs_wallet_entry_self": [],
+        "cs_product_public": [
+          "P_A1",
+          "P_A2"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "name": "0012_missing_owner",
+      "rows": {
+        "customer_order": [],
+        "order_item": [],
+        "order_shipment": [],
+        "wallet_account": [],
+        "wallet_entry": [],
+        "product": [
+          "P_A1",
+          "P_A2"
+        ],
+        "sku": [
+          "S_A1",
+          "S_A2"
+        ],
+        "inventory": [
+          "S_A1",
+          "S_A2"
+        ],
+        "cs_order_self": [],
+        "cs_order_item_self": [],
+        "cs_shipment_self": [],
+        "cs_wallet_summary_self": [],
+        "cs_wallet_entry_self": [],
+        "cs_product_public": [
+          "P_A1",
+          "P_A2"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "name": "0012_missing_store",
+      "rows": {
+        "customer_order": [],
+        "order_item": [],
+        "order_shipment": [],
+        "wallet_account": [],
+        "wallet_entry": [],
+        "product": [],
+        "sku": [],
+        "inventory": [],
+        "cs_order_self": [],
+        "cs_order_item_self": [],
+        "cs_shipment_self": [],
+        "cs_wallet_summary_self": [],
+        "cs_wallet_entry_self": [],
+        "cs_product_public": []
+      },
+      "passed": true
+    },
+    {
+      "name": "0012_missing_batch",
+      "rows": {
+        "customer_order": [],
+        "order_item": [],
+        "order_shipment": [],
+        "wallet_account": [],
+        "wallet_entry": [],
+        "product": [],
+        "sku": [],
+        "inventory": [],
+        "cs_order_self": [],
+        "cs_order_item_self": [],
+        "cs_shipment_self": [],
+        "cs_wallet_summary_self": [],
+        "cs_wallet_entry_self": [],
+        "cs_product_public": []
+      },
+      "passed": true
+    },
+    {
+      "name": "0012_missing_generation",
+      "rows": {
+        "customer_order": [],
+        "order_item": [],
+        "order_shipment": [],
+        "wallet_account": [],
+        "wallet_entry": [],
+        "product": [],
+        "sku": [],
+        "inventory": [],
+        "cs_order_self": [],
+        "cs_order_item_self": [],
+        "cs_shipment_self": [],
+        "cs_wallet_summary_self": [],
+        "cs_wallet_entry_self": [],
+        "cs_product_public": []
+      },
+      "passed": true
+    },
+    {
+      "name": "0012_missing_role",
+      "rows": {
+        "customer_order": [],
+        "order_item": [],
+        "order_shipment": [],
+        "wallet_account": [],
+        "wallet_entry": [],
+        "product": [
+          "P_A1",
+          "P_A2"
+        ],
+        "sku": [
+          "S_A1",
+          "S_A2"
+        ],
+        "inventory": [
+          "S_A1",
+          "S_A2"
+        ],
+        "cs_order_self": [],
+        "cs_order_item_self": [],
+        "cs_shipment_self": [],
+        "cs_wallet_summary_self": [],
+        "cs_wallet_entry_self": [],
+        "cs_product_public": [
+          "P_A1",
+          "P_A2"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "name": "0012_all_stores_inactive",
+      "scope": {},
+      "backend_pid": 60640,
+      "rows": {
+        "customer_order": [],
+        "order_item": [],
+        "order_shipment": [],
+        "wallet_account": [],
+        "wallet_entry": [],
+        "product": [],
+        "sku": [],
+        "inventory": [],
+        "cs_order_self": [],
+        "cs_order_item_self": [],
+        "cs_shipment_self": [],
+        "cs_wallet_summary_self": [],
+        "cs_wallet_entry_self": [],
+        "cs_product_public": []
+      },
+      "passed": true
+    },
+    {
+      "name": "reuse_A_commit",
+      "scope": {},
+      "backend_pid": 60640,
+      "rows": {
+        "customer_order": [
+          "A1"
+        ],
+        "order_item": [
+          "I_A1"
+        ],
+        "order_shipment": [
+          "H_A1"
+        ],
+        "wallet_account": [
+          "W_A1"
+        ],
+        "wallet_entry": [
+          "E_A1"
+        ],
+        "product": [
+          "P_A1",
+          "P_A2"
+        ],
+        "sku": [
+          "S_A1",
+          "S_A2"
+        ],
+        "inventory": [
+          "S_A1",
+          "S_A2"
+        ],
+        "cs_order_self": [
+          "A1"
+        ],
+        "cs_order_item_self": [
+          "I_A1"
+        ],
+        "cs_shipment_self": [
+          "H_A1"
+        ],
+        "cs_wallet_summary_self": [
+          "W_A1"
+        ],
+        "cs_wallet_entry_self": [
+          "E_A1"
+        ],
+        "cs_product_public": [
+          "P_A1",
+          "P_A2"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "name": "reuse_no_context_after_commit",
+      "scope": null,
+      "backend_pid": 60640,
+      "rows": {
+        "customer_order": [],
+        "order_item": [],
+        "order_shipment": [],
+        "wallet_account": [],
+        "wallet_entry": [],
+        "product": [],
+        "sku": [],
+        "inventory": [],
+        "cs_order_self": [],
+        "cs_order_item_self": [],
+        "cs_shipment_self": [],
+        "cs_wallet_summary_self": [],
+        "cs_wallet_entry_self": [],
+        "cs_product_public": []
+      },
+      "passed": true
+    },
+    {
+      "name": "reuse_B_rollback",
+      "scope": {
+        "store": "store_b"
+      },
+      "backend_pid": 60640,
+      "rows": {
+        "customer_order": [],
+        "order_item": [],
+        "order_shipment": [],
+        "wallet_account": [],
+        "wallet_entry": [],
+        "product": [],
+        "sku": [],
+        "inventory": [],
+        "cs_order_self": [],
+        "cs_order_item_self": [],
+        "cs_shipment_self": [],
+        "cs_wallet_summary_self": [],
+        "cs_wallet_entry_self": [],
+        "cs_product_public": []
+      },
+      "passed": true
+    },
+    {
+      "name": "reuse_no_context_after_rollback",
+      "scope": null,
+      "backend_pid": 60640,
+      "rows": {
+        "customer_order": [],
+        "order_item": [],
+        "order_shipment": [],
+        "wallet_account": [],
+        "wallet_entry": [],
+        "product": [],
+        "sku": [],
+        "inventory": [],
+        "cs_order_self": [],
+        "cs_order_item_self": [],
+        "cs_shipment_self": [],
+        "cs_wallet_summary_self": [],
+        "cs_wallet_entry_self": [],
+        "cs_product_public": []
+      },
+      "passed": true
+    },
+    {
+      "name": "reuse_no_context_after_error_rollback",
+      "scope": null,
+      "backend_pid": 60640,
+      "rows": {
+        "customer_order": [],
+        "order_item": [],
+        "order_shipment": [],
+        "wallet_account": [],
+        "wallet_entry": [],
+        "product": [],
+        "sku": [],
+        "inventory": [],
+        "cs_order_self": [],
+        "cs_order_item_self": [],
+        "cs_shipment_self": [],
+        "cs_wallet_summary_self": [],
+        "cs_wallet_entry_self": [],
+        "cs_product_public": []
+      },
+      "passed": true
+    },
+    {
+      "name": "reuse_A_rebound",
+      "scope": {},
+      "backend_pid": 60640,
+      "rows": {
+        "customer_order": [
+          "A1"
+        ],
+        "order_item": [
+          "I_A1"
+        ],
+        "order_shipment": [
+          "H_A1"
+        ],
+        "wallet_account": [
+          "W_A1"
+        ],
+        "wallet_entry": [
+          "E_A1"
+        ],
+        "product": [
+          "P_A1",
+          "P_A2"
+        ],
+        "sku": [
+          "S_A1",
+          "S_A2"
+        ],
+        "inventory": [
+          "S_A1",
+          "S_A2"
+        ],
+        "cs_order_self": [
+          "A1"
+        ],
+        "cs_order_item_self": [
+          "I_A1"
+        ],
+        "cs_shipment_self": [
+          "H_A1"
+        ],
+        "cs_wallet_summary_self": [
+          "W_A1"
+        ],
+        "cs_wallet_entry_self": [
+          "E_A1"
+        ],
+        "cs_product_public": [
+          "P_A1",
+          "P_A2"
+        ]
+      },
+      "passed": true
+    }
+  ],
+  "limitations": [
+    "source-shaped 11-table RLS slice, no external FKs/triggers/full lifecycle migration",
+    "direct limited login and real SQLExecutor.context; no HTTP/model workload",
+    "03 PostgreSQL16.2 report compared to local PostgreSQL17.11, not a PG16 rerun"
+  ],
+  "server": {
+    "version": "PostgreSQL 17.11 on x86_64-windows, compiled by msvc-19.44.35228, 64-bit",
+    "cluster_marker": "cs01_rls_review_7e202ce0e19e5530",
+    "port": 5165,
+    "fresh_path": "C:\\Users\\27997\\.codex\\visualizations\\2026\\10\\21\\01a15d31-2974-74b2-ba9e-cbb18c618df3\\cs01-rls-review-runtime\\cs01_rls_review_7e202ce0e19e5530\\pgdata"
+  },
+  "omitted_external_fks": [
+    {
+      "table": "customer_order",
+      "targets": [
+        "checkout_quote.quote_id"
+      ]
+    },
+    {
+      "table": "customer_order",
+      "targets": [
+        "order_shipping_snapshot.snapshot_id",
+        "order_shipping_snapshot.order_id"
+      ]
+    },
+    {
+      "table": "wallet_entry",
+      "targets": [
+        "business_operation.operation_id"
+      ]
+    },
+    {
+      "table": "order_shipment",
+      "targets": [
+        "business_operation.operation_id"
+      ]
+    },
+    {
+      "table": "order_shipment",
+      "targets": [
+        "order_shipping_snapshot.snapshot_id"
+      ]
+    }
+  ],
+  "fixture_digest": "e2767c05866f2749a82bfdf9f73919475ba9eeb38d06c3d65a34bb1b264936f7",
+  "catalog_0011": [
+    {
+      "tablename": "customer_order",
+      "policyname": "b2_query",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_query_b2"
+      ],
+      "cmd": "SELECT",
+      "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (customer_order.data_batch_id)::text) AND (b.generation = customer_order.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (s.store_id)::text) AND ((s.status)::text = 'active'::text)))) AND ((owner_id)::text = current_setting('cs.owner'::text, true)) AND (current_setting('cs.role'::text, true) = 'customer'::text))",
+      "with_check": null
+    },
+    {
+      "tablename": "customer_order",
+      "policyname": "b2_service",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_app_b0",
+        "cs_agent_owner_b0"
+      ],
+      "cmd": "ALL",
+      "qual": "true",
+      "with_check": "true"
+    },
+    {
+      "tablename": "inventory",
+      "policyname": "b2_query",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_query_b2"
+      ],
+      "cmd": "SELECT",
+      "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (inventory.data_batch_id)::text) AND (b.generation = inventory.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (s.store_id)::text) AND ((s.status)::text = 'active'::text)))))",
+      "with_check": null
+    },
+    {
+      "tablename": "inventory",
+      "policyname": "b2_service",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_app_b0",
+        "cs_agent_owner_b0"
+      ],
+      "cmd": "ALL",
+      "qual": "true",
+      "with_check": "true"
+    },
+    {
+      "tablename": "order_item",
+      "policyname": "b2_query",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_query_b2"
+      ],
+      "cmd": "SELECT",
+      "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (order_item.data_batch_id)::text) AND (b.generation = order_item.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (s.store_id)::text) AND ((s.status)::text = 'active'::text)))) AND ((order_id)::text IN ( SELECT customer_order.order_id\n   FROM customer_order)) AND (current_setting('cs.role'::text, true) = 'customer'::text))",
+      "with_check": null
+    },
+    {
+      "tablename": "order_item",
+      "policyname": "b2_service",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_app_b0",
+        "cs_agent_owner_b0"
+      ],
+      "cmd": "ALL",
+      "qual": "true",
+      "with_check": "true"
+    },
+    {
+      "tablename": "order_shipment",
+      "policyname": "b2_query",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_query_b2"
+      ],
+      "cmd": "SELECT",
+      "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (order_shipment.data_batch_id)::text) AND (b.generation = order_shipment.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (s.store_id)::text) AND ((s.status)::text = 'active'::text)))) AND ((order_id)::text IN ( SELECT customer_order.order_id\n   FROM customer_order)) AND (current_setting('cs.role'::text, true) = 'customer'::text))",
+      "with_check": null
+    },
+    {
+      "tablename": "order_shipment",
+      "policyname": "b2_service",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_app_b0",
+        "cs_agent_owner_b0"
+      ],
+      "cmd": "ALL",
+      "qual": "true",
+      "with_check": "true"
+    },
+    {
+      "tablename": "product",
+      "policyname": "b2_query",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_query_b2"
+      ],
+      "cmd": "SELECT",
+      "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (product.data_batch_id)::text) AND (b.generation = product.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (s.store_id)::text) AND ((s.status)::text = 'active'::text)))))",
+      "with_check": null
+    },
+    {
+      "tablename": "product",
+      "policyname": "b2_service",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_app_b0",
+        "cs_agent_owner_b0"
+      ],
+      "cmd": "ALL",
+      "qual": "true",
+      "with_check": "true"
+    },
+    {
+      "tablename": "sku",
+      "policyname": "b2_query",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_query_b2"
+      ],
+      "cmd": "SELECT",
+      "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (sku.data_batch_id)::text) AND (b.generation = sku.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (s.store_id)::text) AND ((s.status)::text = 'active'::text)))))",
+      "with_check": null
+    },
+    {
+      "tablename": "sku",
+      "policyname": "b2_service",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_app_b0",
+        "cs_agent_owner_b0"
+      ],
+      "cmd": "ALL",
+      "qual": "true",
+      "with_check": "true"
+    },
+    {
+      "tablename": "wallet_account",
+      "policyname": "b2_query",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_query_b2"
+      ],
+      "cmd": "SELECT",
+      "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (wallet_account.data_batch_id)::text) AND (b.generation = wallet_account.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (s.store_id)::text) AND ((s.status)::text = 'active'::text)))) AND ((owner_id)::text = current_setting('cs.owner'::text, true)) AND (current_setting('cs.role'::text, true) = 'customer'::text))",
+      "with_check": null
+    },
+    {
+      "tablename": "wallet_account",
+      "policyname": "b2_service",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_app_b0",
+        "cs_agent_owner_b0"
+      ],
+      "cmd": "ALL",
+      "qual": "true",
+      "with_check": "true"
+    },
+    {
+      "tablename": "wallet_entry",
+      "policyname": "b2_query",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_query_b2"
+      ],
+      "cmd": "SELECT",
+      "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (wallet_entry.data_batch_id)::text) AND (b.generation = wallet_entry.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (s.store_id)::text) AND ((s.status)::text = 'active'::text)))) AND ((owner_id)::text = current_setting('cs.owner'::text, true)) AND (current_setting('cs.role'::text, true) = 'customer'::text))",
+      "with_check": null
+    },
+    {
+      "tablename": "wallet_entry",
+      "policyname": "b2_service",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_app_b0",
+        "cs_agent_owner_b0"
+      ],
+      "cmd": "ALL",
+      "qual": "true",
+      "with_check": "true"
+    }
+  ],
+  "query_role": {
+    "current_user": "cs_agent_query_b2",
+    "rolsuper": false,
+    "rolbypassrls": false,
+    "rolinherit": false
+  },
+  "explain_0011": [
+    {
+      "Plan": {
+        "Node Type": "Subquery Scan",
+        "Parallel Aware": false,
+        "Async Capable": false,
+        "Alias": "cs_order_self",
+        "Startup Cost": 11.12,
+        "Total Cost": 349.44,
+        "Plan Rows": 1,
+        "Plan Width": 178,
+        "Plans": [
+          {
+            "Node Type": "Seq Scan",
+            "Parent Relationship": "Subquery",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Relation Name": "customer_order",
+            "Alias": "customer_order",
+            "Startup Cost": 11.12,
+            "Total Cost": 349.43,
+            "Plan Rows": 1,
+            "Plan Width": 438,
+            "Filter": "((InitPlan 3).col1 AND ((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((owner_id)::text = current_setting('cs.owner'::text, true)) AND (current_setting('cs.role'::text, true) = 'customer'::text) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (ANY (((data_batch_id)::text = (hashed SubPlan 2).col1) AND (batch_generation = (hashed SubPlan 2).col2))))",
+            "Plans": [
+              {
+                "Node Type": "Seq Scan",
+                "Parent Relationship": "InitPlan",
+                "Subplan Name": "InitPlan 3",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Relation Name": "store",
+                "Alias": "s",
+                "Startup Cost": 0.0,
+                "Total Cost": 11.12,
+                "Plan Rows": 1,
+                "Plan Width": 0,
+                "Filter": "(((store_id)::text IS NOT NULL) AND ((status)::text = 'active'::text))"
+              },
+              {
+                "Node Type": "Seq Scan",
+                "Parent Relationship": "SubPlan",
+                "Subplan Name": "SubPlan 2",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Relation Name": "source_batch",
+                "Alias": "b",
+                "Startup Cost": 0.0,
+                "Total Cost": 11.62,
+                "Plan Rows": 1,
+                "Plan Width": 36,
+                "Filter": "((status)::text = 'active'::text)"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "catalog_0012": [
+    {
+      "tablename": "customer_order",
+      "policyname": "b2_query",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_query_b2"
+      ],
+      "cmd": "SELECT",
+      "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (customer_order.data_batch_id)::text) AND (b.generation = customer_order.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (customer_order.store_id)::text) AND ((s.status)::text = 'active'::text)))) AND ((owner_id)::text = current_setting('cs.owner'::text, true)) AND (current_setting('cs.role'::text, true) = 'customer'::text) AND (created_at >= (NULLIF(current_setting('cs.start'::text, true), ''::text))::timestamp with time zone) AND (created_at <= (NULLIF(current_setting('cs.end'::text, true), ''::text))::timestamp with time zone))",
+      "with_check": null
+    },
+    {
+      "tablename": "customer_order",
+      "policyname": "b2_service",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_app_b0",
+        "cs_agent_owner_b0"
+      ],
+      "cmd": "ALL",
+      "qual": "true",
+      "with_check": "true"
+    },
+    {
+      "tablename": "inventory",
+      "policyname": "b2_query",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_query_b2"
+      ],
+      "cmd": "SELECT",
+      "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (inventory.data_batch_id)::text) AND (b.generation = inventory.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (inventory.store_id)::text) AND ((s.status)::text = 'active'::text)))))",
+      "with_check": null
+    },
+    {
+      "tablename": "inventory",
+      "policyname": "b2_service",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_app_b0",
+        "cs_agent_owner_b0"
+      ],
+      "cmd": "ALL",
+      "qual": "true",
+      "with_check": "true"
+    },
+    {
+      "tablename": "order_item",
+      "policyname": "b2_query",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_query_b2"
+      ],
+      "cmd": "SELECT",
+      "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (order_item.data_batch_id)::text) AND (b.generation = order_item.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (order_item.store_id)::text) AND ((s.status)::text = 'active'::text)))) AND ((order_id)::text IN ( SELECT customer_order.order_id\n   FROM customer_order)) AND (current_setting('cs.role'::text, true) = 'customer'::text))",
+      "with_check": null
+    },
+    {
+      "tablename": "order_item",
+      "policyname": "b2_service",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_app_b0",
+        "cs_agent_owner_b0"
+      ],
+      "cmd": "ALL",
+      "qual": "true",
+      "with_check": "true"
+    },
+    {
+      "tablename": "order_shipment",
+      "policyname": "b2_query",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_query_b2"
+      ],
+      "cmd": "SELECT",
+      "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (order_shipment.data_batch_id)::text) AND (b.generation = order_shipment.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (order_shipment.store_id)::text) AND ((s.status)::text = 'active'::text)))) AND ((order_id)::text IN ( SELECT customer_order.order_id\n   FROM customer_order)) AND (current_setting('cs.role'::text, true) = 'customer'::text))",
+      "with_check": null
+    },
+    {
+      "tablename": "order_shipment",
+      "policyname": "b2_service",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_app_b0",
+        "cs_agent_owner_b0"
+      ],
+      "cmd": "ALL",
+      "qual": "true",
+      "with_check": "true"
+    },
+    {
+      "tablename": "product",
+      "policyname": "b2_query",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_query_b2"
+      ],
+      "cmd": "SELECT",
+      "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (product.data_batch_id)::text) AND (b.generation = product.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (product.store_id)::text) AND ((s.status)::text = 'active'::text)))))",
+      "with_check": null
+    },
+    {
+      "tablename": "product",
+      "policyname": "b2_service",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_app_b0",
+        "cs_agent_owner_b0"
+      ],
+      "cmd": "ALL",
+      "qual": "true",
+      "with_check": "true"
+    },
+    {
+      "tablename": "sku",
+      "policyname": "b2_query",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_query_b2"
+      ],
+      "cmd": "SELECT",
+      "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (sku.data_batch_id)::text) AND (b.generation = sku.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (sku.store_id)::text) AND ((s.status)::text = 'active'::text)))))",
+      "with_check": null
+    },
+    {
+      "tablename": "sku",
+      "policyname": "b2_service",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_app_b0",
+        "cs_agent_owner_b0"
+      ],
+      "cmd": "ALL",
+      "qual": "true",
+      "with_check": "true"
+    },
+    {
+      "tablename": "wallet_account",
+      "policyname": "b2_query",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_query_b2"
+      ],
+      "cmd": "SELECT",
+      "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (wallet_account.data_batch_id)::text) AND (b.generation = wallet_account.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (wallet_account.store_id)::text) AND ((s.status)::text = 'active'::text)))) AND ((owner_id)::text = current_setting('cs.owner'::text, true)) AND (current_setting('cs.role'::text, true) = 'customer'::text))",
+      "with_check": null
+    },
+    {
+      "tablename": "wallet_account",
+      "policyname": "b2_service",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_app_b0",
+        "cs_agent_owner_b0"
+      ],
+      "cmd": "ALL",
+      "qual": "true",
+      "with_check": "true"
+    },
+    {
+      "tablename": "wallet_entry",
+      "policyname": "b2_query",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_query_b2"
+      ],
+      "cmd": "SELECT",
+      "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (wallet_entry.data_batch_id)::text) AND (b.generation = wallet_entry.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (wallet_entry.store_id)::text) AND ((s.status)::text = 'active'::text)))) AND ((owner_id)::text = current_setting('cs.owner'::text, true)) AND (current_setting('cs.role'::text, true) = 'customer'::text) AND (occurred_at >= (NULLIF(current_setting('cs.start'::text, true), ''::text))::timestamp with time zone) AND (occurred_at <= (NULLIF(current_setting('cs.end'::text, true), ''::text))::timestamp with time zone))",
+      "with_check": null
+    },
+    {
+      "tablename": "wallet_entry",
+      "policyname": "b2_service",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "cs_agent_app_b0",
+        "cs_agent_owner_b0"
+      ],
+      "cmd": "ALL",
+      "qual": "true",
+      "with_check": "true"
+    }
+  ],
+  "deployed_comparison": {
+    "cs_agent_b0": {
+      "policy_count": 16,
+      "matching": [
+        "customer_order.b2_query",
+        "customer_order.b2_service",
+        "inventory.b2_query",
+        "inventory.b2_service",
+        "order_item.b2_query",
+        "order_item.b2_service",
+        "order_shipment.b2_query",
+        "order_shipment.b2_service",
+        "product.b2_query",
+        "product.b2_service",
+        "sku.b2_query",
+        "sku.b2_service",
+        "wallet_account.b2_query",
+        "wallet_account.b2_service",
+        "wallet_entry.b2_query",
+        "wallet_entry.b2_service"
+      ],
+      "different_or_missing": [],
+      "extra": [],
+      "rls_enabled_forced_all_8": true
+    },
+    "cs_agent_b0_test": {
+      "policy_count": 16,
+      "matching": [
+        "customer_order.b2_query",
+        "customer_order.b2_service",
+        "inventory.b2_query",
+        "inventory.b2_service",
+        "order_item.b2_query",
+        "order_item.b2_service",
+        "order_shipment.b2_query",
+        "order_shipment.b2_service",
+        "product.b2_query",
+        "product.b2_service",
+        "sku.b2_query",
+        "sku.b2_service",
+        "wallet_account.b2_query",
+        "wallet_account.b2_service",
+        "wallet_entry.b2_query",
+        "wallet_entry.b2_service"
+      ],
+      "different_or_missing": [],
+      "extra": [],
+      "rls_enabled_forced_all_8": true
+    },
+    "cs_agent_b0_upgrade": {
+      "policy_count": 16,
+      "matching": [
+        "customer_order.b2_query",
+        "customer_order.b2_service",
+        "inventory.b2_query",
+        "inventory.b2_service",
+        "order_item.b2_query",
+        "order_item.b2_service",
+        "order_shipment.b2_query",
+        "order_shipment.b2_service",
+        "product.b2_query",
+        "product.b2_service",
+        "sku.b2_query",
+        "sku.b2_service",
+        "wallet_account.b2_query",
+        "wallet_account.b2_service",
+        "wallet_entry.b2_query",
+        "wallet_entry.b2_service"
+      ],
+      "different_or_missing": [],
+      "extra": [],
+      "rls_enabled_forced_all_8": true
+    }
+  },
+  "expected_injected_error_type": "DataError",
+  "explain_0012": [
+    {
+      "Plan": {
+        "Node Type": "Subquery Scan",
+        "Parallel Aware": false,
+        "Async Capable": false,
+        "Alias": "cs_order_self",
+        "Startup Cost": 0.0,
+        "Total Cost": 665.81,
+        "Plan Rows": 1,
+        "Plan Width": 178,
+        "Plans": [
+          {
+            "Node Type": "Seq Scan",
+            "Parent Relationship": "Subquery",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Relation Name": "customer_order",
+            "Alias": "customer_order",
+            "Startup Cost": 0.0,
+            "Total Cost": 665.8,
+            "Plan Rows": 1,
+            "Plan Width": 438,
+            "Filter": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((owner_id)::text = current_setting('cs.owner'::text, true)) AND (current_setting('cs.role'::text, true) = 'customer'::text) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (created_at >= (NULLIF(current_setting('cs.start'::text, true), ''::text))::timestamp with time zone) AND (created_at <= (NULLIF(current_setting('cs.end'::text, true), ''::text))::timestamp with time zone) AND (ANY ((store_id)::text = (hashed SubPlan 4).col1)) AND (ANY (((data_batch_id)::text = (hashed SubPlan 2).col1) AND (batch_generation = (hashed SubPlan 2).col2))))",
+            "Plans": [
+              {
+                "Node Type": "Seq Scan",
+                "Parent Relationship": "SubPlan",
+                "Subplan Name": "SubPlan 4",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Relation Name": "store",
+                "Alias": "s",
+                "Startup Cost": 0.0,
+                "Total Cost": 11.12,
+                "Plan Rows": 1,
+                "Plan Width": 32,
+                "Filter": "((status)::text = 'active'::text)"
+              },
+              {
+                "Node Type": "Seq Scan",
+                "Parent Relationship": "SubPlan",
+                "Subplan Name": "SubPlan 2",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Relation Name": "source_batch",
+                "Alias": "b",
+                "Startup Cost": 0.0,
+                "Total Cost": 11.62,
+                "Plan Rows": 1,
+                "Plan Width": 36,
+                "Filter": "((status)::text = 'active'::text)"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "result": "passed",
+  "cleanup": {
+    "owned_cluster_stopped": true,
+    "port_closed": true
+  },
+  "finished_at": "2026-10-24T06:31:13.782786+00:00"
+}

@@ -1,0 +1,205 @@
+{
+  "profile": "operations_store",
+  "status": "02_review_not_jointly_approved",
+  "business_schema_changed": false,
+  "production_sql_available": false,
+  "catalog_revision": "OPS-METRIC-v0.1-review.1",
+  "formula_source": "backend/src/ops_agent/domain.py:251-308; service.py:145-234",
+  "deployed_dashboard_metric_revision": null,
+  "plan_lineage_only": {
+    "metric_revision": "OPS-METRIC-v0.1",
+    "calculation_revision": "OPS-CALC-v0.1"
+  },
+  "metrics": [
+    {
+      "id": "payment_minor",
+      "current_response_field": "metrics.payment_minor",
+      "family": "cash_period",
+      "formula": "sum original paid_minor for paid orders with start<=paid_at<end and paid_at<=visible",
+      "output_type": "minor_string",
+      "zero_null": "0",
+      "status": "implemented_fixed_tool_not_SQL_contract"
+    },
+    {
+      "id": "refund_minor",
+      "current_response_field": "metrics.refund_minor",
+      "family": "cash_period",
+      "formula": "sum succeeded amount_minor with start<=occurred_at<end and occurred_at<=visible",
+      "output_type": "minor_string",
+      "zero_null": "0 unless selected-SKU cash refund allocation unknown",
+      "status": "implemented_fixed_tool_not_SQL_contract"
+    },
+    {
+      "id": "net_paid_minor",
+      "current_response_field": "metrics.net_paid_minor",
+      "family": "cash_period",
+      "formula": "payment_minor-refund_minor; may be negative",
+      "output_type": "signed_minor_string",
+      "zero_null": "null if cash refund unknown",
+      "status": "implemented_fixed_tool_not_SQL_contract"
+    },
+    {
+      "id": "paid_order_count",
+      "current_response_field": "metrics.paid_order_count",
+      "family": "payment_cohort",
+      "formula": "count distinct qualifying order_id",
+      "output_type": "integer",
+      "zero_null": "0",
+      "status": "implemented_fixed_tool_not_SQL_contract"
+    },
+    {
+      "id": "paid_units",
+      "current_response_field": "metrics.paid_units",
+      "family": "payment_cohort",
+      "formula": "sum original item.qty for qualifying orders; no return subtraction",
+      "output_type": "integer",
+      "zero_null": "0",
+      "status": "implemented_fixed_tool_not_SQL_contract"
+    },
+    {
+      "id": "average_order_minor",
+      "current_response_field": "metrics.average_order_minor",
+      "family": "payment_cohort",
+      "formula": "payment_minor/paid_order_count; ROUND_HALF_UP to integer minor",
+      "output_type": "minor_string_or_null",
+      "zero_null": "null iff no qualifying orders",
+      "status": "implemented_fixed_tool_not_SQL_contract"
+    },
+    {
+      "id": "cohort_refund_order_rate",
+      "current_response_field": "metrics.cohort_refund_order_rate",
+      "family": "payment_cohort",
+      "formula": "distinct cohort order_ids with any visible succeeded refund / cohort order count",
+      "output_type": "ratio6_string_or_null",
+      "zero_null": "null if no orders or cohort allocation unknown",
+      "status": "implemented_fixed_tool_not_SQL_contract"
+    },
+    {
+      "id": "cohort_refund_amount_rate",
+      "current_response_field": "metrics.cohort_refund_amount_rate",
+      "family": "payment_cohort",
+      "formula": "visible succeeded refunds linked to cohort / cohort original paid_minor",
+      "output_type": "ratio6_string_or_null",
+      "zero_null": "null if payment<=0 or cohort allocation unknown",
+      "status": "implemented_fixed_tool_not_SQL_contract"
+    }
+  ],
+  "visible_semantics": "min(domain as_of,snapshot.as_of); dashboard passes trusted clock",
+  "timezone": "Asia/Shanghai",
+  "window": "[start_at,end_at); event visible cutoff inclusive",
+  "ratio_rounding": "ROUND_HALF_UP to 0.000001",
+  "amount_rounding": "ROUND_HALF_UP to1minor; input minor is exact integer string",
+  "aggregation_precision": "80 significant Decimal digits; SUM can exceed per-field BIGINT",
+  "channels": {
+    "fields": [
+      "channel",
+      "payment_minor",
+      "paid_order_count"
+    ],
+    "status": "implemented",
+    "additive_when": "same snapshot/revision/window/visible/filters; complete mutually exclusive channel partition"
+  },
+  "history": {
+    "status": "implemented sparse Shanghai day buckets",
+    "fields": [
+      "date",
+      "payment_minor",
+      "refund_minor",
+      "refund_missing?"
+    ],
+    "no_event_date": "row absent, not automatically filled0"
+  },
+  "non_additive": [
+    "cross-SKU distinct order count",
+    "average_order_minor",
+    "cohort refund rates",
+    "stock across time"
+  ],
+  "refund_unknown": "positive succeeded mixed-SKU order refund lacks line allocation; cash and cohort unknown determined independently",
+  "zero_refund_event": "current succeeded zero-amount event counts in refunded-order numerator; policy confirmation pending",
+  "actual_profit": "always null for authorized dashboard; omitted without cost.read; no registered historical profit SQL metric",
+  "cost_authorization": "online backend Principal; demo roles not shared authorization contract",
+  "parameters": [
+    {
+      "name": "snapshot_id",
+      "current_http": "optional; highest revision of id or default archive head",
+      "proposed": "required for query/fixture"
+    },
+    {
+      "name": "revision",
+      "current_http": "not accepted as an explicit selector",
+      "proposed": "required integer>=1; exact immutable reference"
+    },
+    {
+      "name": "snapshot_digest",
+      "current_http": "not exposed in dashboard snapshot",
+      "proposed": "required immutable archive digest"
+    },
+    {
+      "name": "as_of",
+      "current_http": "no request parameter; service uses trusted clock",
+      "proposed": "required for reproducible query; compute visible=min(requested,snapshot.as_of,trusted_clock)"
+    },
+    {
+      "name": "start_at",
+      "current_http": "optional; end-30d default",
+      "proposed": "RFC3339 aware timestamp; missing=>clarify"
+    },
+    {
+      "name": "end_at",
+      "current_http": "optional; trusted clock default",
+      "proposed": "RFC3339 aware timestamp; start<end; right exclusive"
+    },
+    {
+      "name": "sku_id",
+      "current_http": "optional; must belong to snapshot",
+      "proposed": "optional TEXT bind; no invented sku values"
+    },
+    {
+      "name": "channel",
+      "current_http": "optional; must belong to snapshot after trim/unknown normalization",
+      "proposed": "optional TEXT bind"
+    }
+  ],
+  "proposed_limits": {
+    "status": "proposed_unimplemented_not_SLA",
+    "sql_utf8_bytes": 8192,
+    "ast_nodes": 512,
+    "joins": 3,
+    "nonrecursive_ctes": 2,
+    "max_detail_rows": 50,
+    "max_response_bytes": 262144,
+    "statement_timeout_ms": 2000,
+    "lock_timeout_ms": 500,
+    "inflight_per_actor": 1,
+    "inflight_per_instance": 2,
+    "max_window_days": 366,
+    "automatic_sql_retries": 0,
+    "transient_model_transport_max_retries": 1,
+    "explain_cost_budget": null,
+    "cost_budget_not_configured": "fail_closed",
+    "model_deadline_and_token_budget": "03 service agreement pending; no inherited01 model limits"
+  },
+  "pending_projection_metadata": [
+    "schema_revision",
+    "schema_digest",
+    "metric_revision",
+    "calculation_revision",
+    "snapshot.digest",
+    "requested_as_of",
+    "visible_at",
+    "coverage",
+    "unknown_reasons"
+  ],
+  "unsupported": [
+    "visitor conversion",
+    "historical warehouse stock",
+    "historical cost-effective joins",
+    "created_at order metrics",
+    "unapproved profit formulas",
+    "split payment events",
+    "refund quantities",
+    "weekly/monthly group API"
+  ],
+  "current_api": "GET /api/ops/v1/dashboard; {data:...}; errors {error:{code,message},request_id}"
+}

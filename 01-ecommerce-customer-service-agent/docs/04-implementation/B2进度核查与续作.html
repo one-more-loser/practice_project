@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>电商客服 Agent · 接管核查与续作</title>
+<style>
+:root{--paper:#fbf8f3;--ink:#30261e;--muted:#756b61;--accent:#ac4b13;--line:#e4d9cd;--green:#22664c}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 system-ui,"Microsoft YaHei",sans-serif}main{max-width:1120px;margin:auto;padding:64px 40px 80px}h1,h2,h3,p{margin-top:0}h1{font-size:42px;line-height:1.3;letter-spacing:-1px;margin-bottom:20px}h2{font-size:25px;line-height:1.4;margin-bottom:24px}h3{font-size:18px;margin-bottom:8px}.eyebrow{font-size:12px;letter-spacing:2px;color:var(--accent);font-weight:650}.lead{font-size:19px;max-width:850px}.muted{color:var(--muted)}.status{display:inline-block;border:1px solid #b9d4c6;background:#edf6f0;color:var(--green);border-radius:20px;padding:5px 15px;margin-bottom:24px;font-size:14px}section{margin-top:48px}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.metric{background:white;border:1px solid var(--line);padding:24px;border-radius:16px}.number{font-size:38px;line-height:1.2;font-weight:650;color:var(--accent)}.metric p{margin:8px 0 0}.metric small{color:var(--muted)}table{width:100%;border-collapse:collapse;text-align:left;background:white}th,td{padding:16px;border-bottom:1px solid var(--line);vertical-align:top}th{font-weight:600;color:var(--muted);background:#f4ede4}th:first-child{width:24%}a{color:var(--accent);text-underline-offset:4px}a:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:5px}.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.flow div{border-top:3px solid var(--accent);padding:16px 12px;background:#f4ede4;border-radius:0 0 10px 10px}.flow span{display:block;color:var(--muted);font-size:14px}.columns{display:grid;grid-template-columns:1fr 1fr;gap:32px}ul{padding-left:22px}li{margin-bottom:8px}.note{border-left:3px solid var(--accent);padding:16px 20px;background:#f7eadf}details{padding:18px 0;border-bottom:1px solid var(--line)}summary{cursor:pointer;font-weight:600}details p{margin:16px 0 0}.screenshot{width:100%;max-height:550px;object-fit:cover;object-position:top;border:1px solid var(--line);border-radius:16px}footer{border-top:1px solid var(--line);padding-top:24px;margin-top:48px;color:var(--muted);font-size:14px}code{font-size:.9em;overflow-wrap:anywhere} @media(max-width:800px){main{padding:32px 20px}h1{font-size:32px}.metrics,.flow{grid-template-columns:repeat(2,1fr)}.columns{grid-template-columns:1fr}th,td{padding:10px}}
+</style>
+</head>
+<body><main>
+<header>
+<p class="eyebrow">ORANGE DAYS / CUSTOMER SERVICE AGENT</p>
+<h1>接管核查与本轮续作</h1>
+<div class="status">B2 局部出口 · 待用户评审</div>
+<p class="lead">接管时核查到 12 个新增 B2 文件、8 个原文件修改，运行链路尚未接通。本轮保留增量，修通持久任务、受控回复、知识治理和嵌入式客服，并完成数据库升级。</p>
+<p class="muted">2026-10-23 · 需求、设计与开发计划基线不变 · 当前范围 T-CS-009～013</p>
+</header>
+
+<section aria-label="验证结果" class="metrics">
+<div class="metric"><div class="number">139</div><p>后端测试通过</p><small>真实 PG ＋ 显式模型替身</small></div>
+<div class="metric"><div class="number">12</div><p>前端测试通过</p><small>类型、构建和 Ruff 也通过</small></div>
+<div class="metric"><div class="number">3</div><p>Chrome 旅程通过</p><small>商城回归 ＋ 客服窗口</small></div>
+<div class="metric"><div class="number">0</div><p>真实模型调用</p><small>服务配置与质量验收仍待完成</small></div>
+</section>
+
+<section><h2>核查前后</h2>
+<table><thead><tr><th>对象</th><th>接管核查时</th><th>本轮后</th></tr></thead><tbody>
+<tr><td>应用库 / 代码</td><td>库 0010，代码要求 0014</td><td>统一至 0015，启动检查通过</td></tr>
+<tr><td>运行时</td><td>Worker 传错对象；无原生检查点表</td><td>领取、恢复、栅栏、取消、撤权及原生检查点通过验证</td></tr>
+<tr><td>事实回复</td><td>模型能覆盖真实余额</td><td>金额、状态、库存和物流依据受控业务结果生成</td></tr>
+<tr><td>知识与 FAQ</td><td>接口、数据及治理验证未闭环</td><td>审核发布停用、有效期、商品范围、引用与测试索引隔离</td></tr>
+<tr><td>前端</td><td>客服弹窗为准备中</td><td>咨询、SSE、历史恢复、停止回答、资料引用和知识管理</td></tr>
+<tr><td>工程记录</td><td>仍指向暂停与旧 Schema</td><td>当前状态、复现命令、证据和避坑记录已更新</td></tr>
+</tbody></table>
+<p class="muted">原核查快照保留在<a href="B2接管核查.md">接管核查记录</a>，未回写为通过。</p>
+</section>
+
+<section><h2>已经跑通的链路</h2><div class="flow">
+<div><strong>消息入库</strong><span>持久 ACK 与编号去重</span></div>
+<div><strong>任务领取</strong><span>租约、栅栏和身份复核</span></div>
+<div><strong>检查点恢复</strong><span>原生 PostgreSQL 持久化</span></div>
+<div><strong>受控事实</strong><span>只读工具 / 已审核资料</span></div>
+<div><strong>回复与补偿</strong><span>持久事件 / SSE / 历史</span></div>
+</div>
+<p style="margin-top:20px">独立 HTTP 验证终止了已接收任务的服务进程，再由新进程恢复：历史保持一问一答，事件顺序唯一，同键重放不重复。它使用已发布的测试 FAQ，没有注入模型网关替身。</p>
+<p class="note">30 条对话脚本和 FAQ 的 14 标准＋28 同义＋12 负例断言包含在 139 项后端测试中，不另行叠加。真实模型质量、两进程竞争和持续负载尚未验收。</p>
+</section>
+
+<section class="columns">
+<div><h2>数据库保留情况</h2><ul>
+<li>Debian 独立数据库继续运行，地址 <code>192.168.10.100:55432</code>。</li>
+<li>当前 38 张映射表、6 个受控查询视图、4 张原生检查点表。</li>
+<li>原有 28 张业务表内容摘要全部一致；余额按流水方向核对，差异为 0。</li>
+<li>应用库新增 14 条 FAQ 草稿，没有伪造审核发布记录。</li>
+<li>新逻辑备份已保留，目录可读；本轮未重新做恢复演练。</li>
+</ul></div>
+<div><h2>仍未完成</h2><ul>
+<li>客服 / SQL / Embedding / 重排真实 API 及质量评测。</li>
+<li>SQL 计划成本初值、实际参数与时间范围兼容；未核定时拒绝候选执行。</li>
+<li>B3 的取消审核、工单、人工协同、售后及运输退款。</li>
+<li>B4 案例 Skill、运营接口及 B5 全量集成、恢复和负载验收。</li>
+<li>02 / 03 共同契约签收；完整 V1 的 91 项 AC。</li>
+</ul></div>
+</section>
+
+<section><h2>客服窗口实测</h2>
+<img class="screenshot" src="../06-acceptance/B2/客服-真实SSE与引用.png" alt="暖白橙色商城中的店铺客服窗口，展示持久回复与资料引用">
+<p class="muted">Google Chrome 155.0.8059.85；固定测试库。关闭重开后恢复一条回答，引用同等鉴权。未配置模型时明确提示，未返回伪造答案。</p>
+</section>
+
+<section><h2>复核入口</h2>
+<details open><summary>实现、命令和当前边界</summary><p><a href="B2实现与复现.md">B2 实现与复现</a> · <a href="../06-acceptance/B2/README.md">局部验证记录</a> · <a href="compatibility-b2.json">实际版本与源文件指纹</a></p></details>
+<details><summary>原始结果摘要</summary><p><a href="../06-acceptance/B2/http-restart.json">真实 HTTP 重启</a> · <a href="../06-acceptance/B2/database-upgrade.json">数据库升级与对账</a>。JUnit、浏览器原始报告及私密备份留在项目受限 <code>.runtime</code>。</p></details>
+<details><summary>交接与后续执行</summary><p>新任务先读<a href="../../HANDOFF.MD">HANDOFF.MD</a>。当前局部出口提交评审；保留 B1 正式评审、真实模型和完整 V1 未完成状态。本轮没有进入 B3、安装新依赖、训练模型或部署前后端。</p></details>
+</section>
+<footer>修改限本项目目录。父目录、兄弟项目及 Debian 旧工程保持只读；临时验证服务已退出，数据库保留运行。</footer>
+</main></body></html>

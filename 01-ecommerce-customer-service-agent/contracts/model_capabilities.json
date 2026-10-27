@@ -1,0 +1,57 @@
+{
+  "contract_version": "CS-MODEL-CAPABILITIES-v1",
+  "status": "real_services_connected_partial_acceptance",
+  "secret_location": "backend Settings secret_ref; never frontend, database URL, logs, prompt, or checkpoint",
+  "budget": {
+    "request_deadline_seconds": "0.1..60 per invocation, caller supplies remaining turn budget",
+    "concurrency": "1..8 per process and capability",
+    "retry": "at most one retry for 429/502/503/504; bounded by the same deadline",
+    "redirects": "disabled",
+    "response_bytes": 4194304,
+    "cancellation": "cooperative between received HTTP response chunks; provider-side cancellation is unverified"
+  },
+  "capabilities": {
+    "chat": {
+      "protocol": "chat-completions",
+      "output": "LangChain AIMessage; JSON content or structured tool calls",
+      "tools": "caller enforces allowlist and argument schema",
+      "real_service": "deepseek-flash configured; bounded compatibility, public policy and login guidance passed; broader quality and stability pending",
+      "protocols": [
+        "chat-completions",
+        "deepseek-chat"
+      ],
+      "current_generation_model": "deepseek-flash"
+    },
+    "sql": {
+      "protocols": [
+        "chat-completions",
+        "deepseek-chat",
+        "project-sql"
+      ],
+      "output": "XCS-SQL-v0.1 candidate",
+      "execution": "never performed by this capability",
+      "model_identifier": "deepseek-flash temporarily; final fine-tuned service provided by project 03",
+      "real_service": "temporary deepseek-flash API candidate and one guarded test-database roundtrip passed; application cost gate remains closed; project 03 integration pending"
+    },
+    "embedding": {
+      "protocols": [
+        "embedding",
+        "openai-embeddings",
+        "qwen-embeddings"
+      ],
+      "output": "ordered finite nonzero dense vectors, dimension 1024",
+      "intended_model": "Qwen/Qwen3-Embedding-0.6B dense 1024",
+      "real_service": "local CUDA FP16 Qwen3-Embedding-0.6B running; fixed revision, 1024 dimensions, 70 known positive retrieval cases; negative/holdout/load pending",
+      "qwen_input_type": "query or document, explicit and required"
+    },
+    "rerank": {
+      "protocols": [
+        "rerank",
+        "rerank-index"
+      ],
+      "output": "subset of supplied candidate IDs with declared provider score type",
+      "intended_model": "Qwen3-Reranker-0.6B",
+      "real_service": "local CUDA FP16 Qwen3-Reranker-0.6B running; 70 known positive cases; broader negative/holdout/load pending"
+    }
+  }
+}

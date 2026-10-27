@@ -1,0 +1,32 @@
+{
+  "review_id": "CS03-RLS-REVIEW-20261024-v1",
+  "source_digest": "c92f1f554ae2d3e7a2ee8fe9636e6745d9eb391a809c944af6c52054f19e829a",
+  "versions": {
+    "sqlglot": "30.24.0",
+    "psycopg": "3.3.6",
+    "SQLAlchemy": "2.0.55",
+    "pytest": "9.1.1"
+  },
+  "handoff_sha256": "8343c15ec3227102e97e6c966735f0c9eedaece8c21ac74d736bfb3dd3a26846",
+  "files": {
+    "0011_controlled_query-captured.sql": "262446a02e8a23b1c2632ce9d793e27c1e74ed1f25f89b15783b6bf078f99971",
+    "0012_query_scope-captured.sql": "5eabceeba08c32f2cc615a5940a988d3bad8102a41b16527e4825ed9921f39c0",
+    "01对03活跃店RLS独立复核与接入方案.html": "dc96b372591d38f5eab506bc78258b9e5495394bd598c1ce64f66626a017719b",
+    "01对03活跃店RLS独立复核与接入方案.md": "bbc656a550f35370782f9b9a8a81daabc05385dccfc32ebc72d4dd041e761a30",
+    "03-input-observation.json": "7295bb6c274b93cda4429abf20dc921299774bd1570a727a5d0b3917d9e29ec5",
+    "03-miniloop-summary-reviewed.md": "7b30c7c2d75846dbf373406c7bb982e12519c081f897389e61b5f166da92c576",
+    "deployed-policy-catalog.json": "181feebd1b2dd617c9abbddd0c72f345beae927b7c9e7b1c0fb622860ba1d2a1",
+    "deployed-policy-initial-unavailable.json": "1af2a50dab6215e785c48583a1062d61a378da5244e88464a121f58b3fd511f7",
+    "focused-unit.xml": "6159824ad5b8751b80be3b0ff74797bc15be45633d186135b7892ff7cb75e9a1",
+    "independent-rls-initial-timeout.json": "15866f0513441aa3c3b04a83b3265884788e70fdcff2c1331983f7d7ca97f61e",
+    "independent-rls-result.json": "40f305ab2c222843984714b67b4a942400cf21f621298e670903213d8366ad42",
+    "independent-rls-windows-encoding-failure.json": "042ab996407ba33dbcb75098de8352ed0f5638ff4d8d2b037d9166ebaa3ee221",
+    "independent_rls_probe.py": "c74297e4ea624b8cf834aa750922f8d7012235d687fa6237105023752165784b",
+    "preservation-check.json": "3458775e7c8a088f4de120db76e420bdf4332ff0c418e34481048ca5a1f2782e",
+    "read_deployed_policies.py": "afa173fa2cbeb99b58a09278f721e6af3bd8af4110031f5b0495942e5d0db1c0",
+    "render_and_verify.py": "de5851d6b875279cdc467071e1b37ac1fb1b6cccdf301288b439cc3f57f6ccaf",
+    "review-baseline.json": "4b032ce47d204975b320b994aee300043155f97a9d23b7b69b2688400efb4402",
+    "synthetic-fixture.json": "5a015b0de5edb98d8257784991339a339d1268acf7c4109d29c6accf798a1e56"
+  },
+  "captured_at": "2026-10-24T06:40:13.464554+00:00"
+}

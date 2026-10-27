@@ -1,0 +1,192 @@
+{
+  "request": {
+    "contract_version": "XCS-SQL-v0.1",
+    "consumer_profile": "customer_self",
+    "question": "查2026年11月已支付订单数",
+    "schema_revision": "CS-QUERY-B2-v1",
+    "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+    "metric_revision": "CS-METRIC-B2-v1",
+    "resources": {
+      "cs_order_self": {
+        "order_id": "TEXT",
+        "created_at": "TIMESTAMPTZ",
+        "paid_at": "TIMESTAMPTZ",
+        "received_at": "TIMESTAMPTZ",
+        "trade_status": "TEXT",
+        "fulfillment_status": "TEXT",
+        "goods_minor": "BIGINT",
+        "discount_minor": "BIGINT",
+        "freight_minor": "BIGINT",
+        "payable_minor": "BIGINT",
+        "paid_minor": "BIGINT",
+        "refunded_minor": "BIGINT",
+        "net_paid_minor": "BIGINT",
+        "currency": "TEXT"
+      },
+      "cs_order_item_self": {
+        "order_item_id": "TEXT",
+        "order_id": "TEXT",
+        "sku_id": "TEXT",
+        "product_name": "TEXT",
+        "ordered_qty": "INT",
+        "paid_goods_minor": "BIGINT",
+        "refunded_qty": "INT",
+        "refunded_goods_minor": "BIGINT",
+        "remaining_qty": "INT",
+        "remaining_goods_minor": "BIGINT"
+      },
+      "cs_shipment_self": {
+        "shipment_id": "TEXT",
+        "order_id": "TEXT",
+        "carrier": "TEXT",
+        "status": "TEXT",
+        "shipped_at": "TIMESTAMPTZ",
+        "carrier_signed_at": "TIMESTAMPTZ",
+        "tracking_updated_at": "TIMESTAMPTZ"
+      },
+      "cs_wallet_summary_self": {
+        "account_id": "TEXT",
+        "balance_minor": "BIGINT",
+        "currency": "TEXT",
+        "status": "TEXT"
+      },
+      "cs_wallet_entry_self": {
+        "entry_id": "TEXT",
+        "kind": "TEXT",
+        "amount_minor": "BIGINT",
+        "sequence": "BIGINT",
+        "balance_before_minor": "BIGINT",
+        "balance_after_minor": "BIGINT",
+        "occurred_at": "TIMESTAMPTZ",
+        "currency": "TEXT"
+      },
+      "cs_product_public": {
+        "product_id": "TEXT",
+        "sku_id": "TEXT",
+        "name": "TEXT",
+        "category": "TEXT",
+        "price_minor": "BIGINT",
+        "currency": "TEXT",
+        "available_qty": "INT",
+        "price_version": "INT",
+        "as_of": "TIMESTAMPTZ"
+      }
+    },
+    "metric_definitions": {
+      "orders.count": {
+        "grain": "one row per customer_order",
+        "definition": "orders created in the requested half-open time window, excluding unpaid and unpaid-cancelled orders",
+        "time_field": "created_at",
+        "amount_unit": null
+      },
+      "orders.paid_minor": {
+        "grain": "one row per customer_order",
+        "definition": "sum of original paid_minor for paid orders created in the requested window",
+        "time_field": "created_at",
+        "amount_unit": "CNY minor units"
+      },
+      "orders.refunded_minor": {
+        "grain": "one row per customer_order",
+        "definition": "sum of refunded_minor for those same paid orders, independent of refund-entry count",
+        "time_field": "created_at",
+        "amount_unit": "CNY minor units"
+      },
+      "orders.net_paid_minor": {
+        "grain": "one row per customer_order",
+        "definition": "sum of paid_minor minus refunded_minor for those same paid orders",
+        "time_field": "created_at",
+        "amount_unit": "CNY minor units"
+      }
+    },
+    "parameters": {
+      "start_at": "TIMESTAMPTZ",
+      "end_at": "TIMESTAMPTZ",
+      "order_id": "TEXT",
+      "sku_id": "TEXT",
+      "status": "TEXT"
+    },
+    "query_context": {
+      "reference_now": "2026-12-05T04:00:00+00:00",
+      "business_timezone": "Asia/Shanghai",
+      "query_context_id": "qc_fixture",
+      "query_context_version": 1,
+      "confirmed_parameters": [
+        "end_at",
+        "start_at"
+      ],
+      "explicit_time_window": {
+        "start_at": "2026-10-31T16:00:00+00:00",
+        "end_at": "2026-11-30T16:00:00+00:00"
+      }
+    },
+    "limits": {
+      "max_rows": 50,
+      "read_only": true
+    }
+  },
+  "query_response": {
+    "contract_version": "XCS-SQL-v0.1",
+    "kind": "query",
+    "schema_revision": "CS-QUERY-B2-v1",
+    "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+    "metric_revision": "CS-METRIC-B2-v1",
+    "sql": "SELECT count(*) AS n FROM cs_order_self WHERE created_at>=:start_at AND created_at<:end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor>0",
+    "parameter_names": [
+      "start_at",
+      "end_at"
+    ],
+    "service": {
+      "model_identifier": "fixture",
+      "revision": "fixture-v1"
+    }
+  },
+  "clarify_response": {
+    "contract_version": "XCS-SQL-v0.1",
+    "kind": "clarify",
+    "schema_revision": "CS-QUERY-B2-v1",
+    "schema_digest": "509990f5bdbafd1025ec769d6e1f3b3ad41462562f0c867ccd61ddc09caf64b9",
+    "metric_revision": "CS-METRIC-B2-v1",
+    "message": "请选择退款范围",
+    "reason_code": "ambiguous_refund_scope",
+    "missing_slots": [
+      "refund_scope"
+    ],
+    "clarify": {
+      "question": "订单累计退款还是退款到账？",
+      "options": [
+        {
+          "value": "order",
+          "label": "订单累计退款"
+        },
+        {
+          "value": "wallet",
+          "label": "退款到账"
+        }
+      ]
+    },
+    "service": {
+      "model_identifier": "fixture",
+      "revision": "fixture-v1"
+    }
+  },
+  "unsupported_response": {
+    "kind": "unsupported",
+    "reason_code": "metric_not_registered",
+    "message": "此指标未注册"
+  },
+  "error_response": {
+    "kind": "error",
+    "code": "service_busy",
+    "retryable": true,
+    "error": {
+      "code": "budget_exceeded"
+    },
+    "message": "请稍后重试"
+  },
+  "notes": [
+    "Full envelopes required for unsupported/error just as for query/clarify; shown short here.",
+    "Response carries names only; backend ignores any candidate parameter values.",
+    "Graph adds its own query_context_id/version to nonquery responses.",
+    "Samples are synthetic and did not contact project03 or a paid provider."
+  ]
+}

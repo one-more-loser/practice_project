@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>客服 Agent · 数据库部署报告</title>
+  <style>
+    :root { color-scheme: light; --paper:#faf8f4; --ink:#26231f; --muted:#716b64; --line:#e4dfd5; --orange:#cc531b; --green:#32604a; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--paper); color:var(--ink); font:16px/1.65 "Segoe UI","Microsoft YaHei",sans-serif; }
+    main { max-width:1160px; margin:0 auto; padding:32px 36px 64px; }
+    header { display:flex; justify-content:space-between; align-items:center; padding-bottom:22px; border-bottom:1px solid var(--line); gap:16px; }
+    .brand { font-weight:650; letter-spacing:.02em; }
+    .date { color:var(--muted); font-size:14px; }
+    .hero { padding:52px 0 38px; display:grid; grid-template-columns:1.1fr 1fr; gap:52px; align-items:center; }
+    .status { display:inline-flex; gap:8px; align-items:center; color:var(--green); font-size:14px; }
+    .status::before { content:""; width:8px; height:8px; border-radius:50%; background:var(--green); }
+    h1 { font-size:40px; line-height:1.3; letter-spacing:-.035em; margin:15px 0 18px; font-weight:650; }
+    h1 span { display:block; }
+    p { margin:10px 0; }
+    .muted { color:var(--muted); }
+    .host { display:inline-block; font:600 20px/1.3 Consolas,monospace; padding:12px 16px; border:1px solid var(--line); border-radius:8px; background:white; }
+    .diagram { border:1px solid var(--line); border-radius:16px; padding:25px; background:#fff; }
+    .node { display:flex; justify-content:space-between; gap:16px; align-items:center; }
+    .node strong { font-size:18px; font-weight:600; }
+    .node span { color:var(--muted); font-size:14px; }
+    .arrow { color:var(--orange); font-size:24px; margin:12px 0; }
+    .disk { margin-top:18px; padding-top:15px; border-top:1px solid var(--line); font:13px/1.7 Consolas,monospace; color:var(--muted); overflow-wrap:anywhere; }
+    .metrics { display:grid; grid-template-columns:repeat(4,1fr); border:1px solid var(--line); border-radius:12px; background:#fff; overflow:hidden; }
+    .metric { padding:22px 26px; border-right:1px solid var(--line); }
+    .metric:last-child { border:0; }
+    .value { font-size:36px; line-height:1.3; font-weight:600; letter-spacing:-.03em; }
+    .value small { font-size:16px; font-weight:400; }
+    .metric p { font-size:14px; margin:6px 0 0; color:var(--muted); }
+    section { margin-top:38px; }
+    h2 { font-size:23px; line-height:1.4; font-weight:600; margin:0 0 17px; }
+    h3 { font-size:17px; margin:0 0 10px; }
+    .columns { display:grid; grid-template-columns:1fr 1fr; gap:26px; }
+    .panel { padding:25px; background:white; border:1px solid var(--line); border-radius:12px; }
+    table { border-collapse:collapse; width:100%; font-size:14px; }
+    th,td { text-align:left; padding:12px 0; border-bottom:1px solid var(--line); vertical-align:top; }
+    th { width:28%; color:var(--muted); font-weight:400; padding-right:18px; }
+    tr:last-child th,tr:last-child td { border-bottom:0; }
+    code { font:13px/1.65 Consolas,monospace; overflow-wrap:anywhere; }
+    pre { background:#2d2925; color:#fff7ed; padding:20px 22px; border-radius:9px; overflow:auto; margin:0 0 16px; }
+    pre code { white-space:pre; font-size:14px; }
+    .link { color:var(--orange); text-decoration:none; border-bottom:1px solid #d99675; }
+    a:focus-visible { outline:3px solid var(--orange); outline-offset:4px; }
+    .evidence { list-style:none; padding:0; margin:0; }
+    .evidence li { padding:12px 0; border-bottom:1px solid var(--line); }
+    .evidence li:last-child { border:0; }
+    .evidence strong { font-weight:600; }
+    .evidence p { font-size:14px; margin:3px 0 0; color:var(--muted); }
+    .budget { display:flex; gap:10px; flex-wrap:wrap; margin:16px 0; }
+    .budget span { padding:5px 10px; background:#f6f2eb; border-radius:6px; font-size:14px; }
+    .boundary { background:#f2ede5; padding:22px 26px; border-radius:12px; margin-top:28px; }
+    .boundary p { font-size:14px; margin:5px 0; color:var(--muted); }
+    footer { display:flex; gap:20px; flex-wrap:wrap; padding-top:25px; margin-top:28px; border-top:1px solid var(--line); font-size:14px; }
+    @media(max-width:860px) { main { padding:25px 22px; } .hero,.columns { grid-template-columns:1fr; gap:25px; } h1 { font-size:34px; } .metrics { grid-template-columns:1fr 1fr; } .metric:nth-child(2) { border-right:0; } .metric:nth-child(-n+2) { border-bottom:1px solid var(--line); } }
+    @media print { main { max-width:none; padding:0; } .hero { padding-top:25px; } .panel,.metrics,.diagram { break-inside:avoid; } a { color:inherit!important; } }
+  </style>
+</head>
+<body>
+<main>
+  <header><div class="brand">电商店铺客服 Agent</div><div class="date">2026.10.22 · 数据库交接</div></header>
+  <div class="hero">
+    <div>
+      <div class="status">数据库运行正常</div>
+      <h1><span>数据库在 Debian，</span><span>前后端在本机。</span></h1>
+      <p class="host">192.168.10.100:55432</p>
+      <p class="muted">独立 Docker 实例，原有订单和资金记录已保留。<br>本机后端默认连接已切换到新库。</p>
+    </div>
+    <div class="diagram" aria-label="运行链路：Windows浏览器与本机服务连接Debian PostgreSQL和独立持久卷">
+      <div class="node"><strong>Windows</strong><span>商城 · 本机 API</span></div>
+      <div class="arrow" aria-hidden="true">↓</div>
+      <div class="node"><strong>Debian · Docker</strong><span>PostgreSQL 17.11</span></div>
+      <div class="disk">cs01-db-postgres-1<br>cs01_db_pg17_data</div>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="value">93</div><p>后端测试通过</p></div>
+    <div class="metric"><div class="value">2</div><p>真实浏览器旅程通过</p></div>
+    <div class="metric"><div class="value">28</div><p>映射表迁移与重建一致</p></div>
+    <div class="metric"><div class="value">28.95 <small>ms</small></div><p>短时数据库查询 P95</p></div>
+  </div>
+
+  <section class="columns">
+    <div class="panel">
+      <h2>部署配置</h2>
+      <table aria-label="部署配置">
+        <tbody>
+          <tr><th scope="row">远程目录</th><td><code>/home/zzh/ecommerce-customer-service-db</code></td></tr>
+          <tr><th scope="row">Compose</th><td><code>cs01-db</code>，服务 <code>postgres</code></td></tr>
+          <tr><th scope="row">版本</th><td>PG 17.11 · pgvector 0.8.7<br>镜像固定版本及 SHA256</td></tr>
+          <tr><th scope="row">Schema</th><td><code>0010_business_integrity</code></td></tr>
+          <tr><th scope="row">三个库</th><td><code>cs_agent_b0</code><br><code>cs_agent_b0_test</code><br><code>cs_agent_b0_upgrade</code></td></tr>
+          <tr><th scope="row">凭据</th><td>后端私密配置与远程文件 secret；应用、迁移角色独立于 bootstrap。</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="panel">
+      <h2>数据与业务验证</h2>
+      <ul class="evidence">
+        <li><strong>先备份，再迁移</strong><p>本机源库和私密备份保留。新实例采用自己的隔离标识。</p></li>
+        <li><strong>逐表摘要一致，重建后再核对</strong><p>导入后28张表行数和内容SHA256一致；正式运行产生的新交易另行对账。</p></li>
+        <li><strong>真实请求到达远程库</strong><p>登录与越权、充值丢响应重试、下单支付、一次改址、发货和本人收货通过。</p></li>
+        <li><strong>交易后对账差异为0</strong><p>核对余额与流水、流水衔接，以及支付和订单扣款关联。</p></li>
+        <li><strong>旧项目资源保留</strong><p>旧容器ID、镜像和卷名核对不变；本项目使用新目录、新端口和新卷。</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="columns">
+    <div class="panel">
+      <h2>在 Debian 启动数据库</h2>
+      <pre><code>cd /home/zzh/ecommerce-customer-service-db
+docker compose up -d --wait
+docker compose ps</code></pre>
+      <p class="muted">数据库已保持运行。本机查看商城时，启动项目的 <code>scripts/serve_local.py</code> 和 Vite。</p>
+      <p><a class="link" href="数据库部署.md">启动、备份与配置切换说明 →</a></p>
+    </div>
+    <div class="panel">
+      <h2>资源与性能</h2>
+      <div class="budget"><span>1 CPU</span><span>768 MiB 上限</span><span>60 连接上限</span><span>日志 10 MiB × 3</span></div>
+      <p>10 并发、500 次固定只读查询，0 错误。P95 28.949 ms，局部预算 ≤200 ms。</p>
+      <p class="muted">预热连接，小规模B1合成数据，测试短于1秒；采样内存23.82 MiB、CPU 0.00%是单次快照。长时负载和峰值仍需后续验证。</p>
+      <p><a class="link" href="../06-acceptance/debian-db/database-probe.json">查询、对账和测量口径 →</a></p>
+    </div>
+  </section>
+
+  <div class="boundary">
+    <h3>本次交接边界</h3>
+    <p>数据库部署及远程回归完成；B1待用户评审，B2未开始。临时本机服务已停止，数据库容器继续运行。</p>
+    <p>尚未执行模型接入、训练、前后端服务器部署、跨项目联调、15分钟混合负载、跨进程恢复、VM重启或8小时可用性验收。</p>
+  </div>
+  <footer>
+    <a class="link" href="../06-acceptance/debian-db/README.md">完整验证记录</a>
+    <a class="link" href="../../deploy/database/compose.yaml">Compose源文件</a>
+    <a class="link" href="../../HANDOFF.MD">HANDOFF.MD</a>
+  </footer>
+</main>
+</body>
+</html>

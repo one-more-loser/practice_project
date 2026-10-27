@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>B2暂停交接 · 电商店铺客服Agent</title>
+  <style>
+    body{margin:0;background:#faf8f4;color:#29251f;font:16px/1.75 "Segoe UI","Microsoft YaHei",sans-serif}
+    main{max-width:1000px;margin:auto;padding:44px 30px 64px}h1{font-size:34px;line-height:1.4;margin:12px 0 20px}
+    h2{font-size:22px;margin:28px 0 12px}p{margin:10px 0}.date{color:#746e65;font-size:14px}
+    .notice{padding:20px 24px;border-left:4px solid #c65018;background:#f2e8dc;border-radius:5px}
+    table{border-collapse:collapse;width:100%;background:#fff}th,td{text-align:left;padding:13px 16px;border-bottom:1px solid #e5dfd5;font-size:14px}th{font-weight:600}
+    code{font-family:Consolas,monospace;font-size:14px}a{color:#aa3d0d;text-underline-offset:4px}a:focus-visible{outline:3px solid #c65018;outline-offset:4px}
+    .links{display:flex;gap:14px;flex-wrap:wrap;margin:24px 0}.links a{padding:10px 15px;border:1px solid #d6c9b8;border-radius:7px;background:#fff;text-decoration:none}
+    li{margin:9px 0}.muted{color:#746e65}footer{border-top:1px solid #e5dfd5;margin-top:32px;padding-top:18px;font-size:14px}
+  </style>
+</head>
+<body><main>
+  <div class="date">2026.10.22 · 用户主动暂停</div>
+  <h1>B2已有增量，接手从当前断点继续。</h1>
+  <p>当前执行者已停止实现。详细交接包含授权、业务边界、代码清单、迁移状态、测试时点、待修缺口和续接顺序。</p>
+  <div class="links"><a href="B2续接交接.md">完整交接文档</a><a href="续接提示词.md">复制给下一位智能体的提示词</a><a href="../../HANDOFF.MD">项目HANDOFF</a></div>
+  <div class="notice"><strong>先核对Schema差异。</strong><br>代码要求0013，应用库仍0010。此时直接启动应用会unready。先在隔离测试库完成验证，应用库新备份后再前向迁移，不降低就绪标准或清库。</div>
+  <h2>暂停核对</h2>
+  <table><thead><tr><th>对象</th><th>当前版本</th><th>B2资产</th></tr></thead><tbody>
+    <tr><td>应用库</td><td><code>0010_business_integrity</code></td><td>本轮未迁移，原业务数据保留</td></tr>
+    <tr><td>测试库</td><td><code>0013_conversation_runtime</code></td><td>6个查询视图、6张运行时表；无原生检查点表</td></tr>
+    <tr><td>升级库</td><td><code>0010_business_integrity</code></td><td>尚未跑本轮完整升级回归</td></tr>
+  </tbody></table>
+  <h2>已写入与待完成</h2>
+  <ul>
+    <li>009：SQL AST、RLS视图、独立只读角色、执行器及部分真实PG测试已有；固定门面、成本标定和完整边界回归待补。</li>
+    <li>010：消息接收、历史、SSE路由和运行时表已有；租约/检查点代码未验证，没有Worker和checkpoint setup。</li>
+    <li>011：四类模型适配及定点替身测试已有；真实服务、能力清单和配置文档待补。</li>
+    <li>012/013：Agent图、工具、多轮、知识/RAG/FAQ和本轮前端接入尚未实现。</li>
+  </ul>
+  <h2>证据边界</h2>
+  <p>93项后端＋2条浏览器是B2之前的历史证据。B2只有交接文档所列定点结果；没有本轮完整回归、真实网络SSE、浏览器、检查点恢复或真实模型通过记录。</p>
+  <p>Debian数据库保留运行，本机临时服务已停止。模型配置尚未提供，本轮没有真实模型调用、训练或模型下载。</p>
+  <footer class="muted">接手先读Markdown完整交接与实际源码。此页是交接索引，不是B2验收报告。</footer>
+</main></body></html>

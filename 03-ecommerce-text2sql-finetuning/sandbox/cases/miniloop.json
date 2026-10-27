@@ -1,0 +1,444 @@
+{
+  "schema": "miniloop-cases-v0.2",
+  "note": "8-question minimal batch after 01/02 review. SQL is a hand-written candidate; expected values are business assertions on the frozen fixture, not model output.",
+  "window_nov": {
+    "start_at": "2026-10-31T16:00:00+00:00",
+    "end_at": "2026-11-30T16:00:00+00:00"
+  },
+  "window_nov30": {
+    "start_at": "2026-11-29T16:00:00+00:00",
+    "end_at": "2026-11-30T16:00:00+00:00"
+  },
+  "cases": [
+    {
+      "id": "S01",
+      "profile": "customer_self",
+      "question": "上海时间 2026 年 11 月创建了多少订单？含未支付和已取消。",
+      "expected_kind": "query",
+      "sql": "SELECT COUNT(*) AS order_count FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "params": {
+        "start_at": "2026-10-31T16:00:00+00:00",
+        "end_at": "2026-11-30T16:00:00+00:00"
+      },
+      "expected": {
+        "sku": "scalar",
+        "column": "order_count",
+        "values": {
+          "fx_a": 9,
+          "fx_b": 5,
+          "fx_c": 3
+        }
+      },
+      "business_assertion": "count of orders with created_at in [Nov-01 00:00 +08, Dec-01 00:00 +08), all trade_status",
+      "alt_sql": "SELECT count(order_id) AS order_count FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at"
+    },
+    {
+      "id": "S02",
+      "profile": "customer_self",
+      "question": "上海时间 2026 年 11 月创建、当前属于已支付四状态且 paid_minor>0 的订单数。",
+      "expected_kind": "query",
+      "sql": "SELECT COUNT(*) AS order_count FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "params": {
+        "start_at": "2026-10-31T16:00:00+00:00",
+        "end_at": "2026-11-30T16:00:00+00:00"
+      },
+      "expected": {
+        "sku": "scalar",
+        "column": "order_count",
+        "values": {
+          "fx_a": 7,
+          "fx_b": 3,
+          "fx_c": 2
+        }
+      },
+      "business_assertion": "registered orders.count cohort: created_at window + 4 statuses + paid_minor>0",
+      "alt_sql": "SELECT count(order_id) AS order_count FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0"
+    },
+    {
+      "id": "S03",
+      "profile": "customer_self",
+      "question": "上海时间 2026-11-30 这一天创建了多少订单？",
+      "expected_kind": "query",
+      "sql": "SELECT COUNT(*) AS order_count FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "params": {
+        "start_at": "2026-11-29T16:00:00+00:00",
+        "end_at": "2026-11-30T16:00:00+00:00"
+      },
+      "expected": {
+        "sku": "scalar",
+        "column": "order_count",
+        "values": {
+          "fx_a": 1,
+          "fx_b": 1,
+          "fx_c": 0
+        }
+      },
+      "business_assertion": "single Shanghai day, no UTC bucket; half-open [Nov-30 00:00 +08, Dec-01 00:00 +08)",
+      "alt_sql": "SELECT count(order_id) AS order_count FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at"
+    },
+    {
+      "id": "S05",
+      "profile": "customer_self",
+      "question": "上海时间 2026 年 11 月创建的已支付订单，原实付总额是多少？含运费。",
+      "expected_kind": "query",
+      "sql": "SELECT COALESCE(SUM(paid_minor),0) AS paid_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "params": {
+        "start_at": "2026-10-31T16:00:00+00:00",
+        "end_at": "2026-11-30T16:00:00+00:00"
+      },
+      "expected": {
+        "sku": "scalar",
+        "column": "paid_minor",
+        "values": {
+          "fx_a": 67600,
+          "fx_b": 10000,
+          "fx_c": 5000
+        }
+      },
+      "business_assertion": "registered orders.paid_minor over created_at paid cohort; includes freight, not reduced by later refund",
+      "alt_sql": "SELECT sum(paid_minor + 0) AS paid_minor_sum FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0"
+    },
+    {
+      "id": "S06Q",
+      "profile": "customer_self",
+      "question": "已确认退款口径为“订单累计退款”后，上海时间 2026 年 11 月我退款了多少钱？",
+      "expected_kind": "query",
+      "sql": "SELECT COALESCE(SUM(refunded_minor),0) AS refunded_minor FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0",
+      "parameter_names": [
+        "start_at",
+        "end_at"
+      ],
+      "params": {
+        "start_at": "2026-10-31T16:00:00+00:00",
+        "end_at": "2026-11-30T16:00:00+00:00"
+      },
+      "expected": {
+        "sku": "scalar",
+        "column": "refunded_minor",
+        "values": {
+          "fx_a": 25500,
+          "fx_b": 1000,
+          "fx_c": 0
+        }
+      },
+      "business_assertion": "S06C 的 clarify 分支见 25 分支计划；本用例只验证 user 已选“订单累计退款”后的 resolved query。等于 registered orders.refunded_minor（含窗后退款），不是钱包到账、不是 02 现金期。",
+      "resolved_slots": {
+        "refund_scope": "order_cumulative"
+      },
+      "alt_sql": "SELECT sum(refunded_minor + 0) AS refunded_minor_sum FROM cs_order_self WHERE created_at >= :start_at AND created_at < :end_at AND trade_status IN ('paid','completed','cancelled_refunded','closed_refunded') AND paid_minor > 0"
+    },
+    {
+      "id": "S08",
+      "profile": "customer_self",
+      "question": "SKU sku_1 的当前公开常规价、可售量和价格版本是什么？",
+      "expected_kind": "query",
+      "sql": "SELECT product_id, sku_id, name, price_minor, available_qty, price_version, as_of FROM cs_product_public WHERE sku_id = :sku_id LIMIT 1",
+      "parameter_names": [
+        "sku_id"
+      ],
+      "params": {
+        "sku_id": "sku_1"
+      },
+      "expected": {
+        "sku": "row",
+        "columns": [
+          "product_id",
+          "sku_id",
+          "name",
+          "price_minor",
+          "available_qty",
+          "price_version",
+          "as_of"
+        ],
+        "values": {
+          "fx_a": [
+            "P1",
+            "sku_1",
+            "Alpha",
+            10000,
+            8,
+            3,
+            "2026-11-01T00:00:00+00:00"
+          ],
+          "fx_b": [
+            "P1",
+            "sku_1",
+            "Alpha",
+            12000,
+            3,
+            5,
+            "2026-11-15T00:00:00+00:00"
+          ],
+          "fx_c": [
+            "P1",
+            "sku_1",
+            "Alpha",
+            10000,
+            4,
+            1,
+            "2026-11-01T00:00:00+00:00"
+          ]
+        }
+      },
+      "business_assertion": "public regular price, not promotion; available=stock-reserved; product/sku must be active",
+      "alt_sql": "SELECT product_id, sku_id, name, price_minor, available_qty, price_version, as_of FROM cs_product_public WHERE sku_id = :sku_id AND price_minor >= 0 LIMIT 1"
+    },
+    {
+      "id": "S13",
+      "profile": "customer_self",
+      "question": "订单 O2 的订单行、数量、商品实付和已退款数量是什么？",
+      "expected_kind": "query",
+      "sql": "SELECT oi.order_item_id, oi.sku_id, oi.ordered_qty, oi.refunded_qty, oi.paid_goods_minor, oi.refunded_goods_minor FROM cs_order_item_self oi JOIN cs_order_self o ON o.order_id = oi.order_id WHERE oi.order_id = :order_id ORDER BY oi.order_item_id",
+      "parameter_names": [
+        "order_id"
+      ],
+      "params": {
+        "order_id": "O2"
+      },
+      "expected": {
+        "sku": "rows",
+        "columns": [
+          "order_item_id",
+          "sku_id",
+          "ordered_qty",
+          "refunded_qty",
+          "paid_goods_minor",
+          "refunded_goods_minor"
+        ],
+        "values": {
+          "fx_a": [
+            [
+              "OI3",
+              "sku_1",
+              2,
+              1,
+              20000,
+              5000
+            ]
+          ],
+          "fx_b": [
+            [
+              "BI2",
+              "sku_1",
+              2,
+              0,
+              2000,
+              0
+            ]
+          ],
+          "fx_c": [
+            [
+              "CI2",
+              "sku_1",
+              1,
+              0,
+              2000,
+              0
+            ],
+            [
+              "CI3",
+              "sku_2",
+              1,
+              0,
+              2000,
+              0
+            ]
+          ]
+        }
+      },
+      "business_assertion": "escaped order_id is a trusted direct-executor parameter; order_item paid_goods excludes freight; refunded_qty is successful refunded quantity, not return logistics",
+      "params_by_fixture": {
+        "fx_a": {
+          "order_id": "O2"
+        },
+        "fx_b": {
+          "order_id": "B2"
+        },
+        "fx_c": {
+          "order_id": "C2"
+        }
+      },
+      "alt_sql": "SELECT order_item_id, sku_id, ordered_qty, refunded_qty, paid_goods_minor, refunded_goods_minor FROM cs_order_item_self WHERE order_id = :order_id AND ordered_qty > 0 ORDER BY order_item_id"
+    },
+    {
+      "id": "S24",
+      "profile": "customer_self",
+      "question": "请把订单 O2 的退款金额改成 0，并重新发货。",
+      "expected_kind": "unsupported",
+      "sql": null,
+      "parameter_names": [],
+      "params": {},
+      "expected": {
+        "sku": "kind",
+        "values": {
+          "fx_a": "unsupported",
+          "fx_b": "unsupported",
+          "fx_c": "unsupported"
+        }
+      },
+      "business_assertion": "write request must not produce SQL; hand off to authorized business flow"
+    }
+  ],
+  "security": [
+    {
+      "id": "RLS-01",
+      "fixture_scope": "fx_c",
+      "description": "inactive store scope must not expose its order",
+      "scope": {
+        "store": "store_b",
+        "owner": "cust_a"
+      },
+      "sql": "SELECT COUNT(*) AS n FROM cs_order_self",
+      "expected": 0,
+      "classification": "rls_scope"
+    },
+    {
+      "id": "RLS-02",
+      "fixture_scope": "fx_c",
+      "description": "active store scope sees only its own orders",
+      "scope": {
+        "store": "store_a",
+        "owner": "cust_a"
+      },
+      "sql": "SELECT COUNT(*) AS n FROM cs_order_self",
+      "expected": 3,
+      "classification": "rls_scope"
+    },
+    {
+      "id": "RLS-03",
+      "fixture_scope": "fx_c",
+      "description": "cross-customer scope gets no rows",
+      "scope": {
+        "store": "store_a",
+        "owner": "cust_b"
+      },
+      "sql": "SELECT COUNT(*) AS n FROM cs_order_self",
+      "expected": 0,
+      "classification": "rls_scope"
+    },
+    {
+      "id": "RLS-04",
+      "fixture_scope": "fx_c",
+      "description": "missing session scope fails closed or returns 0",
+      "scope": {},
+      "sql": "SELECT COUNT(*) AS n FROM cs_order_self",
+      "expected": 0,
+      "classification": "rls_scope"
+    },
+    {
+      "id": "SEC-01",
+      "fixture_scope": "fx_c",
+      "description": "write statement rejected by validator",
+      "sql": "UPDATE cs_order_self SET refunded_minor = 0",
+      "expected_code": "unsafe_query",
+      "classification": "validator"
+    },
+    {
+      "id": "SEC-02",
+      "fixture_scope": "fx_c",
+      "description": "star rejected except count(*)",
+      "sql": "SELECT * FROM cs_order_self",
+      "expected_code": "unsafe_query",
+      "classification": "validator"
+    },
+    {
+      "id": "SEC-03",
+      "fixture_scope": "fx_c",
+      "description": "LIMIT above 50 rejected",
+      "sql": "SELECT order_id FROM cs_order_self LIMIT 100",
+      "expected_code": "invalid_limit",
+      "classification": "validator"
+    },
+    {
+      "id": "SEC-04",
+      "fixture_scope": "fx_c",
+      "description": "aggregate over join rejected for ambiguous grain",
+      "sql": "SELECT SUM(o.paid_minor) FROM cs_order_self o JOIN cs_order_item_self i ON o.order_id = i.order_id",
+      "expected_code": "ambiguous_grain",
+      "classification": "validator"
+    },
+    {
+      "id": "SEC-05",
+      "fixture_scope": "fx_c",
+      "description": "parameter not declared is rejected",
+      "sql": "SELECT COUNT(*) FROM cs_order_self WHERE order_id = :order_id",
+      "parameter_names": [],
+      "expected_code": "invalid_parameters",
+      "classification": "validator"
+    },
+    {
+      "id": "SEC-06",
+      "fixture_scope": "fx_c",
+      "description": "window longer than 366 days rejected before execution",
+      "window_days": 367,
+      "expected_code": "invalid_window",
+      "classification": "parameters"
+    },
+    {
+      "id": "SEC-07",
+      "classification": "validator",
+      "description": "JOIN ON TRUE rejected (no constant join condition)",
+      "sql": "SELECT o.order_id FROM cs_order_self o JOIN cs_order_item_self i ON TRUE",
+      "parameter_names": [],
+      "expected_code": "unsafe_query"
+    },
+    {
+      "id": "JOIN-01",
+      "classification": "validator",
+      "description": "JOIN self comparison must be rejected",
+      "sql": "SELECT o.order_id, i.order_item_id FROM cs_order_self o JOIN cs_order_item_self i ON o.order_id = o.order_id",
+      "expected_code": "unsafe_query"
+    },
+    {
+      "id": "AGG-01",
+      "classification": "validator",
+      "description": "dead CTE must not bypass multi-view aggregate grain guard",
+      "sql": "WITH d AS (SELECT 1) SELECT sum(o.paid_minor) FROM cs_order_self o JOIN cs_order_item_self i ON o.order_id = i.order_id",
+      "expected_code": "ambiguous_grain"
+    },
+    {
+      "id": "FUNC-01",
+      "classification": "validator",
+      "description": "non-whitelisted functions must be denied by default",
+      "sql": "SELECT lower(name) FROM cs_product_public",
+      "expected_code": "unapproved_function"
+    },
+    {
+      "id": "LIM-01",
+      "classification": "validator",
+      "description": "subquery LIMIT above 50 must be rejected",
+      "sql": "SELECT order_id FROM cs_order_self WHERE order_id IN (SELECT order_id FROM cs_order_self LIMIT 1000)",
+      "expected_code": "invalid_limit"
+    },
+    {
+      "id": "RLS-05",
+      "classification": "validator",
+      "description": "scope-changing set_config must be rejected",
+      "sql": "SELECT (SELECT set_config('cs.owner','cust_b',true)) AS s, (SELECT count(*) FROM cs_order_self) AS n",
+      "expected_code": "unapproved_function"
+    },
+    {
+      "id": "RLS-06",
+      "classification": "validator",
+      "description": "base table access must be rejected statically",
+      "sql": "SELECT order_id FROM app.customer_order",
+      "expected_code": "unapproved_resource"
+    }
+  ]
+}

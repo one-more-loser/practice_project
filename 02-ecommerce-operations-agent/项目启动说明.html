@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>02 项目启动：经验筛选与提示词</title>
+  <style>
+    :root{color-scheme:light;--paper:#f4f3ee;--ink:#202821;--muted:#596359;--line:#d8ddd3;--accent:#245b43;--soft:#eaf0e7;--card:#fffefa}
+    *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:24px}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.8 "Segoe UI","Microsoft YaHei",sans-serif}a{color:var(--accent);text-underline-offset:4px}button,.button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid #b07732;outline-offset:4px}.wrap{max-width:1120px;margin:auto;padding:40px 28px 64px}.mast{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:16px;gap:16px}.project{font-weight:700;letter-spacing:.02em}.date{font-size:14px;color:var(--muted)}h1,h2,h3,p{margin-top:0}h1{font-size:clamp(28px,4vw,44px);line-height:1.3;letter-spacing:-.03em;max-width:880px;margin-bottom:18px}h2{font-size:25px;line-height:1.45;margin-bottom:20px}h3{font-size:18px;margin-bottom:8px}.hero{padding:40px 0 28px}.lead{max-width:840px;color:var(--muted);font-size:18px}.actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:24px}button,.button{border:1px solid var(--accent);border-radius:7px;padding:10px 20px;background:var(--accent);color:white;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;line-height:1.5}.button.secondary{background:transparent;color:var(--accent)}.toc{display:flex;flex-wrap:wrap;gap:8px 24px;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:32px}.toc a{text-decoration:none}.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:28px;margin-bottom:26px}.scope{display:grid;grid-template-columns:1fr 1fr;gap:24px}.scope p{margin-bottom:0}.flow{padding:17px 20px;background:var(--soft);border-left:4px solid var(--accent);font-weight:600;margin:24px 0 0}.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}.tabs button{background:transparent;color:var(--muted);border:1px solid var(--line);padding:8px 15px}.tabs button[aria-pressed="true"]{background:var(--accent);color:white;border-color:var(--accent)}[hidden]{display:none!important}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:15px;line-height:1.7}th{text-align:left;font-weight:600;color:var(--muted);background:#f1f3ed}th,td{padding:13px 14px;vertical-align:top;border-bottom:1px solid var(--line)}th:first-child{width:22%}td strong{font-weight:600}tbody tr:last-child td{border-bottom:0}.evidence{margin-top:22px;padding:18px 20px;border:1px solid var(--line);border-radius:8px}.evidence p:last-child{margin-bottom:0}code{font-family:Consolas,"Microsoft YaHei",monospace;font-size:.9em;overflow-wrap:anywhere}.note{color:var(--muted);font-size:14px}.prompt-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:16px}.prompt-heading h2{margin:0}textarea{display:block;width:100%;height:660px;min-height:300px;resize:vertical;border:1px solid #c8cfc3;border-radius:7px;background:#fbfcf8;color:var(--ink);padding:20px;font:15px/1.9 Consolas,"Microsoft YaHei",monospace;white-space:pre-wrap;overflow-wrap:anywhere}.status{min-height:28px;color:var(--accent);font-size:14px;margin:10px 0 0}details{border-top:1px solid var(--line);padding-top:16px;margin-top:20px}summary{cursor:pointer;font-weight:600}.sources{padding-left:22px}.sources li{margin:8px 0}.footer{color:var(--muted);font-size:14px;padding-top:4px}.starter{background:var(--soft);border-radius:8px;padding:16px 20px;overflow-wrap:anywhere}.starter p{margin:0}ul{padding-left:22px}
+    @media(max-width:720px){.wrap{padding:24px 16px 40px}.mast{align-items:flex-start;flex-direction:column;gap:4px}.hero{padding-top:28px}.panel{padding:20px 16px}.scope{grid-template-columns:1fr;gap:18px}.prompt-heading{align-items:flex-start;flex-direction:column}table{font-size:14px;min-width:610px}textarea{height:560px;padding:14px;font-size:14px}.actions .button,.actions button{flex:1 1 auto}.toc{gap:6px 18px}.lead{font-size:16px}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media print{body{background:white}.wrap{max-width:none;padding:0}.actions,.tabs,.toc,.prompt-heading button,.status{display:none}.panel{break-inside:avoid}.filter-panel[hidden]{display:block!important}textarea{height:auto;min-height:600px;overflow:visible}.table-wrap{overflow:visible}}
+  </style>
+</head>
+<body>
+<main class="wrap">
+  <header class="mast"><span class="project">02 · 电商促销筹备与经营分析 Agent</span><span class="date">2026-10-23 · 需求阶段启动材料</span></header>
+  <section class="hero">
+    <h1>把 01 的经验，变成 02 的推进方法</h1>
+    <p class="lead">保留能减少接口返工、计算歧义和重复验证的方法。运行参数、历史任务和项目专属授权留在 01。下方提示词可全文发给 02 新会话。</p>
+    <div class="actions"><button type="button" data-copy>复制完整提示词</button><a class="button secondary" href="项目启动提示词.md" download>下载 Markdown</a></div>
+    <p class="status" id="copy-status" role="status" aria-live="polite"></p>
+  </section>
+  <nav class="toc" aria-label="页面导航"><a href="#goal">02 要完成什么</a><a href="#filter">经验如何筛选</a><a href="#prompt-section">启动提示词</a></nav>
+
+  <section class="panel" id="goal">
+    <h2>先定义成功，再安排工作</h2>
+    <div class="scope">
+      <div><h3>本次交付</h3><p>筛选经验并准备新会话提示词。启动 02 后，先交付需求规格、需求与验收矩阵、评审记录；经评审后进入设计和实现。</p></div>
+      <div><h3>业务目标</h3><p>给店铺管理者提供有经营数据、竞品证据和计算依据的活动方案，覆盖预算、利润、备货、人员产能，以及监控与复盘。</p></div>
+    </div>
+    <p class="flow">经营问题 → 数据与证据 → 确定性测算 → 候选比较 → 人工决策 → 监控复盘</p>
+    <p class="note" style="margin-top:16px;margin-bottom:0">先实现一条经评审的业务闭环，再扩大功能。完整目标保留在需求中，不把首批开发顺序写成已批准删减。</p>
+  </section>
+
+  <section class="panel" id="filter">
+    <h2>8 项保留，4 项按需，4 类删除或改写</h2>
+    <p>判断标准：能否减少重复决策、接口返工、排错成本或无效验证。01 的 MD 与 HTML 是同一份经验，不算两份验证；本次还对照了当前交接、契约文件和聚合源码。</p>
+    <div class="tabs" role="group" aria-label="经验筛选分类">
+      <button type="button" aria-pressed="true" data-filter="keep">保留 8 项</button>
+      <button type="button" aria-pressed="false" data-filter="conditional">按需 4 项</button>
+      <button type="button" aria-pressed="false" data-filter="remove">删除或改写 4 类</button>
+    </div>
+    <div class="filter-panel" id="filter-keep"><div class="table-wrap"><table>
+      <thead><tr><th>经验</th><th>为什么提高效率</th><th>如何进入 02</th></tr></thead>
+      <tbody>
+        <tr><td><strong>限定接手阅读范围</strong></td><td>避免翻完历史材料后，仍无法判断当前阶段。</td><td>先读 02 当前交接与已批准成果；01 的模型和验收记录按依赖读取。</td></tr>
+        <tr><td><strong>阶段关口，批内自主</strong></td><td>需求与设计关口防止方向返工；重复许可拖慢已授权工作。</td><td>保留需求/设计评审，阶段批准后自主完成覆盖范围内的可逆任务。</td></tr>
+        <tr><td><strong>先交付业务闭环</strong></td><td>前后端、数据、权限和工具尽早暴露不匹配。</td><td>先评审“经营快照→候选测算→约束筛选→方案保存”，后续能力排入迭代。</td></tr>
+        <tr><td><strong>口径先行，代码算数</strong></td><td>避免模型编数、金额重复累计和事后重写指标。</td><td>明确粒度/单位/退款/成本；缺数不补造；模型解释业务代码的计算结果。</td></tr>
+        <tr><td><strong>依赖开发前对齐契约</strong></td><td>减少猜路径、猜字段、猜权限造成的联调返工。</td><td>只对齐当前链路的生产/消费、版本、错误与样本；记录快照替换及抑制语义。</td></tr>
+        <tr><td><strong>复用前做小范围兼容验证</strong></td><td>“同技术栈/同接口格式”不足以证明能工作。</td><td>候选模块按需引入；真实 Schema 校验；先小样本协议/业务验证再扩大。</td></tr>
+        <tr><td><strong>按风险选择验证范围</strong></td><td>避免每次修改重跑全量、反复付费重试到偶然成功。</td><td>相关检查优先；阶段出口扩大回归；固定首次失败和调用预算。</td></tr>
+        <tr><td><strong>一份当前交接与版本证据</strong></td><td>避免新会话重新侦查现场，以及不同报告互相冲突。</td><td>HANDOFF 维护当前执行点；区分静态、替身、真实服务和联调；结果绑定版本。</td></tr>
+      </tbody>
+    </table></div><p class="note" style="margin-top:16px;margin-bottom:0">对应原文第一、三、四、五、六、八、九、十节。重复表达已合并；“先读全部资料”和固定提问数量改为按依赖、按阻塞程度决定。</p></div>
+
+    <div class="filter-panel" id="filter-conditional" hidden><div class="table-wrap"><table>
+      <thead><tr><th>经验</th><th>什么时候需要</th><th>启动时怎样处理</th></tr></thead>
+      <tbody>
+        <tr><td><strong>共享 Embedding / 重排</strong></td><td>检索成为获批需求，并且现有快照/服务可复用时。</td><td>保留核验入口，不先下载、启动向量服务或照抄 01 的长度/显存参数。</td></tr>
+        <tr><td><strong>事件、重放与幂等</strong></td><td>开始消费事件或支持业务执行时。</td><td>快照修订语义先写清；不为手工批次导入提前建设消息平台。</td></tr>
+        <tr><td><strong>数据库、迁移与进程归属</strong></td><td>进入环境搭建、数据库操作、集成测试时。</td><td>落实测试隔离与目标校验；需求阶段不连接 01 数据库或管理其服务。</td></tr>
+        <tr><td><strong>完整质量、负载与稳定性</strong></td><td>接口/规则稳定及部署验收阶段。</td><td>需求先列目标和验证安排；不把 01 未完长测设成 02 开始门槛，关键正确性仍早验。</td></tr>
+      </tbody>
+    </table></div><p class="note" style="margin-top:16px;margin-bottom:0">对应原文第五至八节。保留触发条件，移除启动阶段无用的操作细节。</p></div>
+
+    <div class="filter-panel" id="filter-remove" hidden><div class="table-wrap"><table>
+      <thead><tr><th>删除或改写</th><th>问题</th><th>替换为</th></tr></thead>
+      <tbody>
+        <tr><td><strong>端口/PID/显存/阈值等常量</strong></td><td>会漂移，且属于 01 的当次环境，照抄可能引发冲突。</td><td>真正使用资源时核对健康、容量、配置和归属。</td></tr>
+        <tr><td><strong>01 任务号、测试数和历史进度</strong></td><td>不能帮助 02 判断业务完成，也容易成为重复验证清单。</td><td>保留 02 自身的需求、验收和版本证据；01 待办留在 01。</td></tr>
+        <tr><td><strong>将 01 型号与授权当作 02 硬要求</strong></td><td>原文要求保持 deepseek-flash 限制，超出了当前能证明的 02 选型和授权。</td><td>接入时核对本会话获准型号、预算与配置；不重复索要已授权事项。</td></tr>
+        <tr><td><strong>重复总结和机械流程指标</strong></td><td>再读十节经验、逐批问许可、固定三问或堆空文档会增加沟通成本。</td><td>一个启动词、按需阅读、只问关键阻塞项，初稿用三份有内容的需求材料承载。</td></tr>
+      </tbody>
+    </table></div><p class="note" style="margin-top:16px;margin-bottom:0">删除的是对 02 没有通用价值的形式与常量；权限、金额正确性、数据隔离和证据边界仍保留。</p></div>
+
+    <div class="evidence">
+      <h3>本次筛选发现的实际差异</h3>
+      <p>01 早期草案使用 <code>/integration/v1/support-summaries</code>；当前 <code>contracts/support_summary.json</code> 与聚合路由源码使用 <code>/api/v1/internal/stores/{store_id}/support-summary</code>，通过 <code>week_start</code> 读取固定周窗，部分指标也与早期示例不同。</p>
+      <p>这会影响 02 的接口和活动监控设计：周汇总不能直接充当活动当日实时数据源。启动词已要求在依赖开发前核对当前契约、提出差异，并保留“生产方提案，未共同签收”的状态。此处为静态核对，未调用真实接口。</p>
+    </div>
+    <details><summary>查看来源与判断边界</summary>
+      <ul class="sources">
+        <li><a href="../01-ecommerce-customer-service-agent/docs/04-implementation/给02项目Agent的经验提示词.md">01 原始经验 Markdown</a> 与同名 HTML：筛选对象，主提示词内容相同。</li>
+        <li><a href="../01-ecommerce-customer-service-agent/HANDOFF.MD">01 当前交接</a>：最新意向支持 02 开始需求，01 保留开发基线，尚未正式签收。</li>
+        <li><a href="../01-ecommerce-customer-service-agent/docs/02-design/跨项目契约草案.md">01 跨项目草案</a>、<a href="../01-ecommerce-customer-service-agent/contracts/support_summary.json">当前聚合契约</a>、<a href="../01-ecommerce-customer-service-agent/contracts/model_capabilities.json">模型能力记录</a>：均不能单方替 02 批准接口。</li>
+        <li>源码核对：<code>01-ecommerce-customer-service-agent/backend/src/cs_agent/feedback/api.py</code> 与 <code>aggregation.py</code>；未进行数据库、模型或跨项目运行验收。</li>
+        <li>共同职责来自 <a href="../项目总览.md">项目总览</a>，原始业务方向来自 <a href="../项目实战.md">项目实战.md</a>；旧总览中的进度按当前项目交接核对。</li>
+      </ul>
+    </details>
+  </section>
+
+  <section class="panel" id="prompt-section">
+    <div class="prompt-heading"><h2>发给 02 新会话的完整提示词</h2><button type="button" data-copy>复制完整提示词</button></div>
+    <p class="note">Markdown 是权威文本，下框嵌入同一份内容。无需另附 01 的长经验提示词。</p>
+    <textarea id="prompt" aria-label="02 项目完整启动提示词" readonly spellcheck="false"># 02 项目启动提示词：电商促销筹备与经营分析 Agent
+
+版本：OPS-START-v0.1，2026-10-23。可将本文全文发给负责 02 的新会话。
+
+你负责本项目的需求分析和后续工程推进。工作目录为：
+
+`D:\codex_project\项目实战\02-ecommerce-operations-agent`
+
+本次启动任务是形成可评审的需求基线。业务方向已经确定，不重开选题；尚未批准的功能、技术建议、跨项目接口和验收目标，不自行写成已确认。本提示词已筛选 01 的经验，无须再把其经验原文全文读一遍。
+
+## 1. 接手与本轮交付
+
+先读本目录 `AGENTS.md`（若存在）、`HANDOFF.MD`、`README.md` 和已有需求评审结论。若尚无需求基线，按下文完成需求初稿；若已有获批成果，从最新授权阶段接着做，不覆盖或重开访谈。
+
+共同背景只读：
+
+- `D:\codex_project\项目实战\项目总览.md`：组合项目的职责与协作约定。开头的历史进度不能替代各项目当前交接。
+- `D:\codex_project\项目实战\项目实战.md`：重点读取 3.9.2，结合 2.1、2.6、3.13.1、3.15.2、3.15.3 的适用部分，不承接这些方向的全部平台功能。
+- `D:\codex_project\项目实战\电商双Agent项目_GitHub复用调研.md`：只取运营相关结论和固定版本参考。已有静态研究不重复做；真的要引入依赖或复制代码时，再核对当前源码、许可证和适配成本。
+
+01 材料按依赖读取：先看其 `HANDOFF.MD` 顶部最新决定；设计对接时再读 `docs\02-design\跨项目契约草案.md` 和 `contracts\support_summary.json`；接模型时再读 `contracts\model_capabilities.json` 及相应复现记录。以上均以 `D:\codex_project\项目实战\01-ecommerce-customer-service-agent` 为根，不遍历其历史验收报告或重跑其测试。
+
+已有批准规格决定业务范围；当前契约、源码和对应运行证据说明实际提供了什么。两者不一致时登记差异，不凭文档日期或接口示例宣布已对齐。01 的未完质量/稳定性验证不阻塞 02 的独立需求工作，也不构成 02 的通过证据。
+
+本轮在 `docs/01-requirements/` 输出：
+
+1. `PRD.md`：目标、角色、流程、范围与优先级、规则、数据需求、跨项目依赖、非功能目标和未决事项。
+2. `需求追踪与验收矩阵.md`：用 `FR-OPS-xxx`、`BR-OPS-xxx`、`NFR-OPS-xxx`、`AC-OPS-xxx` 关联需求、判定条件和未来验证方式。
+3. `需求评审记录.md`：版本、建议及理由、待用户决定项和评审状态。初稿明确标“待评审”，不代签。
+
+不为每个小节另建文档；数据与接口需求先放 PRD 附表。先交出有内容的初稿。能从现有材料确定的事项不重复问；仅对会改变范围、口径、权限、成本或验收的缺失信息集中提问，给建议和影响。非阻塞假设标待确认并继续独立工作，不把所有技术细节交给用户选。
+
+## 2. 业务目标与边界
+
+为店铺管理者在 618、双十一等活动前后提供可追溯的经营判断和方案比较：
+
+`经营目标/问题 → 获准经营数据与市场证据 → 工具查询与确定性测算 → 候选方案比较 → 人工决策 → 监控与复盘`
+
+需求应覆盖并划分优先级：
+
+| 能力 | 要解决的问题 | 输出要求 |
+| --- | --- | --- |
+| 经营问数与诊断 | 哪些商品、时段或渠道表现异常，活动依据是什么 | 带口径、时间窗、数据来源的指标与拆解；区分关联解释与根因 |
+| 市场与竞品证据 | 可比商品的价格和活动有什么变化 | 有来源、时间、地区、规格、价格组成与有效期的证据；缺证据标未知 |
+| 促销方案比较 | 折扣、优惠券等规则在预算与利润约束下如何取舍 | 候选、计算明细、排名依据、被淘汰原因与适用条件 |
+| 备货与履约风险 | 各销量情景下会缺多少货、何时补、履约是否承受得住 | 当前可用库存/在途与到货时点、资源缺口、风险阈值和建议 |
+| 人员产能 | 客服、仓储等环节需要多少可用工时或班次容量 | 基于明确生产率和需求假设的容量缺口，不凭销量编造个人排班 |
+| 监控与复盘 | 活动偏离了什么，结果与计划为何不同 | 计划/实际比较、告警规则、证据和调整建议；无实验依据不承诺因果增量 |
+
+建议首个可验收闭环为：选定一批 SKU 和活动目标，读取或导入一份来源明确的经营快照，计算若干促销候选的预算/利润/库存约束，比较并保存方案与假设。竞品可先用人工整理的证据，产能可先按岗位容量测算，监控可先用历史回放或数据导入。这是供评审的实施顺序，不是已批准删减功能；完整目标与后续迭代保留在 PRD。
+
+- 01 负责商城交易、履约、客服与工单；02 不重建商城、支付、余额和售后系统。
+- 03 负责 Text-to-SQL 数据、训练、推理与独立评测；02 提出经营查询的逻辑 Schema、指标和任务需求，不在这里开展微调。
+- 初始方案以分析和建议为主。发布活动、改价、采购、改库存等执行能力若要纳入，单列业务权限和验收，不因方案生成就自动执行。对外发送消息须有用户明确指示。
+- 店铺/角色范围由后端授权；不靠提示词或模型生成的 WHERE 限权。SQL 生成候选与受控只读执行分开，写操作使用获批业务 API。
+
+## 3. 先确定数据与口径，减少计算返工
+
+先列“业务问题 → 所需字段/粒度 → 来源及提供方 → 质量/更新频率 → 缺口处理”，再定表和工具。用户曾提供的数据介绍截图不是已接入数据，也不是 SQL 标注集；先核对本次实际收到的文件和样本。01 已有模拟业务库也不代表 02 已取得全店经营数据。缺数时用显式合成样本推进规则验证，保留来源标记，不宣称真实经营效果。
+
+- 明确订单/明细/SKU 粒度、时区和半开时间窗、支付/取消/退款处理、金额单位及舍入、折扣叠加、指标分母、去重及成本归属。不要多表关联后重复累计订单金额。
+- 金额、利润、补贴、库存、预算、工时及约束筛选由可测试代码计算；模型负责理解问题、选工具和解释。毛利、贡献利润、促销 ROI 的口径分开定义，缺少成本/费用或必要对照时不输出伪精确指标。
+- 成本、库存时点、补货提前期、价格弹性、转化率和岗位生产率缺失时，给出缺口或标明情景假设；缺失/被抑制值不当作 0。“销量增长 10% 时的结果”不等于“活动会增长 10%”。
+- 每个方案记录数据快照、指标口径、假设、计算版本和方案版本，结果能追溯重算。数据或关键规则变化后怎样重算、失效或重新确认，在需求中定义。
+
+## 4. 先对齐当前这条链路的契约
+
+在依赖进入开发前明确生产方、消费方、权威来源、店铺/SKU 标识映射、权限、粒度/单位、更新时点、版本、错误和正常/空/过期/重复样本。先对齐本批用到的接口，不一次设计整个企业平台。
+
+01→02 的客服聚合与全店经营事实是两类输入。投诉/咨询主题不能替代销售额、退款率或库存事实。01 当前契约仍是生产方提案，需 02 签收；早期草案路径和示例指标不能直接写成已可用 API。其当前聚合按已结束的周窗提供，不能假定支持活动当日实时告警；若需更细粒度，提出契约差异和备选数据源，不自行修改 01。
+
+消费快照保留：`event_id` 去重、`snapshot_id/revision` 替换而非累加、多主题非可加总、小样本抑制/迟到/缺失标记。不能为补统计索取客服个人明细。
+
+02→03 的经营查询 Schema 与 01 的“顾客本人”查询范围不同，应单独声明。03 未就绪时，可用获准基线服务或带标记的契约替身推进；真实切换再做协议与业务回归，不把替身当真实联调，也不以微调评分替代经营查询正确性。
+
+## 5. 复用要降低依赖，验证要定位风险
+
+保留 01 的可复用模块和开发习惯，避免整仓复制。Vue/TypeScript、FastAPI、PostgreSQL、LangGraph 是候选，不因 01 使用就全部引入；有确定性规则的步骤用业务服务，Agent 图只承载必要的工具路由、状态与决策。没有用途就不建向量库、消息中间件或复杂多 Agent 层。
+
+真正接入模型时再核对本会话获准的型号、配置入口及预算。01 的 deepseek-flash 配置和既有调用授权不自动成为 02 的固定要求。已有可用服务优先评估复用，按能力隔离 chat/sql 等适配；用实际 JSON Schema/Pydantic 校验输出，不凭可解析 JSON 就执行，也不补造 SQL、身份或金额来修复错误。
+
+普通自动化测试使用可控替身，真实模型检查单设入口并限制请求、token、超时和重试。先验证小样本协议与关键业务，接口/规则稳定后做质量与负载验证；共享供应商额度或硬件要合并考虑。只有确需检索时才核对共享模型文件、编码用途和资源容量，不先下载模型或调优临时服务。
+
+每次改动跑相关检查；跨模块变更、阶段出口或新风险出现时扩大回归。业务优先检查金额/舍入、折扣规则、预算/库存边界、缺数处理、店铺越权、重复消费、数据过期和方案失效。保留首次失败与最小复现，不无限重跑到偶然通过。
+
+静态检查、替身、真实数据库/HTTP、真实模型和跨项目联调分别登记，结果绑定当次源码与数据/服务版本。前端类型检查不代替构建与实际页面；工具成功不代替最终结论相关、数字一致、依据清楚。完整质量/稳定性目标按 02 需求确定，不能照搬 01 的测试数、并发数与持续时长，也不能把关键正确性留到最后。
+
+数据库和服务操作到对应阶段再处理：应用/测试库隔离，重置前验证目标；共享写环境串行或分别隔离；只管理归属明确的进程、端口和卷；不复制 01 密钥、写凭据、数据库重置或部署命令。涉及部署时，验收增加查询耗时、响应时延、调用成本、并发容量及资源开销，数值由场景和实测确定。
+
+## 6. 推进节奏与交接
+
+按需求评审 → 架构/数据/接口设计及评审 → 计划与分批实现 → 测试/集成验收 → 部署交付推进。当前只授权需求产出，先不安装依赖、建表或写业务代码。需求与设计关口保留；阶段获批后，覆盖范围内的可逆工作自主完成，不逐文件、逐批次重复索要许可。
+
+本会话只修改 02 目录。兄弟项目、旧工程和总目录只读；跨项目变更在 02 列差异、影响和建议，交用户协调，不代改、代签或自行消息通知其他会话。
+
+`HANDOFF.MD` 顶部维护一份当前执行点：目标/授权阶段、已确认决定、当前任务、关键文件、验证范围、阻塞项和下一步。坑按“现象 → 原因（证实/待证）→ 修复 → 复验入口”记，历史标过期；其他文档引用它，不叠加互相冲突的进度总结。
+
+沟通先讲目标、结论和需要决定的事；中文，减少副词。复杂取舍提供 HTML，简单结论直接回复；界面突出经营结论、比较与依据，少放技术标签。
+
+请现在先核对现场，用一段话确认本轮目标与阶段，完成上述需求材料初稿和评审问题。不要只给计划或重复经验总结；初稿完成后交用户评审，不自行进入实现。
+</textarea>
+    <details><summary>已在 02 目录打开会话时，也可以发送这段入口</summary>
+      <div class="starter"><p>请先读取本目录 HANDOFF.MD 和 项目启动提示词.md，按其中的需求阶段任务执行。保留既定电商运营方向，先完成需求规格、验收矩阵和待评审记录；不要重读 01 的完整经验原文，也不要提前实现。</p></div>
+    </details>
+  </section>
+  <footer class="footer">本次仅编写与核对启动材料；业务范围、技术选型和共同接口仍需各自评审。交接入口：<a href="HANDOFF.MD">HANDOFF.MD</a>。</footer>
+</main>
+<script>
+  const promptField = document.getElementById('prompt');
+  const copyStatus = document.getElementById('copy-status');
+  document.querySelectorAll('[data-copy]').forEach(button => {
+    button.addEventListener('click', async () => {
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(promptField.value);
+        } else {
+          promptField.focus();
+          promptField.select();
+          if (!document.execCommand('copy')) throw new Error('copy unavailable');
+        }
+        copyStatus.textContent = '完整提示词已复制。';
+        document.querySelectorAll('[data-copy]').forEach(item => { item.textContent = '已复制完整提示词'; });
+      } catch (error) {
+        promptField.scrollIntoView({block:'center'});
+        promptField.focus();
+        promptField.select();
+        copyStatus.textContent = '浏览器未允许复制，已选中全文，请按 Ctrl+C。';
+      }
+    });
+  });
+  document.querySelectorAll('[data-filter]').forEach(button => {
+    button.addEventListener('click', () => {
+      const selected = button.dataset.filter;
+      document.querySelectorAll('[data-filter]').forEach(item => {
+        item.setAttribute('aria-pressed', String(item === button));
+      });
+      document.querySelectorAll('.filter-panel').forEach(panel => {
+        panel.hidden = panel.id !== 'filter-' + selected;
+      });
+    });
+  });
+</script>
+</body>
+</html>

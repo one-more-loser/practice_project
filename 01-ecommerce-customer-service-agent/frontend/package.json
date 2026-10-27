@@ -1,0 +1,32 @@
+{
+  "name": "cs-agent-web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "^22.22.2 || ^24.15.0 || >=26.0.0"
+  },
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vue-tsc --noEmit && vite build",
+    "test": "vitest run",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "element-plus": "^2.9.0",
+    "pinia": "^3.0.0",
+    "vue": "^3.5.0",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "@vue/test-utils": "^2.4.6",
+    "jsdom": "^26.1.0",
+    "prettier": "3.9.10",
+    "typescript": "~5.9.3",
+    "vite": "^7.3.7",
+    "vitest": "^3.2.7",
+    "vue-tsc": "^3.0.0"
+  }
+}

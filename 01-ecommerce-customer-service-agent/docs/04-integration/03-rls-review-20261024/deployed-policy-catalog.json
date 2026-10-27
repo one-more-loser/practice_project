@@ -1,0 +1,828 @@
+{
+  "captured_at": "2026-10-24T06:21:39.749003+00:00",
+  "mode": "read-only REPEATABLE READ; metadata only; no business row query",
+  "databases": {
+    "cs_agent_b0": {
+      "identity": {
+        "database": "cs_agent_b0",
+        "role": "cs_agent_owner_b0",
+        "read_only": "on",
+        "server_version": "17.11 (Debian 17.11-1.pgdg12+2)",
+        "isolation": "repeatable read"
+      },
+      "guard_verified": true,
+      "alembic_head": "0020_agent_action_binding",
+      "policies": [
+        {
+          "schemaname": "public",
+          "tablename": "customer_order",
+          "policyname": "b2_query",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_query_b2"
+          ],
+          "cmd": "SELECT",
+          "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (customer_order.data_batch_id)::text) AND (b.generation = customer_order.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (customer_order.store_id)::text) AND ((s.status)::text = 'active'::text)))) AND ((owner_id)::text = current_setting('cs.owner'::text, true)) AND (current_setting('cs.role'::text, true) = 'customer'::text) AND (created_at >= (NULLIF(current_setting('cs.start'::text, true), ''::text))::timestamp with time zone) AND (created_at <= (NULLIF(current_setting('cs.end'::text, true), ''::text))::timestamp with time zone))",
+          "with_check": null
+        },
+        {
+          "schemaname": "public",
+          "tablename": "customer_order",
+          "policyname": "b2_service",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_app_b0",
+            "cs_agent_owner_b0"
+          ],
+          "cmd": "ALL",
+          "qual": "true",
+          "with_check": "true"
+        },
+        {
+          "schemaname": "public",
+          "tablename": "inventory",
+          "policyname": "b2_query",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_query_b2"
+          ],
+          "cmd": "SELECT",
+          "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (inventory.data_batch_id)::text) AND (b.generation = inventory.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (inventory.store_id)::text) AND ((s.status)::text = 'active'::text)))))",
+          "with_check": null
+        },
+        {
+          "schemaname": "public",
+          "tablename": "inventory",
+          "policyname": "b2_service",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_app_b0",
+            "cs_agent_owner_b0"
+          ],
+          "cmd": "ALL",
+          "qual": "true",
+          "with_check": "true"
+        },
+        {
+          "schemaname": "public",
+          "tablename": "order_item",
+          "policyname": "b2_query",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_query_b2"
+          ],
+          "cmd": "SELECT",
+          "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (order_item.data_batch_id)::text) AND (b.generation = order_item.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (order_item.store_id)::text) AND ((s.status)::text = 'active'::text)))) AND ((order_id)::text IN ( SELECT customer_order.order_id\n   FROM customer_order)) AND (current_setting('cs.role'::text, true) = 'customer'::text))",
+          "with_check": null
+        },
+        {
+          "schemaname": "public",
+          "tablename": "order_item",
+          "policyname": "b2_service",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_app_b0",
+            "cs_agent_owner_b0"
+          ],
+          "cmd": "ALL",
+          "qual": "true",
+          "with_check": "true"
+        },
+        {
+          "schemaname": "public",
+          "tablename": "order_shipment",
+          "policyname": "b2_query",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_query_b2"
+          ],
+          "cmd": "SELECT",
+          "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (order_shipment.data_batch_id)::text) AND (b.generation = order_shipment.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (order_shipment.store_id)::text) AND ((s.status)::text = 'active'::text)))) AND ((order_id)::text IN ( SELECT customer_order.order_id\n   FROM customer_order)) AND (current_setting('cs.role'::text, true) = 'customer'::text))",
+          "with_check": null
+        },
+        {
+          "schemaname": "public",
+          "tablename": "order_shipment",
+          "policyname": "b2_service",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_app_b0",
+            "cs_agent_owner_b0"
+          ],
+          "cmd": "ALL",
+          "qual": "true",
+          "with_check": "true"
+        },
+        {
+          "schemaname": "public",
+          "tablename": "product",
+          "policyname": "b2_query",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_query_b2"
+          ],
+          "cmd": "SELECT",
+          "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (product.data_batch_id)::text) AND (b.generation = product.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (product.store_id)::text) AND ((s.status)::text = 'active'::text)))))",
+          "with_check": null
+        },
+        {
+          "schemaname": "public",
+          "tablename": "product",
+          "policyname": "b2_service",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_app_b0",
+            "cs_agent_owner_b0"
+          ],
+          "cmd": "ALL",
+          "qual": "true",
+          "with_check": "true"
+        },
+        {
+          "schemaname": "public",
+          "tablename": "sku",
+          "policyname": "b2_query",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_query_b2"
+          ],
+          "cmd": "SELECT",
+          "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (sku.data_batch_id)::text) AND (b.generation = sku.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (sku.store_id)::text) AND ((s.status)::text = 'active'::text)))))",
+          "with_check": null
+        },
+        {
+          "schemaname": "public",
+          "tablename": "sku",
+          "policyname": "b2_service",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_app_b0",
+            "cs_agent_owner_b0"
+          ],
+          "cmd": "ALL",
+          "qual": "true",
+          "with_check": "true"
+        },
+        {
+          "schemaname": "public",
+          "tablename": "wallet_account",
+          "policyname": "b2_query",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_query_b2"
+          ],
+          "cmd": "SELECT",
+          "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (wallet_account.data_batch_id)::text) AND (b.generation = wallet_account.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (wallet_account.store_id)::text) AND ((s.status)::text = 'active'::text)))) AND ((owner_id)::text = current_setting('cs.owner'::text, true)) AND (current_setting('cs.role'::text, true) = 'customer'::text))",
+          "with_check": null
+        },
+        {
+          "schemaname": "public",
+          "tablename": "wallet_account",
+          "policyname": "b2_service",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_app_b0",
+            "cs_agent_owner_b0"
+          ],
+          "cmd": "ALL",
+          "qual": "true",
+          "with_check": "true"
+        },
+        {
+          "schemaname": "public",
+          "tablename": "wallet_entry",
+          "policyname": "b2_query",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_query_b2"
+          ],
+          "cmd": "SELECT",
+          "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (wallet_entry.data_batch_id)::text) AND (b.generation = wallet_entry.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (wallet_entry.store_id)::text) AND ((s.status)::text = 'active'::text)))) AND ((owner_id)::text = current_setting('cs.owner'::text, true)) AND (current_setting('cs.role'::text, true) = 'customer'::text) AND (occurred_at >= (NULLIF(current_setting('cs.start'::text, true), ''::text))::timestamp with time zone) AND (occurred_at <= (NULLIF(current_setting('cs.end'::text, true), ''::text))::timestamp with time zone))",
+          "with_check": null
+        },
+        {
+          "schemaname": "public",
+          "tablename": "wallet_entry",
+          "policyname": "b2_service",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_app_b0",
+            "cs_agent_owner_b0"
+          ],
+          "cmd": "ALL",
+          "qual": "true",
+          "with_check": "true"
+        }
+      ],
+      "table_flags": [
+        {
+          "relname": "customer_order",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true,
+          "owner": "cs_agent_owner_b0"
+        },
+        {
+          "relname": "inventory",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true,
+          "owner": "cs_agent_owner_b0"
+        },
+        {
+          "relname": "order_item",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true,
+          "owner": "cs_agent_owner_b0"
+        },
+        {
+          "relname": "order_shipment",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true,
+          "owner": "cs_agent_owner_b0"
+        },
+        {
+          "relname": "product",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true,
+          "owner": "cs_agent_owner_b0"
+        },
+        {
+          "relname": "sku",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true,
+          "owner": "cs_agent_owner_b0"
+        },
+        {
+          "relname": "wallet_account",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true,
+          "owner": "cs_agent_owner_b0"
+        },
+        {
+          "relname": "wallet_entry",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true,
+          "owner": "cs_agent_owner_b0"
+        }
+      ],
+      "query_role": {
+        "rolname": "cs_agent_query_b2",
+        "rolsuper": false,
+        "rolbypassrls": false,
+        "rolcreaterole": false,
+        "rolcreatedb": false,
+        "rolinherit": false,
+        "rolcanlogin": true
+      },
+      "query_role_memberships": [],
+      "self_equality_policies": []
+    },
+    "cs_agent_b0_test": {
+      "identity": {
+        "database": "cs_agent_b0_test",
+        "role": "cs_agent_owner_b0",
+        "read_only": "on",
+        "server_version": "17.11 (Debian 17.11-1.pgdg12+2)",
+        "isolation": "repeatable read"
+      },
+      "guard_verified": true,
+      "alembic_head": "0023_operations_snapshot",
+      "policies": [
+        {
+          "schemaname": "public",
+          "tablename": "customer_order",
+          "policyname": "b2_query",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_query_b2"
+          ],
+          "cmd": "SELECT",
+          "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (customer_order.data_batch_id)::text) AND (b.generation = customer_order.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (customer_order.store_id)::text) AND ((s.status)::text = 'active'::text)))) AND ((owner_id)::text = current_setting('cs.owner'::text, true)) AND (current_setting('cs.role'::text, true) = 'customer'::text) AND (created_at >= (NULLIF(current_setting('cs.start'::text, true), ''::text))::timestamp with time zone) AND (created_at <= (NULLIF(current_setting('cs.end'::text, true), ''::text))::timestamp with time zone))",
+          "with_check": null
+        },
+        {
+          "schemaname": "public",
+          "tablename": "customer_order",
+          "policyname": "b2_service",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_app_b0",
+            "cs_agent_owner_b0"
+          ],
+          "cmd": "ALL",
+          "qual": "true",
+          "with_check": "true"
+        },
+        {
+          "schemaname": "public",
+          "tablename": "inventory",
+          "policyname": "b2_query",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_query_b2"
+          ],
+          "cmd": "SELECT",
+          "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (inventory.data_batch_id)::text) AND (b.generation = inventory.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (inventory.store_id)::text) AND ((s.status)::text = 'active'::text)))))",
+          "with_check": null
+        },
+        {
+          "schemaname": "public",
+          "tablename": "inventory",
+          "policyname": "b2_service",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_app_b0",
+            "cs_agent_owner_b0"
+          ],
+          "cmd": "ALL",
+          "qual": "true",
+          "with_check": "true"
+        },
+        {
+          "schemaname": "public",
+          "tablename": "order_item",
+          "policyname": "b2_query",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_query_b2"
+          ],
+          "cmd": "SELECT",
+          "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (order_item.data_batch_id)::text) AND (b.generation = order_item.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (order_item.store_id)::text) AND ((s.status)::text = 'active'::text)))) AND ((order_id)::text IN ( SELECT customer_order.order_id\n   FROM customer_order)) AND (current_setting('cs.role'::text, true) = 'customer'::text))",
+          "with_check": null
+        },
+        {
+          "schemaname": "public",
+          "tablename": "order_item",
+          "policyname": "b2_service",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_app_b0",
+            "cs_agent_owner_b0"
+          ],
+          "cmd": "ALL",
+          "qual": "true",
+          "with_check": "true"
+        },
+        {
+          "schemaname": "public",
+          "tablename": "order_shipment",
+          "policyname": "b2_query",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_query_b2"
+          ],
+          "cmd": "SELECT",
+          "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (order_shipment.data_batch_id)::text) AND (b.generation = order_shipment.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (order_shipment.store_id)::text) AND ((s.status)::text = 'active'::text)))) AND ((order_id)::text IN ( SELECT customer_order.order_id\n   FROM customer_order)) AND (current_setting('cs.role'::text, true) = 'customer'::text))",
+          "with_check": null
+        },
+        {
+          "schemaname": "public",
+          "tablename": "order_shipment",
+          "policyname": "b2_service",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_app_b0",
+            "cs_agent_owner_b0"
+          ],
+          "cmd": "ALL",
+          "qual": "true",
+          "with_check": "true"
+        },
+        {
+          "schemaname": "public",
+          "tablename": "product",
+          "policyname": "b2_query",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_query_b2"
+          ],
+          "cmd": "SELECT",
+          "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (product.data_batch_id)::text) AND (b.generation = product.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (product.store_id)::text) AND ((s.status)::text = 'active'::text)))))",
+          "with_check": null
+        },
+        {
+          "schemaname": "public",
+          "tablename": "product",
+          "policyname": "b2_service",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_app_b0",
+            "cs_agent_owner_b0"
+          ],
+          "cmd": "ALL",
+          "qual": "true",
+          "with_check": "true"
+        },
+        {
+          "schemaname": "public",
+          "tablename": "sku",
+          "policyname": "b2_query",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_query_b2"
+          ],
+          "cmd": "SELECT",
+          "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (sku.data_batch_id)::text) AND (b.generation = sku.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (sku.store_id)::text) AND ((s.status)::text = 'active'::text)))))",
+          "with_check": null
+        },
+        {
+          "schemaname": "public",
+          "tablename": "sku",
+          "policyname": "b2_service",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_app_b0",
+            "cs_agent_owner_b0"
+          ],
+          "cmd": "ALL",
+          "qual": "true",
+          "with_check": "true"
+        },
+        {
+          "schemaname": "public",
+          "tablename": "wallet_account",
+          "policyname": "b2_query",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_query_b2"
+          ],
+          "cmd": "SELECT",
+          "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (wallet_account.data_batch_id)::text) AND (b.generation = wallet_account.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (wallet_account.store_id)::text) AND ((s.status)::text = 'active'::text)))) AND ((owner_id)::text = current_setting('cs.owner'::text, true)) AND (current_setting('cs.role'::text, true) = 'customer'::text))",
+          "with_check": null
+        },
+        {
+          "schemaname": "public",
+          "tablename": "wallet_account",
+          "policyname": "b2_service",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_app_b0",
+            "cs_agent_owner_b0"
+          ],
+          "cmd": "ALL",
+          "qual": "true",
+          "with_check": "true"
+        },
+        {
+          "schemaname": "public",
+          "tablename": "wallet_entry",
+          "policyname": "b2_query",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_query_b2"
+          ],
+          "cmd": "SELECT",
+          "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (wallet_entry.data_batch_id)::text) AND (b.generation = wallet_entry.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (wallet_entry.store_id)::text) AND ((s.status)::text = 'active'::text)))) AND ((owner_id)::text = current_setting('cs.owner'::text, true)) AND (current_setting('cs.role'::text, true) = 'customer'::text) AND (occurred_at >= (NULLIF(current_setting('cs.start'::text, true), ''::text))::timestamp with time zone) AND (occurred_at <= (NULLIF(current_setting('cs.end'::text, true), ''::text))::timestamp with time zone))",
+          "with_check": null
+        },
+        {
+          "schemaname": "public",
+          "tablename": "wallet_entry",
+          "policyname": "b2_service",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_app_b0",
+            "cs_agent_owner_b0"
+          ],
+          "cmd": "ALL",
+          "qual": "true",
+          "with_check": "true"
+        }
+      ],
+      "table_flags": [
+        {
+          "relname": "customer_order",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true,
+          "owner": "cs_agent_owner_b0"
+        },
+        {
+          "relname": "inventory",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true,
+          "owner": "cs_agent_owner_b0"
+        },
+        {
+          "relname": "order_item",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true,
+          "owner": "cs_agent_owner_b0"
+        },
+        {
+          "relname": "order_shipment",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true,
+          "owner": "cs_agent_owner_b0"
+        },
+        {
+          "relname": "product",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true,
+          "owner": "cs_agent_owner_b0"
+        },
+        {
+          "relname": "sku",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true,
+          "owner": "cs_agent_owner_b0"
+        },
+        {
+          "relname": "wallet_account",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true,
+          "owner": "cs_agent_owner_b0"
+        },
+        {
+          "relname": "wallet_entry",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true,
+          "owner": "cs_agent_owner_b0"
+        }
+      ],
+      "query_role": {
+        "rolname": "cs_agent_query_b2",
+        "rolsuper": false,
+        "rolbypassrls": false,
+        "rolcreaterole": false,
+        "rolcreatedb": false,
+        "rolinherit": false,
+        "rolcanlogin": true
+      },
+      "query_role_memberships": [],
+      "self_equality_policies": []
+    },
+    "cs_agent_b0_upgrade": {
+      "identity": {
+        "database": "cs_agent_b0_upgrade",
+        "role": "cs_agent_owner_b0",
+        "read_only": "on",
+        "server_version": "17.11 (Debian 17.11-1.pgdg12+2)",
+        "isolation": "repeatable read"
+      },
+      "guard_verified": true,
+      "alembic_head": "0023_operations_snapshot",
+      "policies": [
+        {
+          "schemaname": "public",
+          "tablename": "customer_order",
+          "policyname": "b2_query",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_query_b2"
+          ],
+          "cmd": "SELECT",
+          "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (customer_order.data_batch_id)::text) AND (b.generation = customer_order.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (customer_order.store_id)::text) AND ((s.status)::text = 'active'::text)))) AND ((owner_id)::text = current_setting('cs.owner'::text, true)) AND (current_setting('cs.role'::text, true) = 'customer'::text) AND (created_at >= (NULLIF(current_setting('cs.start'::text, true), ''::text))::timestamp with time zone) AND (created_at <= (NULLIF(current_setting('cs.end'::text, true), ''::text))::timestamp with time zone))",
+          "with_check": null
+        },
+        {
+          "schemaname": "public",
+          "tablename": "customer_order",
+          "policyname": "b2_service",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_app_b0",
+            "cs_agent_owner_b0"
+          ],
+          "cmd": "ALL",
+          "qual": "true",
+          "with_check": "true"
+        },
+        {
+          "schemaname": "public",
+          "tablename": "inventory",
+          "policyname": "b2_query",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_query_b2"
+          ],
+          "cmd": "SELECT",
+          "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (inventory.data_batch_id)::text) AND (b.generation = inventory.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (inventory.store_id)::text) AND ((s.status)::text = 'active'::text)))))",
+          "with_check": null
+        },
+        {
+          "schemaname": "public",
+          "tablename": "inventory",
+          "policyname": "b2_service",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_app_b0",
+            "cs_agent_owner_b0"
+          ],
+          "cmd": "ALL",
+          "qual": "true",
+          "with_check": "true"
+        },
+        {
+          "schemaname": "public",
+          "tablename": "order_item",
+          "policyname": "b2_query",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_query_b2"
+          ],
+          "cmd": "SELECT",
+          "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (order_item.data_batch_id)::text) AND (b.generation = order_item.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (order_item.store_id)::text) AND ((s.status)::text = 'active'::text)))) AND ((order_id)::text IN ( SELECT customer_order.order_id\n   FROM customer_order)) AND (current_setting('cs.role'::text, true) = 'customer'::text))",
+          "with_check": null
+        },
+        {
+          "schemaname": "public",
+          "tablename": "order_item",
+          "policyname": "b2_service",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_app_b0",
+            "cs_agent_owner_b0"
+          ],
+          "cmd": "ALL",
+          "qual": "true",
+          "with_check": "true"
+        },
+        {
+          "schemaname": "public",
+          "tablename": "order_shipment",
+          "policyname": "b2_query",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_query_b2"
+          ],
+          "cmd": "SELECT",
+          "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (order_shipment.data_batch_id)::text) AND (b.generation = order_shipment.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (order_shipment.store_id)::text) AND ((s.status)::text = 'active'::text)))) AND ((order_id)::text IN ( SELECT customer_order.order_id\n   FROM customer_order)) AND (current_setting('cs.role'::text, true) = 'customer'::text))",
+          "with_check": null
+        },
+        {
+          "schemaname": "public",
+          "tablename": "order_shipment",
+          "policyname": "b2_service",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_app_b0",
+            "cs_agent_owner_b0"
+          ],
+          "cmd": "ALL",
+          "qual": "true",
+          "with_check": "true"
+        },
+        {
+          "schemaname": "public",
+          "tablename": "product",
+          "policyname": "b2_query",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_query_b2"
+          ],
+          "cmd": "SELECT",
+          "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (product.data_batch_id)::text) AND (b.generation = product.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (product.store_id)::text) AND ((s.status)::text = 'active'::text)))))",
+          "with_check": null
+        },
+        {
+          "schemaname": "public",
+          "tablename": "product",
+          "policyname": "b2_service",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_app_b0",
+            "cs_agent_owner_b0"
+          ],
+          "cmd": "ALL",
+          "qual": "true",
+          "with_check": "true"
+        },
+        {
+          "schemaname": "public",
+          "tablename": "sku",
+          "policyname": "b2_query",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_query_b2"
+          ],
+          "cmd": "SELECT",
+          "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (sku.data_batch_id)::text) AND (b.generation = sku.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (sku.store_id)::text) AND ((s.status)::text = 'active'::text)))))",
+          "with_check": null
+        },
+        {
+          "schemaname": "public",
+          "tablename": "sku",
+          "policyname": "b2_service",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_app_b0",
+            "cs_agent_owner_b0"
+          ],
+          "cmd": "ALL",
+          "qual": "true",
+          "with_check": "true"
+        },
+        {
+          "schemaname": "public",
+          "tablename": "wallet_account",
+          "policyname": "b2_query",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_query_b2"
+          ],
+          "cmd": "SELECT",
+          "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (wallet_account.data_batch_id)::text) AND (b.generation = wallet_account.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (wallet_account.store_id)::text) AND ((s.status)::text = 'active'::text)))) AND ((owner_id)::text = current_setting('cs.owner'::text, true)) AND (current_setting('cs.role'::text, true) = 'customer'::text))",
+          "with_check": null
+        },
+        {
+          "schemaname": "public",
+          "tablename": "wallet_account",
+          "policyname": "b2_service",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_app_b0",
+            "cs_agent_owner_b0"
+          ],
+          "cmd": "ALL",
+          "qual": "true",
+          "with_check": "true"
+        },
+        {
+          "schemaname": "public",
+          "tablename": "wallet_entry",
+          "policyname": "b2_query",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_query_b2"
+          ],
+          "cmd": "SELECT",
+          "qual": "(((store_id)::text = current_setting('cs.store'::text, true)) AND ((data_batch_id)::text = current_setting('cs.batch'::text, true)) AND ((batch_generation)::text = current_setting('cs.generation'::text, true)) AND (EXISTS ( SELECT 1\n   FROM source_batch b\n  WHERE (((b.batch_id)::text = (wallet_entry.data_batch_id)::text) AND (b.generation = wallet_entry.batch_generation) AND ((b.status)::text = 'active'::text)))) AND (EXISTS ( SELECT 1\n   FROM store s\n  WHERE (((s.store_id)::text = (wallet_entry.store_id)::text) AND ((s.status)::text = 'active'::text)))) AND ((owner_id)::text = current_setting('cs.owner'::text, true)) AND (current_setting('cs.role'::text, true) = 'customer'::text) AND (occurred_at >= (NULLIF(current_setting('cs.start'::text, true), ''::text))::timestamp with time zone) AND (occurred_at <= (NULLIF(current_setting('cs.end'::text, true), ''::text))::timestamp with time zone))",
+          "with_check": null
+        },
+        {
+          "schemaname": "public",
+          "tablename": "wallet_entry",
+          "policyname": "b2_service",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "cs_agent_app_b0",
+            "cs_agent_owner_b0"
+          ],
+          "cmd": "ALL",
+          "qual": "true",
+          "with_check": "true"
+        }
+      ],
+      "table_flags": [
+        {
+          "relname": "customer_order",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true,
+          "owner": "cs_agent_owner_b0"
+        },
+        {
+          "relname": "inventory",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true,
+          "owner": "cs_agent_owner_b0"
+        },
+        {
+          "relname": "order_item",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true,
+          "owner": "cs_agent_owner_b0"
+        },
+        {
+          "relname": "order_shipment",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true,
+          "owner": "cs_agent_owner_b0"
+        },
+        {
+          "relname": "product",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true,
+          "owner": "cs_agent_owner_b0"
+        },
+        {
+          "relname": "sku",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true,
+          "owner": "cs_agent_owner_b0"
+        },
+        {
+          "relname": "wallet_account",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true,
+          "owner": "cs_agent_owner_b0"
+        },
+        {
+          "relname": "wallet_entry",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true,
+          "owner": "cs_agent_owner_b0"
+        }
+      ],
+      "query_role": {
+        "rolname": "cs_agent_query_b2",
+        "rolsuper": false,
+        "rolbypassrls": false,
+        "rolcreaterole": false,
+        "rolcreatedb": false,
+        "rolinherit": false,
+        "rolcanlogin": true
+      },
+      "query_role_memberships": [],
+      "self_equality_policies": []
+    }
+  }
+}

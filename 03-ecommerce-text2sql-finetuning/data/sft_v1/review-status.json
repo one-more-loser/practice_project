@@ -1,0 +1,36 @@
+{
+  "dataset": "sft-v1",
+  "original_metadata": "candidate_unreviewed (preserved)",
+  "current_data_status": "independently_accepted_for_first_sft_offline_subset",
+  "review_id": "03-first-sft-closeout-20261024",
+  "reviewed_at_original": "2026-10-24T15:42:46.691428-04:00",
+  "reviewer": "本会话历史主代理，对 dsh 交付执行独立核查；原文件未列人名，不推定01/02业务方签署",
+  "scope": "customer_self first offline Base/SFT run data and local preparation",
+  "frozen_sha256": {
+    "train": "a03798fa1aeae5639aa6f550413f1be62e21e667b337cfcda1e4420b95e7597b",
+    "dev": "dd34b5a6849062dd693fb8881626a35655e9aa9ce83f018cc0a8332084b13282",
+    "test": "469bd91ccaa3c92f5fa6745e267cf92ab669678089a4432e4a68a834827079bb"
+  },
+  "original_evidence": [
+    {
+      "path": "/mnt/d/codex_project/项目实战/03-ecommerce-text2sql-finetuning/docs/07-iteration/ITER-20261025-01/review-output/evidence/historical-data-signoff.json",
+      "sha256": "aad9c4fbb0534b5d8972e06f2b19358a071ebe47774d602424fc8547c859adf3"
+    },
+    {
+      "path": "/mnt/d/codex_project/项目实战/03-ecommerce-text2sql-finetuning/docs/07-iteration/ITER-20261025-01/review-output/evidence/historical-data-signoff.md",
+      "sha256": "cc30554ab325b8b2966c7f51a5405fb2b79e3a0972ed62a742409f567324fcd5"
+    }
+  ],
+  "historical_origin": "C:/Users/27997/.codex/visualizations/2026/10/24/01a16cb4-5693-71d3-a45d-b52ef35ddc57/coordination",
+  "not_approved": [
+    "full V1/business coverage",
+    "02 operations training baseline",
+    "model quality",
+    "GPU training/fees",
+    "joint HTTP contract"
+  ],
+  "iteration": "ITER-20261025-01",
+  "iteration_state": "code repairs await coordination independent review",
+  "labels_changed_this_iteration": false,
+  "training_executed_this_iteration": false
+}

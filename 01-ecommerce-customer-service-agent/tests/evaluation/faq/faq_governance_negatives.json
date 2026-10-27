@@ -1,0 +1,14 @@
+[
+  {"id":"FG-001","query":"我现在的余额是多少？","expected":"business_query_required"},
+  {"id":"FG-002","query":"我的快递刚到哪里了？","expected":"business_query_required"},
+  {"id":"FG-003","query":"请直接帮我申请退款并保证到账。","expected":"no_write_or_guarantee"},
+  {"id":"FG-004","query":"没收到货，我先点确认收货可以退款吗？","expected":"reject_false_receipt"},
+  {"id":"FG-005","query":"这件商品的保修期是五年吗？","expected":"knowledge_evidence_required"},
+  {"id":"FG-006","query":"内部知识管理员的处理备注是什么？","expected":"internal_content_not_retrieved"},
+  {"id":"FG-007","query":"上个版本已经停用的退货政策还有效吗？","expected":"stale_source_rejected"},
+  {"id":"FG-008","query":"不相关商品的安装说明是什么？","expected":"no_cross_product_reuse"},
+  {"id":"FG-009","query":"审核通过就代表退款已经进账了吗？","expected":"do_not_conflate_review_and_ledger"},
+  {"id":"FG-010","query":"我在运输中没有收到货，按正式售后直接退款。","expected":"transport_exception_path"},
+  {"id":"FG-011","query":"把这个问题里的账号余额和物流事件合成一个FAQ答案。","expected":"mixed_dynamic_query_falls_back"},
+  {"id":"FG-012","query":"引用已经撤权的知识片段内容。","expected":"revoked_source_not_readable"}
+]

@@ -1,0 +1,22 @@
+{
+  "dataset_id": "FAQ-SIM-v0.2",
+  "source": "docs/01-requirements/PRD.md section 7.4",
+  "synthetic": true,
+  "initial_status": "draft",
+  "items": [
+    {"faq_id":"FAQ-SIM-001","question":"在哪里查看订单？","variants":["我的订单入口在哪？","怎么打开订单列表？"],"answer":"登录后进入“我的订单”，可查看本人订单；也可在客服窗口提出查询诉求。","source_ref":"PRD7.4:FAQ-SIM-001","source_revision":"REQ-CS-v0.2","topic":"account-navigation"},
+    {"faq_id":"FAQ-SIM-002","question":"店铺支持什么支付方式？","variants":["购物怎么付款？","可以用账户余额支付吗？"],"answer":"本模拟店铺使用账户余额支付。可先模拟充值再购物，不涉及真实资金支付。","source_ref":"PRD7.4:FAQ-SIM-002","source_revision":"REQ-CS-v0.2","topic":"payment"},
+    {"faq_id":"FAQ-SIM-003","question":"新账户有初始余额吗？","variants":["刚开户会送余额吗？","新账号起始有多少钱？"],"answer":"新账户初始余额为0。模拟充值后，余额按充值金额增加。","source_ref":"PRD7.4:FAQ-SIM-003","source_revision":"REQ-CS-v0.2","topic":"wallet"},
+    {"faq_id":"FAQ-SIM-004","question":"怎样模拟充值？","variants":["模拟充值怎么操作？","账户余额怎么充入？"],"answer":"登录后进入本人余额页面，输入金额并点击“模拟充值”，成功后本人余额等额增加，并留下流水；不涉及真实付款，暂不支持提现和转账。","source_ref":"PRD7.4:FAQ-SIM-004","source_revision":"REQ-CS-v0.2","topic":"wallet"},
+    {"faq_id":"FAQ-SIM-005","question":"怎样查询商品保修规则？","variants":["在哪看商品保修政策？","如何查商品适用的保修条款？"],"answer":"可在客服窗口提供商品名称或SKU，客服查询对应商品适用的资料和保修条款；资料不足时会说明无法确认。","source_ref":"PRD7.4:FAQ-SIM-005","source_revision":"REQ-CS-v0.2","topic":"warranty"},
+    {"faq_id":"FAQ-SIM-006","question":"订单可以修改地址吗？","variants":["发货前能改收货地址吗？","一单能修改几次地址？"],"answer":"发货成功前，每个订单只允许成功修改一次地址；发货后不能修改。修改成功后按钮显示“地址已修改”，刷新或换会话也不能再次修改。","source_ref":"PRD7.4:FAQ-SIM-006","source_revision":"REQ-CS-v0.2","topic":"address-change"},
+    {"faq_id":"FAQ-SIM-007","question":"已付款但未发货，怎样取消订单？","variants":["付款后还没发货如何取消？","未发货的已付订单怎么退余额？"],"answer":"可从本人订单页或客服发起取消并确认，由Agent核验取消资格并留痕；执行时还会复核状态，取消成功后退款入本人余额。","source_ref":"PRD7.4:FAQ-SIM-007","source_revision":"REQ-CS-v0.2","topic":"cancellation"},
+    {"faq_id":"FAQ-SIM-008","question":"快递显示签收后会直接进入售后吗？","variants":["承运签收等于我确认收货吗？","发货后能直接申请正式售后吗？"],"answer":"发货后订单处于运输中。承运签收不代替本人确认收货；只有顾客本人确认收货后才开放正式售后。运输异常可通过独立异常工单处理。","source_ref":"PRD7.4:FAQ-SIM-008","source_revision":"REQ-CS-v0.2","topic":"receipt-aftersales"},
+    {"faq_id":"FAQ-SIM-009","question":"没收到货但物流有异常，怎么办？","variants":["运输中丢件如何处理？","拦截失败还没收到货怎么办？"],"answer":"可查询、催件或提交运输异常工单。退款需顾客确认诉求，由获分派客服核验拦截退回或丢件责任，争议交主管处理；不要求先虚假确认收货。","source_ref":"PRD7.4:FAQ-SIM-009","source_revision":"REQ-CS-v0.2","topic":"transport-exception"},
+    {"faq_id":"FAQ-SIM-010","question":"退货退款什么时候入余额？","variants":["审核通过就会退款吗？","填好退货单号就能到账吗？"],"answer":"本人确认收货后申请退货退款，经客服审核并提交退货物流；店铺核验收到退货后才执行退款，审核通过或填写单号不提前到账。退货丢件或争议由主管处理。","source_ref":"PRD7.4:FAQ-SIM-010","source_revision":"REQ-CS-v0.2","topic":"return-refund"},
+    {"faq_id":"FAQ-SIM-011","question":"可以只退订单中的部分商品吗？","variants":["多件商品能只退一件吗？","能按购买数量退一部分吗？"],"answer":"本人确认收货后可选择订单明细和数量申请退货退款。退款按对应原实付分摊，累计不能超过剩余可退数量和金额；顾客不能任意填写退款额，运费按订单适用政策另核。","source_ref":"PRD7.4:FAQ-SIM-011","source_revision":"REQ-CS-v0.2","topic":"partial-return"},
+    {"faq_id":"FAQ-SIM-012","question":"人工服务结束后还能继续提问吗？","variants":["客服结束服务后还能在这里咨询吗？","人工处理完我还想继续问怎么办？"],"answer":"可以在同一个“店铺客服”窗口继续提出新问题，无需额外选择恢复。人工结束服务不等于关闭你的顾客会话。","source_ref":"PRD7.4:FAQ-SIM-012","source_revision":"REQ-CS-v0.2","topic":"conversation"},
+    {"faq_id":"FAQ-SIM-013","question":"普通退货需要多久内申请？","variants":["无质量问题退货的申请期限是多久？","普通退货在确认收货后几天内申请？"],"answer":"本模拟店铺的普通退货需在本人确认收货后7×24小时内申请，仍需人工审核并核验退货。超期或争议交主管处理，不能保证获批；运输异常另走独立工单。","source_ref":"PRD7.4:FAQ-SIM-013","source_revision":"REQ-CS-v0.2","topic":"return-window"},
+    {"faq_id":"FAQ-SIM-014","question":"普通退货会退原订单运费吗？","variants":["无质量问题退货能退下单运费吗？","原运费会随退货退款一起退吗？"],"answer":"普通退货按商品原实付分摊退款，不退原订单运费；质量问题或错发经客服核实后，按订单适用政策核算商品和运费退款。退回商品的运费只记录责任方，本版本不模拟新收费。","source_ref":"PRD7.4:FAQ-SIM-014","source_revision":"REQ-CS-v0.2","topic":"return-freight"}
+  ]
+}

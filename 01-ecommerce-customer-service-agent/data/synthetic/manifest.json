@@ -1,0 +1,11 @@
+{
+  "revision": "SIM-CS-B0-v1", "source_kind": "synthetic", "batch_id": "sim_b0_20261022", "generation": 1,
+  "seed": 20261022, "business_timezone": "Asia/Shanghai", "currency": "CNY",
+  "identity_accounts": ["customer_a", "customer_b", "support_a", "support_b", "supervisor", "shop_admin", "knowledge_admin", "multi_role"],
+  "contact_sample_count": 2,
+  "opening_balance_minor": "0", "nonzero_balance_source": "T-CS-004模拟充值；B0不建钱包表或赠送余额",
+  "fixed_source_time": "2026-10-22T00:00:00Z",
+  "privacy": "合成电话号码和地址仅存在受限样本/本人读取；禁止用于真实联系",
+  "future_capacity_batch": {"seed": 20261023, "orders": 500, "skus": 50, "knowledge_chunks": 200, "status": "planned", "rule": "按T-CS-005/006/013完整实体字典生成；每订单1至3明细，关联独立包裹，不省必需字段；按manifest和规范化样本SHA256核对，不将随机密码摘要计入业务指纹"},
+  "deferred_entities": {"wallet_topup": "T-CS-004", "catalog_inventory": "T-CS-005", "cart_quote_order_shipping_snapshot": "T-CS-006", "shipment_address_change": "T-CS-008", "conversation_assignment": "T-CS-010/015/016", "knowledge_faq": "T-CS-013", "aftersale_transport": "T-CS-017/018"}
+}

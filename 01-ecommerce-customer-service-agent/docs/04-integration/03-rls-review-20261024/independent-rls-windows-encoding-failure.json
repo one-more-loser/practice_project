@@ -1,0 +1,17 @@
+{
+  "review_id": "CS03-RLS-REVIEW-20261024-v1",
+  "started_at": "2026-10-24T06:28:13.878668+00:00",
+  "scope": "fresh 01-owned Windows PostgreSQL only; source 0011/0012; no existing profile/03 writes",
+  "cases": [],
+  "limitations": [
+    "source-shaped 11-table RLS slice, no external FKs/triggers/full lifecycle migration",
+    "direct limited login and real SQLExecutor.context; no HTTP/model workload",
+    "03 PostgreSQL16.2 report compared to local PostgreSQL17.11, not a PG16 rerun"
+  ],
+  "result": "harness_error",
+  "error": {
+    "type": "RuntimeError",
+    "message": "private cluster command failed; see private command-error.txt"
+  },
+  "finished_at": "2026-10-24T06:28:15.157036+00:00"
+}

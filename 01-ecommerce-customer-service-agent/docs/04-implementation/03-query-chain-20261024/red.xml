@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="1" failures="0" skipped="0" tests="1" time="0.597" timestamp="2026-10-24T14:49:11.941127+08:00" hostname="ZZH"><testcase classname="" name="tests.unit.test_sql_call_chain" time="0.000"><error message="collection failure">.venv\Lib\site-packages\_pytest\python.py:508: in importtestmodule
+    mod = import_path(
+.venv\Lib\site-packages\_pytest\pathlib.py:596: in import_path
+    importlib.import_module(module_name)
+C:\Users\27997\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+&lt;frozen importlib._bootstrap&gt;:1387: in _gcd_import
+    ???
+&lt;frozen importlib._bootstrap&gt;:1360: in _find_and_load
+    ???
+&lt;frozen importlib._bootstrap&gt;:1331: in _find_and_load_unlocked
+    ???
+&lt;frozen importlib._bootstrap&gt;:935: in _load_unlocked
+    ???
+.venv\Lib\site-packages\_pytest\assertion\rewrite.py:179: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\_pytest\assertion\rewrite.py:348: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\27997\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "D:\codex_project\项目实战\01-ecommerce-customer-service-agent\backend\tests\unit\test_sql_call_chain.py", line 129
+E       assert "rows" in result(execute(graph,"查sku_a",slots={"sku_id":"sku_a"})))
+E                                                                                ^
+E   SyntaxError: unmatched ')'</error></testcase></testsuite></testsuites>

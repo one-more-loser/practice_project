@@ -1,0 +1,475 @@
+{
+  "profile": "operations_store",
+  "status": "02_review_not_jointly_approved",
+  "business_schema_changed": false,
+  "production_sql_available": false,
+  "current_API": {
+    "status": "implemented; below body verified only through isolated service method, not live HTTP",
+    "request": {
+      "method": "GET",
+      "path": "/api/ops/v1/dashboard",
+      "query": {
+        "snapshot_id": "ops03_review_synthetic",
+        "start_at": "2026-11-01T00:00:00+08:00",
+        "end_at": "2026-12-01T00:00:00+08:00"
+      }
+    },
+    "response": {
+      "data": {
+        "snapshot": {
+          "snapshot_id": "ops03_review_synthetic",
+          "revision": 1,
+          "source_kind": "synthetic",
+          "as_of": "2026-12-10T00:00:00+08:00",
+          "currency": "CNY"
+        },
+        "window": {
+          "start_at": "2026-11-01T00:00:00+08:00",
+          "end_at": "2026-12-01T00:00:00+08:00",
+          "semantics": "[start,end); cash events; cohort separate"
+        },
+        "metrics": {
+          "payment_minor": "60000",
+          "refund_minor": "10000",
+          "net_paid_minor": "50000",
+          "paid_order_count": 3,
+          "paid_units": 6,
+          "average_order_minor": "20000",
+          "cohort_refund_order_rate": "0.666667",
+          "cohort_refund_amount_rate": "0.500000",
+          "channels": [
+            {
+              "channel": "unknown",
+              "payment_minor": "20000",
+              "paid_order_count": 1
+            },
+            {
+              "channel": "web",
+              "payment_minor": "40000",
+              "paid_order_count": 2
+            }
+          ]
+        },
+        "skus": [
+          {
+            "sku_id": "A",
+            "title": "合成商品A",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          },
+          {
+            "sku_id": "B",
+            "title": "合成商品B",
+            "category": "合成分类",
+            "base_price_minor": "10000",
+            "cost_minor": "6000",
+            "variable_fee_minor": "500",
+            "available_qty": 120,
+            "price_version": 1
+          }
+        ],
+        "history": [
+          {
+            "date": "2026-11-01",
+            "payment_minor": "10000",
+            "refund_minor": "0"
+          },
+          {
+            "date": "2026-11-15",
+            "payment_minor": "30000",
+            "refund_minor": "0"
+          },
+          {
+            "date": "2026-11-20",
+            "payment_minor": "0",
+            "refund_minor": "10000"
+          },
+          {
+            "date": "2026-11-25",
+            "payment_minor": "20000",
+            "refund_minor": "0"
+          }
+        ],
+        "filters": {
+          "sku_id": null,
+          "channel": null
+        },
+        "query_ref": "20dcbd0a62d5e49ea8b858078de38c1773c224e77b100a021eda2c906c9c6a88",
+        "order_count_semantics": "筛选内distinct订单数；不同SKU订单数不可相加",
+        "filter_missing": [],
+        "cost_coverage": {
+          "known": 2,
+          "total": 2
+        },
+        "contribution_profit_minor": null,
+        "profit_missing_reason": "实际退货成本冲回、渠道/履约实际费用与活动固定费分摊尚未提供；净支付不是利润"
+      }
+    },
+    "trusted_fixture_clock": "2026-12-10T00:00:00+08:00",
+    "unsupported_current_query_selectors": [
+      "as_of",
+      "revision",
+      "schema_revision",
+      "metric_revision"
+    ]
+  },
+  "transition_intent": {
+    "status": "proposed_unimplemented_SEPARATE_from_SQL_MODEL_training",
+    "response": {
+      "kind": "metric",
+      "metric_ids": [
+        "payment_minor",
+        "refund_minor"
+      ],
+      "parameters": {
+        "start_at": "2026-11-01T00:00:00+08:00",
+        "end_at": "2026-12-01T00:00:00+08:00"
+      },
+      "sql": null
+    }
+  },
+  "SQL_MODEL_proposal": {
+    "status": "proposed_unimplemented_NOT_SQL_validated_or_executed",
+    "direction": "02=>03 request;03=>02 candidate;02 executes and returns business result",
+    "request": {
+      "request_id": "ops03-synthetic-example-1",
+      "profile": "operations_store",
+      "question": "2026年11月支付了多少分？",
+      "locale": "zh-CN",
+      "schema_revision": "OPS-QUERY-v0.2-draft.1",
+      "schema_digest": "ddd291474c26edb7ea74ffcf4e7ae653c34a4550e153bdcaf4df76b405f99fdc",
+      "metric_revision": "OPS-METRIC-v0.1-review.1",
+      "schema": {
+        "revision": "OPS-QUERY-v0.2-draft.1",
+        "dialect": "postgresql",
+        "resources": {
+          "ops_order": {
+            "status": "proposed_unimplemented",
+            "grain": "one normalized order in server-bound snapshot revision",
+            "key": [
+              "order_id"
+            ],
+            "fields": [
+              {
+                "name": "order_id",
+                "type": "TEXT",
+                "nullable": false
+              },
+              {
+                "name": "status",
+                "type": "TEXT",
+                "nullable": false
+              },
+              {
+                "name": "paid_at",
+                "type": "TIMESTAMPTZ",
+                "nullable": true
+              },
+              {
+                "name": "channel",
+                "type": "TEXT",
+                "nullable": false,
+                "normalization": "strip; empty=>unknown"
+              },
+              {
+                "name": "paid_minor",
+                "type": "BIGINT",
+                "nullable": false
+              },
+              {
+                "name": "currency",
+                "type": "TEXT",
+                "nullable": false,
+                "derived": "snapshot.currency"
+              }
+            ]
+          },
+          "ops_order_item": {
+            "status": "proposed_unimplemented",
+            "grain": "one array item in a fixed order snapshot",
+            "key": [
+              "order_id",
+              "line_no"
+            ],
+            "fields": [
+              {
+                "name": "order_id",
+                "type": "TEXT",
+                "nullable": false
+              },
+              {
+                "name": "line_no",
+                "type": "BIGINT",
+                "nullable": false,
+                "derived": "1-based array ordinal; not native order_item_id"
+              },
+              {
+                "name": "sku_id",
+                "type": "TEXT",
+                "nullable": false
+              },
+              {
+                "name": "qty",
+                "type": "BIGINT",
+                "nullable": false
+              },
+              {
+                "name": "paid_minor",
+                "type": "BIGINT",
+                "nullable": false
+              }
+            ]
+          },
+          "ops_refund": {
+            "status": "proposed_unimplemented",
+            "grain": "one normalized refund event",
+            "key": [
+              "refund_id"
+            ],
+            "fields": [
+              {
+                "name": "refund_id",
+                "type": "TEXT",
+                "nullable": false
+              },
+              {
+                "name": "order_id",
+                "type": "TEXT",
+                "nullable": false
+              },
+              {
+                "name": "occurred_at",
+                "type": "TIMESTAMPTZ",
+                "nullable": false
+              },
+              {
+                "name": "status",
+                "type": "TEXT",
+                "nullable": false
+              },
+              {
+                "name": "amount_minor",
+                "type": "BIGINT",
+                "nullable": false
+              }
+            ]
+          },
+          "ops_sku": {
+            "status": "proposed_unimplemented",
+            "grain": "one sku at the fixed snapshot instant",
+            "key": [
+              "sku_id"
+            ],
+            "fields": [
+              {
+                "name": "sku_id",
+                "type": "TEXT",
+                "nullable": false
+              },
+              {
+                "name": "title",
+                "type": "TEXT",
+                "nullable": false
+              },
+              {
+                "name": "category",
+                "type": "TEXT",
+                "nullable": false
+              },
+              {
+                "name": "base_price_minor",
+                "type": "BIGINT",
+                "nullable": false
+              },
+              {
+                "name": "price_version",
+                "type": "BIGINT",
+                "nullable": false
+              },
+              {
+                "name": "available_qty",
+                "type": "BIGINT",
+                "nullable": true
+              },
+              {
+                "name": "as_of",
+                "type": "TIMESTAMPTZ",
+                "nullable": false,
+                "derived": "snapshot.as_of"
+              }
+            ]
+          }
+        },
+        "scope": "store+snapshot_id+revision pinned by02; not user/model WHERE",
+        "status": "proposed_unimplemented_not_training_frozen"
+      },
+      "snapshot": {
+        "snapshot_id": "ops03_review_synthetic",
+        "revision": 1,
+        "source_kind": "synthetic",
+        "as_of": "2026-12-10T00:00:00+08:00",
+        "currency": "CNY",
+        "digest": "6f738c139a4a695162c5169b3bd400d39f3c2fd704fa859b8c55f0a427e3ffef"
+      },
+      "parameters": {
+        "start_at": "2026-11-01T00:00:00+08:00",
+        "end_at": "2026-12-01T00:00:00+08:00",
+        "as_of": "2026-12-10T00:00:00+08:00"
+      },
+      "limits": {
+        "status": "proposed_unimplemented_not_SLA",
+        "sql_utf8_bytes": 8192,
+        "ast_nodes": 512,
+        "joins": 3,
+        "nonrecursive_ctes": 2,
+        "max_detail_rows": 50,
+        "max_response_bytes": 262144,
+        "statement_timeout_ms": 2000,
+        "lock_timeout_ms": 500,
+        "inflight_per_actor": 1,
+        "inflight_per_instance": 2,
+        "max_window_days": 366,
+        "automatic_sql_retries": 0,
+        "transient_model_transport_max_retries": 1,
+        "explain_cost_budget": null,
+        "cost_budget_not_configured": "fail_closed",
+        "model_deadline_and_token_budget": "03 service agreement pending; no inherited01 model limits"
+      }
+    },
+    "responses": {
+      "query": {
+        "request_id": "ops03-synthetic-example-1",
+        "kind": "query",
+        "profile": "operations_store",
+        "schema_revision": "OPS-QUERY-v0.2-draft.1",
+        "schema_digest": "ddd291474c26edb7ea74ffcf4e7ae653c34a4550e153bdcaf4df76b405f99fdc",
+        "metric_revision": "OPS-METRIC-v0.1-review.1",
+        "sql": "SELECT COALESCE(SUM(paid_minor), 0) AS payment_minor FROM ops_order WHERE status = 'paid' AND paid_at >= :start_at AND paid_at < :end_at AND paid_at <= :as_of",
+        "parameter_names": [
+          "start_at",
+          "end_at",
+          "as_of"
+        ],
+        "clarify": null,
+        "unsupported": null,
+        "error": null,
+        "service": {
+          "model_identifier": "Qwen/Qwen3-8B-Base-derived",
+          "revision": "example-placeholder-not-deployed"
+        }
+      },
+      "clarify": {
+        "request_id": "ops03-synthetic-example-1",
+        "kind": "clarify",
+        "profile": "operations_store",
+        "schema_revision": "OPS-QUERY-v0.2-draft.1",
+        "schema_digest": "ddd291474c26edb7ea74ffcf4e7ae653c34a4550e153bdcaf4df76b405f99fdc",
+        "metric_revision": "OPS-METRIC-v0.1-review.1",
+        "parameter_names": [],
+        "clarify": {
+          "slots": [
+            {
+              "name": "refund_rate_basis",
+              "question": "按支付批次的退款订单率，还是退款金额率？",
+              "options": [
+                "cohort_refund_order_rate",
+                "cohort_refund_amount_rate"
+              ]
+            }
+          ]
+        },
+        "unsupported": null,
+        "error": null,
+        "service": {
+          "model_identifier": "Qwen/Qwen3-8B-Base-derived",
+          "revision": "example-placeholder-not-deployed"
+        }
+      },
+      "unsupported": {
+        "request_id": "ops03-synthetic-example-1",
+        "kind": "unsupported",
+        "profile": "operations_store",
+        "schema_revision": "OPS-QUERY-v0.2-draft.1",
+        "schema_digest": "ddd291474c26edb7ea74ffcf4e7ae653c34a4550e153bdcaf4df76b405f99fdc",
+        "metric_revision": "OPS-METRIC-v0.1-review.1",
+        "parameter_names": [],
+        "clarify": null,
+        "unsupported": {
+          "reason_code": "capability_unavailable",
+          "message": "当前查询能力不可用"
+        },
+        "error": null,
+        "service": {
+          "model_identifier": "Qwen/Qwen3-8B-Base-derived",
+          "revision": "example-placeholder-not-deployed"
+        }
+      },
+      "error": {
+        "request_id": "ops03-synthetic-example-1",
+        "kind": "error",
+        "profile": "operations_store",
+        "schema_revision": "OPS-QUERY-v0.2-draft.1",
+        "schema_digest": "ddd291474c26edb7ea74ffcf4e7ae653c34a4550e153bdcaf4df76b405f99fdc",
+        "metric_revision": "OPS-METRIC-v0.1-review.1",
+        "parameter_names": [],
+        "clarify": null,
+        "unsupported": null,
+        "error": {
+          "code": "schema_mismatch",
+          "message": "Schema版本或摘要不匹配"
+        },
+        "service": {
+          "model_identifier": "Qwen/Qwen3-8B-Base-derived",
+          "revision": "example-placeholder-not-deployed"
+        }
+      }
+    },
+    "parameter_binding": "02 resolves/pins snapshot and clamps as_of to visible before SQL binding; generated names only, no model identity/store bind",
+    "forbidden_request_fields": [
+      "DSN",
+      "password",
+      "Cookie",
+      "csrf_token",
+      "subject_id",
+      "store_id",
+      "role",
+      "caller_capabilities"
+    ],
+    "execution_result_proposal": {
+      "query_ref": "generated-by02-not-model",
+      "rows": [
+        {
+          "payment_minor": "60000"
+        }
+      ],
+      "row_count": 1,
+      "snapshot": {
+        "snapshot_id": "ops03_review_synthetic",
+        "revision": 1,
+        "source_kind": "synthetic",
+        "as_of": "2026-12-10T00:00:00+08:00",
+        "currency": "CNY",
+        "digest": "6f738c139a4a695162c5169b3bd400d39f3c2fd704fa859b8c55f0a427e3ffef"
+      },
+      "requested_as_of": "2026-12-10T00:00:00+08:00",
+      "visible_at": "2026-12-10T00:00:00+08:00",
+      "schema_revision": "OPS-QUERY-v0.2-draft.1",
+      "schema_digest": "ddd291474c26edb7ea74ffcf4e7ae653c34a4550e153bdcaf4df76b405f99fdc",
+      "metric_revision": "OPS-METRIC-v0.1-review.1",
+      "truncated": false,
+      "unknown_reasons": []
+    }
+  },
+  "labeling_notes": [
+    "sql string is illustrative only; no02 SQL parser/executor exists; do not use as approved SQL gold",
+    "service metadata and request/Schema identifiers are server-owned, not model-generated truth",
+    "cost columns omitted in public model schema; backend rechecks authorization independently",
+    "as_of in SQL is effective cutoff supplied by02, not a model-owned arbitrary timestamp",
+    "non-query variants omit sql; nullable clarify/unsupported/error branches shown for serializer discussion",
+    "missing start/end=>clarify only missing slots; invalid range=>error invalid_window; empty scalar is normal zero/null row"
+  ]
+}

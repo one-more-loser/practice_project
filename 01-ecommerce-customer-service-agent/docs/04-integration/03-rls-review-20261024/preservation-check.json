@@ -1,0 +1,58 @@
+{
+  "source": {
+    "count": 288,
+    "digest": "c92f1f554ae2d3e7a2ee8fe9636e6745d9eb391a809c944af6c52054f19e829a",
+    "unchanged": true
+  },
+  "03_inputs": {
+    "checked": 3,
+    "changed_or_missing": [
+      "D:\\codex_project\\项目实战\\03-ecommerce-text2sql-finetuning\\sandbox\\results\\miniloop-summary.md"
+    ],
+    "unchanged": false
+  },
+  "existing_acceptance_files": {
+    "checked": 186,
+    "changed_or_missing": [],
+    "unchanged": true
+  },
+  "historical_migrations": {
+    "checked": 23,
+    "changed_or_missing": [],
+    "unchanged": true
+  },
+  "runtime": {
+    "probe_result": "passed",
+    "scenario_assertions": 25,
+    "historical_defect_controls": 1,
+    "current_regression_scenarios": 24,
+    "all_assertions_passed": true,
+    "cleanup": {
+      "owned_cluster_stopped": true,
+      "port_closed": true
+    },
+    "unit_tests": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "28",
+      "time": "0.353",
+      "timestamp": "2026-10-24T14:31:47.578771+08:00",
+      "hostname": "ZZH"
+    }
+  },
+  "html": {
+    "source_sha256": "bbc656a550f35370782f9b9a8a81daabc05385dccfc32ebc72d4dd041e761a30",
+    "h1": 1,
+    "tables": 4,
+    "h2": 9,
+    "script_tags": 0,
+    "bytes": 36370
+  },
+  "captured_at": "2026-10-24T06:40:13.464554+00:00",
+  "03_reviewed_inputs_stable": true,
+  "03_drift_acknowledged": [
+    "D:\\codex_project\\项目实战\\03-ecommerce-text2sql-finetuning\\sandbox\\results\\miniloop-summary.md"
+  ]
+}
